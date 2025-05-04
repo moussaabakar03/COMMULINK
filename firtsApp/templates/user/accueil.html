@@ -1,0 +1,607 @@
+{% extends "user/base.html" %}
+{% load static %}
+
+{% block body %}
+
+    
+    <!-- Carousel Start -->
+    <div class="container-fluid p-0 mb-5">
+        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img class="w-100" src="{% static 'user/img/sinekey1.jpg' %}" alt="Image">
+                    <div class="carousel-caption">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-7 pt-5">
+                                    <h1 class="display-4 text-white mb-3 animated slideInDown">Connecter. Organiser. Valoriser.</h1>
+                                    <p class="fs-5 text-white-50 mb-5 animated slideInDown">Une communauté unie et connectée, c’est maintenant possible avec CommuLink.</p>
+                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
+                                        S'inscrire
+                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                            <i class="fa fa-arrow-right"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img class="w-100" src="{% static 'user/img/reussite.jpg'%}" alt="Image">
+                    <div class="carousel-caption">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-7 pt-5">
+                                    <h1 class="display-4 text-white mb-3 animated slideInDown">Solidarité. Fraternité. Reussite.</h1>
+                                    <p class="fs-5 text-white-50 mb-5 animated slideInDown">Apprentissage, reussite sont nos prioritaires.</p>
+                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
+                                        S'inscrire
+                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                            <i class="fa fa-arrow-right"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img class="w-100" src="{% static 'user/img/mariage1.jpg'%}" alt="Image">
+                    <div class="carousel-caption">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-7 pt-5">
+                                    <h1 class="display-4 text-white mb-3 animated slideInDown">Connecter. Organiser. Valoriser.</h1>
+                                    <p class="fs-5 text-white-50 mb-5 animated slideInDown">Une communauté unie et connectée, c’est maintenant possible avec CommuLink.</p>
+                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="">
+                                        S'inscrire
+                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                            <i class="fa fa-arrow-right"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#header-carousel"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#header-carousel"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+    <!-- Carousel End -->
+
+
+    <!-- About Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="position-relative overflow-hidden h-100" style="min-height: 400px;">
+                        <img class="position-absolute w-100 h-100 pt-5 pe-5" src="{% static 'user/img/about.jpg'%}" alt="" style="object-fit: cover;">
+                        <img class="position-absolute top-0 end-0 bg-white ps-2 pb-2" src="{% static 'user/img/mariage1.jpg'%}" alt="" style="width: 200px; height: 200px; object-fit: cover">
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="h-100">
+                        <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">A propos de Nous</div>
+                        <h1 class="display-6 mb-5">Qu’est-ce que CommuLink ? </h1>
+                        <div class="bg-light border-bottom border-5 border-primary rounded p-4 mb-4">
+                            <p class="text-dark mb-2">CommuLink est une application web conçue pour moderniser la gestion de la communauté tchadienne (<span style = "font-weight: bold;">Beribour</span>) vivant au Togo.
+                                Elle centralise les informations importantes, facilite l'enregistrement des membres, simplifie la coordination des événements, et permet une communication rapide et efficace entre tous les membres.
+                                C’est un espace numérique sécurisé qui renforce les liens sociaux, valorise notre culture et conserve notre mémoire collective.</p>
+                            {% comment %} <span class="text-primary">Jhon Doe, Founder</span> {% endcomment %}
+                        </div>
+                        {% comment %} <p class="mb-5">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet</p> {% endcomment %}
+                        <a class="btn btn-primary py-2 px-3 me-3" href="">
+                            Savoir plus
+                            <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </div>
+                        </a>
+                        <a class="btn btn-outline-primary py-2 px-3" href="{% url 'contact' %}">
+                            Contactez Nous
+                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- About End -->
+
+
+    <!-- Causes Start -->
+    <div class="container-xxl bg-light my-5 py-5" id = "evenements">
+        <div class="container py-5">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <h1 class="display-6 mb-5">Nos événements</h1>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
+                        <div class="text-center p-4 pt-0">
+                            <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
+                                <small>Soirée culturelle</small>
+                            </div>
+                            <p style = "text-align: center;">Plongez au cœur de la richesse culturelle tchadienne à travers nos soirées animées de danses, musiques traditionnelles et partages culinaires.</p>
+                            {% comment %} <div class="causes-progress bg-light p-3 pt-2">
+                                <div class="d-flex justify-content-between">
+                                    <p class="text-dark">4 <small class="text-body">Goal</small></p>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                                        <span>90%</span>
+                                    </div>
+                                </div>
+                            </div> {% endcomment %}
+                        </div>
+                        <div class="position-relative mt-auto">
+                            <img class="img-fluid" src="{% static 'user/img/soirée.jpg'%}" style="height:510px; width:100%; object-fit: cover;" alt="">
+                            <div class="causes-overlay">
+                                <a class="btn btn-outline-primary" href="{% url 'soireeCulturelle' %}">
+                                    Lire plus
+                                    <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                        <i class="fa fa-arrow-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
+                        <div class="text-center p-4 pt-0">
+                            <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
+                                <small>Journée integration</small>
+                            </div>
+                            <p style = "text-align: center;">Une journée dédiée à l'accueil des nouveaux membres avec des activités interactives, des présentations et un esprit fraternel.</p>
+                            <div class="causes-progress bg-light p-3 pt-2">
+                                <div class="d-flex justify-content-between">
+                                    <p class="text-dark">$10,000 <small class="text-body">Goal</small></p>
+                                    <p class="text-dark">$9,542 <small class="text-body">Raised</small></p>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                                        <span>90%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="position-relative mt-auto">
+                            <img class="" style="height:510px; width:100%; object-fit: cover;" src="{% static 'user/img/integration.png'%}" alt="">
+                            <div class="causes-overlay">
+                                <a class="btn btn-outline-primary" href="{% url 'journeeIntegration' %}">
+                                    Lire plus
+                                    <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                        <i class="fa fa-arrow-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
+                        <div class="text-center p-4 pt-0">
+                            <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
+                                <small>Fêtes</small>
+                            </div>
+                            <p style = "text-align: center;">CommuLink célèbre les grandes fêtes religieuses dans un cadre de respect et de partage, en rassemblant la communauté autour des valeurs spirituelles.</p>
+                            {% comment %} <div class="causes-progress bg-light p-3 pt-2">
+                                <div class="d-flex justify-content-between">
+                                    <p class="text-dark">$10,000 <small class="text-body">Goal</small></p>
+                                    <p class="text-dark">$9,542 <small class="text-body">Raised</small></p>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
+                                        <span>90%</span>
+                                    </div>
+                                </div>
+                            </div> {% endcomment %}
+                        </div>
+                        <div class="position-relative mt-auto">
+                            <img class="" style="height:510px; width:100%; object-fit: cover;" src="{% static 'user/img/fete.jpg'%}" alt="">
+                            <div class="causes-overlay">
+                                <a class="btn btn-outline-primary" href="{% url 'feteIs' %}">
+                                    Lire plus
+                                    <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                        <i class="fa fa-arrow-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Causes End -->
+
+
+    <!-- Service Start -->
+    {% comment %} <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">What We Do</div>
+                <h1 class="display-6 mb-5">Learn More What We Do And Get Involved</h1>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="service-item bg-white text-center h-100 p-4 p-xl-5">
+                        <img class="img-fluid mb-4" src="{% static 'user/img/icon-1.png'%}" alt="">
+                        <h4 class="mb-3">Child Education</h4>
+                        <p class="mb-4">Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed vero dolor duo.</p>
+                        <a class="btn btn-outline-primary px-3" href="">
+                            Learn More
+                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="service-item bg-white text-center h-100 p-4 p-xl-5">
+                        <img class="img-fluid mb-4" src="{% static 'user/img/icon-2.png'%}" alt="">
+                        <h4 class="mb-3">Medical Treatment</h4>
+                        <p class="mb-4">Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed vero dolor duo.</p>
+                        <a class="btn btn-outline-primary px-3" href="">
+                            Learn More
+                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                    <div class="service-item bg-white text-center h-100 p-4 p-xl-5">
+                        <img class="img-fluid mb-4" src="{% static 'user/img/icon-3.png'%}" alt="">
+                        <h4 class="mb-3">Pure Drinking Water</h4>
+                        <p class="mb-4">Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed vero dolor duo.</p>
+                        <a class="btn btn-outline-primary px-3" href="">
+                            Learn More
+                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+    <!-- Service End -->
+
+
+    <!-- Team Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">Membres Equipes dirigeante</div>
+                <h1 class="display-6 mb-5">Rencontrez notre équipe dynamique.</h1>
+            </div>
+           
+            <div class="swiper myTeamSwiper">
+                <div class="swiper-wrapper">
+                  <!-- Team Member Slide Start -->
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/presi.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>Mahamat Ibrahim</h5>
+                                <p class="text-primary">President</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                  <!-- Team Member Slide End -->
+                    <!-- Slide 2 -->
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/porteParole.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>Ahmat</h5>
+                                <p class="text-primary">Porte parole</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 3 -->
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/tresorier.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>Mahamat MOUSSA</h5>
+                                <p class="text-primary">Trésorier</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4 -->
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>Adam Yaya</h5>
+                                <p class="text-primary">conseiller</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 5 -->
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/acadmique.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>ALI MOUSSA</h5>
+                                <p class="text-primary">Chargé affaire academique et sociale</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 6 -->
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil2.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>Mahamat</h5>
+                                <p class="text-primary">conseiller2</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil3.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>MOUSSA</h5>
+                                <p class="text-primary">conseil3</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil4.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>ISSA</h5>
+                                <p class="text-primary">conseil4</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="team-item position-relative rounded overflow-hidden">
+                            <div class="overflow-hidden">
+                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil5.png'%}" alt="">
+                            </div>
+                            <div class="team-text bg-light text-center p-4">
+                                <h5>ISSA</h5>
+                                <p class="text-primary">conseil5</p>
+                                <div class="team-social text-center">
+                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
+                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+              
+                <!-- Navigation buttons -->
+                <div class="swiper-button-next" style="color: rgba(234, 95, 9, 0.8); font-weight: bold;"></div>
+                <div class="swiper-button-prev"  style="color: rgba(234, 95, 9, 0.8); font-weight: bold;"></div>
+            </div>
+              
+        </div>
+    </div>
+    <!-- Team End -->
+
+
+    <!-- Testimonial Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">Témoingnages</div>
+                <h5 class="display-6 mb-2" style = "font-size: 20px;">Découvrez les témoingnages des présidents de différentes communauté résidants au Togo. Sur notre attachement.</h5>
+            </div>
+            <div class="owl-carousel testimonial-carousel wow fadeInUp" data-wow-delay="0.1s">
+                <div class="testimonial-item text-center">
+                    <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{% static 'user/img/Conseil5.png'%}" style="width: 100px; height: 100px;">
+                    <div class="testimonial-text rounded text-center p-4">
+                        <p>
+                            « La soirée culturelle organisée par BeriBour228 a été une magnifique célébration de 
+                            nos racines communes. J’ai été particulièrement touché par la façon dont les danses 
+                            traditionnelles ont été présentées avec respect et authenticité. Ces initiatives sont 
+                            essentielles pour maintenir vivantes nos traditions et les transmettre à la jeune génération. »
+                        </p>
+                        <h5 class="mb-1">Saleh</h5>
+                        <span class="fst-italic">Président de la communauté Dagaza</span>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{% static 'user/img/Conseil8.png'%}" style="width: 100px; height: 100px;">
+                    <div class="testimonial-text rounded text-center p-4">
+                        <p>
+                            « BeriBour228 a réussi l’exploit de créer un espace où notre héritage culturel Billala
+                            a pu briller de tous ses feux. Les chants ancestraux et les récits de nos aînés ont 
+                            trouvé un écho particulier lors de cette soirée mémorable. Je tiens à saluer l’organisation 
+                            impeccable et l’attention portée aux détails qui font honneur à nos traditions. »
+                        </p>
+                        <h5 class="mb-1">Hassan</h5>
+                        <span class="fst-italic">Président de la communauté Billala</span>
+                    </div>
+                </div>
+                <div class="testimonial-item text-center">
+                    <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{% static 'user/img/Conseil7.png'%}" style="width: 100px; height: 100px;">
+                    <div class="testimonial-text rounded text-center p-4">
+                        <p>
+                            « Cette soirée culturelle a été un véritable pont entre passé et présent, permettant 
+                            à notre communauté Kanembou de partager ses trésors culturels dans un cadre respectueux 
+                            et valorisant. J’ai été impressionné par la qualité des échanges et la curiosité sincère 
+                            des participants. BeriBour228 démontre qu’il est possible de célébrer nos différences tout 
+                            en renforçant ce qui nous unit.
+                        </p>
+                        <h5 class="mb-1"> Bokhit </h5>
+                        <span class="fst-italic">Président de la communauté Kanembou</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Testimonial End -->
+
+
+
+
+     <!-- Donate Start -->
+     <div class="container-fluid donate my-5 py-5" style="object-fit: cover; " data-parallax="scroll" data-image-src="{% static 'user/img/reussite.jpg'%}">
+        <div class="container py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">Faites un Don</div>
+                    <h1 class="display-6 text-white mb-5" style = "font-size: 15px;">💝 Soutenez la Communauté – Faites un Don</h1>
+                    <p class="text-white-50 mb-0">
+                        Votre contribution aide à organiser des événements culturels, soutenir les membres en difficulté, et préserver le patrimoine de la communauté tchadienne au Togo.
+                        Chaque don, petit ou grand, renforce nos actions solidaires. Merci pour votre générosité.</p>
+                </div>
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+                    <div class="h-100 bg-white p-5">
+                        <form>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control bg-light border-0" id="name" placeholder="Your Name">
+                                        <label for="name"> Votre nom</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control bg-light border-0" id="email" placeholder="Your Email">
+                                        <label for="email"> Votre Email</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="btn-group d-flex justify-content-around">
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" checked>
+                                        <label class="btn btn-light py-3" for="btnradio1">10.000</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+                                        <label class="btn btn-light py-3" for="btnradio2">20.000</label>
+
+                                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3">
+                                        <label class="btn btn-light py-3" for="btnradio3">100.000</label>
+                                        
+                                        {% comment %} <input type="number" class="btn-check" name="prix" id="prix"> {% endcomment %}
+                                        <label class="btn btn-light" for="prix">Votre prix</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary px-5" style="height: 60px;">
+                                        Faites un don maintenant
+                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                            <i class="fa fa-arrow-right"></i>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Donate End -->
+
+
+
+    # scrole.
+    <script>
+        var swiper = new Swiper(".myTeamSwiper", {
+          slidesPerView: 4,
+          spaceBetween: 40,
+          navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          },
+          loop: false,
+          breakpoints: {
+            1024: {
+              slidesPerView: 4,
+            },
+            768: {
+              slidesPerView: 2,
+            },
+            576: {
+              slidesPerView: 1,
+            }
+          }
+        });
+    </script>
+      
+{% endblock %}

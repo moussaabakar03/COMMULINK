@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire COMMULINK</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #FF6F0F;
+            --primary-dark: #ffffff;
+            --secondary-color: #073841;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border-radius: 8px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background-color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .header p {
+            color: var(--dark-gray);
+            font-size: 16px;
+            font-weight: 300;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .header p::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 3px;
+        }
+        
+        .form-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--dark-gray);
+            transition: var(--transition);
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--danger);
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+        }
+        
+        input::placeholder {
+            color: #adb5bd;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 5px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .custom-radio {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--medium-gray);
+            transition: var(--transition);
+        }
+        
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .radio-option input:checked + .custom-radio {
+            border-color: var(--primary-color);
+        }
+        
+        .radio-option input:checked + .custom-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+        }
+        
+        .radio-option label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .type-selector {
+            margin-bottom: 10px;
+        }
+        
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        
+        .form-section {
+            padding: 20px;
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .type-form {
+            background-color: #e8f4fd;
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+        
+        .type-form .section-title {
+            color: var(--primary-color);
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            box-shadow: 0 8px 25px rgba(58, 123, 213, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(58, 123, 213, 0.3);
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.6s, opacity 0.6s;
+        }
+        
+        button:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            top: 14px;
+            left: 15px;
+            color: var(--dark-gray);
+        }
+        
+        .icon-input {
+            padding-left: 45px;
+        }
+        
+        .tooltip {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            font-size: 12px;
+            color: var(--info);
+            cursor: help;
+        }
+        
+        .tooltip:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            width: 200px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.4;
+            z-index: 10;
+        }
+        
+        .error-message {
+            display: none;
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        input.error, select.error {
+            border-color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>COMMULINK</h1>
+            <p>Formulaire d'inscription</p>
+        </div>
+        
+        <form id="commulink-form">
+            <div class="form-content">
+                <!-- Type Section - Now with independent fields -->
+                <div class="type-form">
+                    <h3 class="section-title">Votre Type</h3>
+                    <div class="form-group">
+                        <label class="required">Veuillez remplir les champs de type</label>
+                        <div class="two-columns">
+                            <div class="form-group">
+                                <label for="type_ner">Ner</label>
+                                <input type="text" id="type_ner" name="type_ner" placeholder="Valeur pour Ner">
+                            </div>
+                            <div class="form-group">
+                                <label for="type_keri">Keri</label>
+                                <input type="text" id="type_keri" name="type_keri" placeholder="Valeur pour Keri">
+                            </div>
+                        </div>
+                        <div class="two-columns">
+                            <div class="form-group">
+                                <label for="type_keribour">Keribour</label>
+                                <input type="text" id="type_keribour" name="type_keribour" placeholder="Valeur pour Keribour">
+                            </div>
+                            <div class="form-group">
+                                <label for="type_keri_ba">Keri Bâ</label>
+                                <input type="text" id="type_keri_ba" name="type_keri_ba" placeholder="Valeur pour Keri Bâ">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="type_keribour_ba">Keribour Bâ</label>
+                            <input type="text" id="type_keribour_ba" name="type_keribour_ba" placeholder="Valeur pour Keribour Bâ">
+                        </div>
+                        <div class="error-message" id="type-error">Veuillez remplir au moins un des champs de type</div>
+                    </div>
+                </div>
+                
+                <!-- Informations personnelles -->
+                <div class="form-section">
+                    <h3 class="section-title">Informations Personnelles</h3>
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="nom" class="required">Nom</label>
+                            <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
+                            <div class="error-message" id="nom-error">Veuillez entrer votre nom</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prenom" class="required">Prénom</label>
+                            <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required>
+                            <div class="error-message" id="prenom-error">Veuillez entrer votre prénom</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sexe -->
+                    <div class="form-group">
+                        <label class="required">Sexe</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="homme" name="sexe" value="homme" required>
+                                <span class="custom-radio"></span>
+                                <label for="homme">Homme</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="femme" name="sexe" value="femme">
+                                <span class="custom-radio"></span>
+                                <label for="femme">Femme</label>
+                            </div>
+                        </div>
+                        <div class="error-message" id="sexe-error">Veuillez sélectionner votre sexe</div>
+                    </div>
+                </div>
+                
+                <!-- Coordonnées -->
+                <div class="form-section">
+                    <h3 class="section-title">Coordonnées</h3>
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="quartier" class="required">Quartier</label>
+                            <input type="text" id="quartier" name="quartier" placeholder="Votre quartier" required>
+                            <div class="error-message" id="quartier-error">Veuillez entrer votre quartier</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact" class="required">Contact téléphonique</label>
+                            <input type="tel" id="contact" name="contact" placeholder="Votre numéro de téléphone" required>
+                            <div class="error-message" id="contact-error">Veuillez entrer un numéro de téléphone valide</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="required">Adresse email</label>
+                        <input type="email" id="email" name="email" placeholder="votre.email@exemple.com" required>
+                        <div class="error-message" id="email-error">Veuillez entrer une adresse email valide</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="urgence" class="required">Numéro en cas d'urgence</label>
+                        <input type="tel" id="urgence" name="urgence" placeholder="Numéro d'une personne à contacter" required>
+                        <div class="error-message" id="urgence-error">Veuillez entrer un numéro en cas d'urgence</div>
+                    </div>
+                </div>
+                
+                <!-- Études et profession -->
+                <div class="form-section">
+                    <h3 class="section-title">Formation & Profession</h3>
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="niveau_etude" class="required">Niveau d'étude</label>
+                            <select id="niveau_etude" name="niveau_etude" required>
+                                <option value="" disabled selected>Sélectionnez votre niveau...</option>
+                                <option value="Primaire">Primaire</option>
+                                <option value="Collège">Collège</option>
+                                <option value="Lycée">Lycée</option>
+                                <option value="Bac">Bac</option>
+                                <option value="Bac+1">Bac+1</option>
+                                <option value="Bac+2">Bac+2</option>
+                                <option value="Bac+3">Bac+3</option>
+                                <option value="Bac+4">Bac+4</option>
+                                <option value="Bac+5">Bac+5</option>
+                                <option value="Doctorat">Doctorat</option>
+                            </select>
+                            <div class="error-message" id="niveau-error">Veuillez sélectionner votre niveau d'étude</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="universite">Université/École</label>
+                            <input type="text" id="universite" name="universite" placeholder="Nom de votre établissement">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="profession" class="required">Profession</label>
+                        <input type="text" id="profession" name="profession" placeholder="Votre profession actuelle" required>
+                        <div class="error-message" id="profession-error">Veuillez entrer votre profession</div>
+                    </div>
+                </div>
+                
+                <!-- Autres renseignements -->
+                <div class="form-section">
+                    <h3 class="section-title">Informations Complémentaires</h3>
+                    <div class="form-group">
+                        <label for="autres_renseignements">Autres renseignements</label>
+                        <textarea id="autres_renseignements" name="autres_renseignements" rows="5" placeholder="Ajoutez ici toute information complémentaire que vous souhaitez partager..." style="width: 100%; padding: 12px 15px; border: 2px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 16px; transition: var(--transition); font-family: 'Poppins', sans-serif; resize: vertical;"></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit">Soumettre le formulaire</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('commulink-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Reset previous errors
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(msg => {
+                msg.style.display = 'none';
+            });
+            
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.classList.remove('error');
+            });
+            
+            // Validation
+            let isValid = true;
+            
+            // Check required fields
+            const requiredFields = document.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    isValid = false;
+                    field.classList.add('error');
+                    
+                    // Show error message for the field
+                    const fieldName = field.name;
+                    const errorElement = document.getElementById(`${fieldName}-error`) || 
+                                        document.getElementById(`${field.id}-error`);
+                    
+                    if (errorElement) {
+                        errorElement.style.display = 'block';
+                    }
+                }
+            });
+            
+            // Check radio buttons (sexe)
+            const sexeSelected = document.querySelector('input[name="sexe"]:checked');
+            if (!sexeSelected) {
+                isValid = false;
+                document.getElementById('sexe-error').style.display = 'block';
+            }
+            
+            // Special validation for email
+            const email = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email.value && !emailRegex.test(email.value)) {
+                isValid = false;
+                email.classList.add('error');
+                document.getElementById('email-error').style.display = 'block';
+                document.getElementById('email-error').textContent = 'Format d\'email invalide';
+            }
+            
+            // Special validation for phone numbers
+            const phoneFields = ['contact', 'urgence'];
+            phoneFields.forEach(field => {
+                const phoneInput = document.getElementById(field);
+                if (phoneInput.value && !/^\d{8,}$/.test(phoneInput.value.replace(/\s/g, ''))) {
+                    isValid = false;
+                    phoneInput.classList.add('error');
+                    document.getElementById(`${field}-error`).style.display = 'block';
+                    document.getElementById(`${field}-error`).textContent = 'Format de numéro invalide';
+                }
+            });
+            
+            // Special validation for Type fields (ensure at least one is filled)
+            const typeFields = ['type_ner', 'type_keri', 'type_keribour', 'type_keri_ba', 'type_keribour_ba'];
+            let atLeastOneTypeFilled = false;
+            
+            typeFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && field.value.trim() !== '') {
+                    atLeastOneTypeFilled = true;
+                }
+            });
+            
+            if (!atLeastOneTypeFilled) {
+                isValid = false;
+                typeFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.classList.add('error');
+                });
+                document.getElementById('type-error').style.display = 'block';
+            }
+            
+            if (isValid) {
+                // Add animation to button
+                const btn = document.querySelector('button');
+                btn.innerHTML = 'Envoi en cours...';
+                btn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+                
+                // Simulate submission (would be an API call in real app)
+                setTimeout(() => {
+                    alert('Formulaire soumis avec succès !');
+                    this.reset();
+                    btn.innerHTML = 'Soumettre le formulaire';
+                    btn.style.background = 'linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%)';
+                }, 1500);
+            } else {
+                // Scroll to first error
+                const firstError = document.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+        
+        // Real-time validation
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.hasAttribute('required') && this.value) {
+                    this.classList.remove('error');
+                    const fieldName = this.name;
+                    const errorElement = document.getElementById(`${fieldName}-error`) || 
+                                      document.getElementById(`${this.id}-error`);
+                    if (errorElement) {
+                        errorElement.style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        // Animation for radio buttons
+        const radioButtons = document.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const name = this.getAttribute('name');
+                document.getElementById(`${name}-error`).style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
