@@ -176,7 +176,7 @@
             background-color: var(--success);
         }
         
-        .btn {
+        .btn, .inscrit{
             {% comment %} background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%); {% endcomment %}
             color: black;
             border: none;
@@ -405,7 +405,7 @@
                     <div class="error-message" id="confirm-password-error"></div>
                 </div>
                 
-                <button type="submit" class="btn" id="signup-btn">S'inscrire</button>
+                <a  href = "{% url 'formulaireInformation' %}" type="submit button" class="btn inscrit" id="signup-btn">S'inscrire</a>
                 
                 <div class="switch-form">
                     Déjà inscrit ? <a href="{% url 'connexion' %}" id="switch-to-login" style="color: red;" >Se connecter</a>

@@ -265,7 +265,7 @@
             margin-bottom: 15px;
         }
         
-        button {
+        button, a {
             background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
             border: none;
@@ -283,6 +283,7 @@
             overflow: hidden;
             text-transform: uppercase;
             letter-spacing: 1px;
+            
         }
         
         button:hover {
@@ -534,141 +535,10 @@
                 </div>
                 
                 <button type="submit">Soumettre le formulaire</button>
+                <a href="{% url 'index' %}" type="button" style = "text-decoration: none ; text-align: center;">Annuler/Ignorer</a>
             </div>
         </form>
     </div>
-
-    <script>
-        document.getElementById('commulink-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Reset previous errors
-            const errorMessages = document.querySelectorAll('.error-message');
-            errorMessages.forEach(msg => {
-                msg.style.display = 'none';
-            });
-            
-            const inputs = document.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.classList.remove('error');
-            });
-            
-            // Validation
-            let isValid = true;
-            
-            // Check required fields
-            const requiredFields = document.querySelectorAll('[required]');
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    isValid = false;
-                    field.classList.add('error');
-                    
-                    // Show error message for the field
-                    const fieldName = field.name;
-                    const errorElement = document.getElementById(`${fieldName}-error`) || 
-                                        document.getElementById(`${field.id}-error`);
-                    
-                    if (errorElement) {
-                        errorElement.style.display = 'block';
-                    }
-                }
-            });
-            
-            // Check radio buttons (sexe)
-            const sexeSelected = document.querySelector('input[name="sexe"]:checked');
-            if (!sexeSelected) {
-                isValid = false;
-                document.getElementById('sexe-error').style.display = 'block';
-            }
-            
-            // Special validation for email
-            const email = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.value && !emailRegex.test(email.value)) {
-                isValid = false;
-                email.classList.add('error');
-                document.getElementById('email-error').style.display = 'block';
-                document.getElementById('email-error').textContent = 'Format d\'email invalide';
-            }
-            
-            // Special validation for phone numbers
-            const phoneFields = ['contact', 'urgence'];
-            phoneFields.forEach(field => {
-                const phoneInput = document.getElementById(field);
-                if (phoneInput.value && !/^\d{8,}$/.test(phoneInput.value.replace(/\s/g, ''))) {
-                    isValid = false;
-                    phoneInput.classList.add('error');
-                    document.getElementById(`${field}-error`).style.display = 'block';
-                    document.getElementById(`${field}-error`).textContent = 'Format de numéro invalide';
-                }
-            });
-            
-            // Special validation for Type fields (ensure at least one is filled)
-            const typeFields = ['type_ner', 'type_keri', 'type_keribour', 'type_keri_ba', 'type_keribour_ba'];
-            let atLeastOneTypeFilled = false;
-            
-            typeFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field && field.value.trim() !== '') {
-                    atLeastOneTypeFilled = true;
-                }
-            });
-            
-            if (!atLeastOneTypeFilled) {
-                isValid = false;
-                typeFields.forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) field.classList.add('error');
-                });
-                document.getElementById('type-error').style.display = 'block';
-            }
-            
-            if (isValid) {
-                // Add animation to button
-                const btn = document.querySelector('button');
-                btn.innerHTML = 'Envoi en cours...';
-                btn.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
-                
-                // Simulate submission (would be an API call in real app)
-                setTimeout(() => {
-                    alert('Formulaire soumis avec succès !');
-                    this.reset();
-                    btn.innerHTML = 'Soumettre le formulaire';
-                    btn.style.background = 'linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%)';
-                }, 1500);
-            } else {
-                // Scroll to first error
-                const firstError = document.querySelector('.error');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-        });
-        
-        // Real-time validation
-        const inputs = document.querySelectorAll('input, select');
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                if (this.hasAttribute('required') && this.value) {
-                    this.classList.remove('error');
-                    const fieldName = this.name;
-                    const errorElement = document.getElementById(`${fieldName}-error`) || 
-                                      document.getElementById(`${this.id}-error`);
-                    if (errorElement) {
-                        errorElement.style.display = 'none';
-                    }
-                }
-            });
-        });
-        
-        // Animation for radio buttons
-        const radioButtons = document.querySelectorAll('input[type="radio"]');
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const name = this.getAttribute('name');
-                document.getElementById(`${name}-error`).style.display = 'none';
-            });
-        });
-    </script>
+   
 </body>
 </html>
