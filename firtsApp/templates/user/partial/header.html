@@ -1,11 +1,26 @@
- <!-- Navbar Start -->
- <div class="container-fluid fixed-top px-0 wow fadeIn headerNav" data-wow-delay="0.1s">
+<style>
+    .sociaux a i:hover
+    {
+        color: #FF6F0F;
+    }
+    ..dropdown-item{
+        transition: all 1.5s ease-in-out;
+        font-weight: bold;
+    }
+    .dropdown-item:hover
+    {
+        color: #FF6F0F;
+    }
+</style>
+
+<!-- Navbar Start -->
+<div class="container-fluid fixed-top px-0 wow fadeIn headerNav" data-wow-delay="0.1s">
     <div class="top-bar text-white-50 row gx-0 align-items-center d-none d-lg-flex">
         <div class="col-lg-6 px-5 text-start">
             {% comment %} <small><i class="fa fa-map-marker-alt me-2"></i>123 Street, New York, USA</small> {% endcomment %}
             <small class="ms-4"><i class="fa fa-envelope me-2"></i>commulink@gmail.com</small>
         </div>
-        <div class="col-lg-6 px-5 text-end">
+        <div class="col-lg-6 px-5 text-end sociaux">
             <small>Follow us:</small>
             <a class="text-white-50 ms-3" href=""><i class="fab fa-facebook-f"></i></a>
             <a class="text-white-50 ms-3" href=""><i class="fab fa-twitter"></i></a>
@@ -25,17 +40,20 @@
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="{% url 'index' %}" class="nav-item nav-link active">Accueil</a>
                 <a href="" class="nav-item nav-link">A propos</a>
-                {% comment %} <a href="causes.html" class="nav-item nav-link">Causes</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                    <div class="dropdown-menu m-0">
-                        <a href="service.html" class="dropdown-item">Service</a>
-                        <a href="donate.html" class="dropdown-item">Donate</a>
-                        <a href="team.html" class="dropdown-item">Our Team</a>
-                        <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                        <a href="404.html" class="dropdown-item">404 Page</a>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto p-4 p-lg-0">
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Explorer</a>
+                            <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
+                                <a href="{% url 'index' %}#evenements" class="dropdown-item">Nos évenements</a>
+                                <a href="{% url 'index' %}#dernierEvenement" class="dropdown-item">Nos Evenements recent</a>
+                                <a href="{% url 'index' %}#equipeDirigeante" class="dropdown-item">Notre Equipe</a>
+                                <a href="{% url 'index' %}#temoingnage" class="dropdown-item">Nos Temoingnages</a>
+                                <a href="{% url 'index' %}#faireDon" class="dropdown-item">Faire un don</a>
+                            </div>
+                        </div>
                     </div>
-                </div> {% endcomment %}
+                </div>
                 <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
             </div>
             <div class="d-none d-lg-flex ms-2">

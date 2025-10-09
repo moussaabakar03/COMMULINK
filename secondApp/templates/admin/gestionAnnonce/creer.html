@@ -1,0 +1,697 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.id %}Modifier Annonce{% else %}Créer Annonce{% endif %}{% endblock %}
+
+{% block style %}
+<style>
+    :root {
+        --primary-color: #FF6F0F;
+        --secondary-color: #1a2035;
+        --bg-light: #f8f9fa;
+        --text-dark: #212529;
+        --text-light: #ffffff;
+        --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        --radius: 15px;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+    }
+    
+    .page-header {
+        background-color: var(--secondary-color);
+        color: var(--text-light);
+        padding: 2.5rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(135deg, transparent 33.33%, #f9f7f5 33.33%, #f9f7f5 66.66%, transparent 66.66%);
+        background-size: 20px 20px;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Saira', sans-serif;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .container-custom {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .form-card {
+        background-color: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, #2d3748 100%);
+        color: var(--text-light);
+        padding: 1.5rem 2rem;
+        position: relative;
+    }
+    
+    .card-header-custom::before {
+        content: "\f0a1";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 2.5rem;
+        opacity: 0.2;
+    }
+    
+    .card-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        font-family: 'Saira', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .card-body-custom {
+        padding: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        font-family: 'Saira', sans-serif;
+        position: relative;
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .form-control-custom,
+    .form-textarea-custom {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        width: 100%;
+        font-family: inherit;
+    }
+    
+    .form-control-custom:focus,
+    .form-textarea-custom:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.2);
+    }
+    
+    .form-control-custom.is-invalid,
+    .form-textarea-custom.is-invalid {
+        border-color: var(--danger-color);
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+    }
+    
+    .form-textarea-custom {
+        min-height: 200px;
+        resize: vertical;
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .invalid-feedback {
+        display: none;
+        width: 100%;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--danger-color);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .was-validated .form-control-custom:invalid ~ .invalid-feedback,
+    .was-validated .form-textarea-custom:invalid ~ .invalid-feedback,
+    .form-control-custom.is-invalid ~ .invalid-feedback,
+    .form-textarea-custom.is-invalid ~ .invalid-feedback {
+        display: flex;
+    }
+    
+    .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .file-input-wrapper input[type=file] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    
+    .file-input-custom {
+        border: 2px dashed #ced4da;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background-color: var(--bg-light);
+        cursor: pointer;
+    }
+    
+    .file-input-custom:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(255, 111, 15, 0.05);
+    }
+    
+    .file-input-custom i {
+        font-size: 2rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .file-input-custom .file-text {
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 0.25rem;
+    }
+    
+    .file-input-custom .file-hint {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .current-image {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: var(--bg-light);
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .current-image img {
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-check-custom {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background-color: var(--bg-light);
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check-custom:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(255, 111, 15, 0.05);
+    }
+    
+    .form-check-input-custom {
+        width: 1.2em;
+        height: 1.2em;
+        border-radius: 0.25em;
+        border: 2px solid #adb5bd;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check-input-custom:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .form-check-label-custom {
+        font-weight: 600;
+        color: var(--secondary-color);
+        cursor: pointer;
+    }
+    
+    .creation-info {
+        background-color: var(--bg-light);
+        padding: 1rem;
+        border-radius: 10px;
+        border-left: 4px solid var(--primary-color);
+        margin-top: 1rem;
+    }
+    
+    .creation-info p {
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-cancel {
+        background-color: var(--secondary-color);
+        color: var(--text-light);
+        border: none;
+        border-radius: 30px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+    
+    .btn-cancel:hover {
+        background-color: #0f1420;
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 0 0.7rem 1.5rem rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: var(--text-light);
+        border: none;
+        border-radius: 30px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+    
+    .btn-submit:hover {
+        background-color: #e05b00;
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 0 0.7rem 1.5rem rgba(0, 0, 0, 0.2);
+    }
+    
+    .character-count {
+        font-size: 0.875rem;
+        color: #6c757d;
+        text-align: right;
+        margin-top: 0.5rem;
+    }
+    
+    .character-count.warning {
+        color: var(--warning-color);
+    }
+    
+    .character-count.danger {
+        color: var(--danger-color);
+    }
+    
+    @media(max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+        
+        .btn-cancel,
+        .btn-submit {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .form-textarea-custom {
+            min-height: 150px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container-custom text-center">
+            <h1 class="page-title">
+                {% if form.instance.id %}✏️ Modifier l'Annonce{% else %}📢 Créer une Annonce{% endif %}
+            </h1>
+            <p class="page-subtitle">
+                {% if form.instance.id %}Modifiez les détails de votre annonce{% else %}Rédigez une nouvelle annonce pour votre communauté{% endif %}
+            </p>
+        </div>
+    </header>
+
+    <div class="page-inner">
+        <div class="container-custom">
+            <!-- Carte du formulaire -->
+            <div class="form-card">
+                <!-- En-tête -->
+                <div class="card-header-custom">
+                    <h3 class="card-title">
+                        <i class="fas fa-bullhorn"></i>
+                        {% if form.instance.id %}Modifier l'Annonce{% else %}Nouvelle Annonce{% endif %}
+                    </h3>
+                </div>
+                
+                <!-- Corps -->
+                <div class="card-body-custom">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Section Contenu -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-edit"></i>
+                                Contenu de l'annonce
+                            </h4>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.titre.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading"></i>
+                                    Titre*
+                                </label>
+                                {{ form.titre }}
+                                <div class="character-count" id="title-count">
+                                    <span id="title-length">0</span>/100 caractères
+                                </div>
+                                <div class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Veuillez entrer un titre valide.
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.contenu.id_for_label }}" class="form-label">
+                                    <i class="fas fa-align-left"></i>
+                                    Contenu*
+                                </label>
+                                {{ form.contenu }}
+                                <div class="character-count" id="content-count">
+                                    <span id="content-length">0</span>/2000 caractères
+                                </div>
+                                <div class="invalid-feedback">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Veuillez entrer un contenu valide.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Section Image -->
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-image"></i>
+                                Image illustrative
+                            </h4>
+                            
+                            <div class="form-group">
+                                <div class="file-input-wrapper">
+                                    {{ form.image }}
+                                    <div class="file-input-custom">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <div class="file-text">Choisir une image</div>
+                                        <div class="file-hint">JPG, PNG ou GIF (max. 5MB)</div>
+                                    </div>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Une image illustrative rend votre annonce plus attrayante
+                                </div>
+                                
+                                {% if form.instance.id and form.instance.image %}
+                                <div class="current-image">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <i class="fas fa-image text-primary"></i>
+                                        <strong>Image actuelle :</strong>
+                                    </div>
+                                    <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
+                                        <img src="{{ form.instance.image.url }}" 
+                                             class="img-fluid"
+                                             alt="Image actuelle de l'annonce">
+                                        <div class="form-check-custom mt-2 mt-md-0">
+                                            <input class="form-check-input-custom" 
+                                                   type="checkbox" 
+                                                   name="image-clear" 
+                                                   id="image-clear">
+                                            <label class="form-check-label-custom" for="image-clear">
+                                                Supprimer l'image actuelle
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Section Publication (uniquement pour modification) -->
+                        {% if form.instance.id %}
+                        <div class="form-section">
+                            <h4 class="section-title">
+                                <i class="fas fa-cog"></i>
+                                Paramètres de publication
+                            </h4>
+                            
+                            <div class="form-group">
+                                <div class="form-check-custom">
+                                    {{ form.est_publie }}
+                                    <label class="form-check-label-custom" for="{{ form.est_publie.id_for_label }}">
+                                        Publier cette annonce
+                                    </label>
+                                </div>
+                                
+                                <div class="creation-info">
+                                    <p>
+                                        <i class="fas fa-calendar-plus"></i>
+                                        <strong>Créée le :</strong> {{ form.instance.date_creation|date:"d/m/Y à H:i" }}
+                                    </p>
+                                    {% if form.instance.date_publication %}
+                                    <p>
+                                        <i class="fas fa-paper-plane"></i>
+                                        <strong>Publiée le :</strong> {{ form.instance.date_publication|date:"d/m/Y à H:i" }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Boutons de soumission -->
+                        <div class="form-actions">
+                            <a href="{% url 'liste_annonces' %}" class="btn-cancel">
+                                <i class="fas fa-arrow-left"></i> Retour à la liste
+                            </a>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-save"></i> 
+                                {% if form.instance.id %}Mettre à jour{% else %}Créer l'annonce{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    
+    <script>
+        // Validation Bootstrap
+        (function () {
+            'use strict'
+            
+            const forms = document.querySelectorAll('.needs-validation')
+            
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+        
+        // Initialisation du formulaire
+        document.addEventListener('DOMContentLoaded', function() {
+            // Appliquer les classes CSS aux champs du formulaire
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                if (input.type !== 'file' && input.type !== 'checkbox' && input.type !== 'hidden') {
+                    if (input.tagName === 'TEXTAREA') {
+                        input.classList.add('form-textarea-custom');
+                    } else if (input.type === 'checkbox') {
+                        input.classList.add('form-check-input-custom');
+                    } else {
+                        input.classList.add('form-control-custom');
+                    }
+                }
+            });
+            
+            // Compteur de caractères pour le titre
+            const titleInput = document.getElementById('id_titre');
+            const titleCount = document.getElementById('title-count');
+            const titleLength = document.getElementById('title-length');
+            
+            if (titleInput) {
+                // Initialiser le compteur
+                titleLength.textContent = titleInput.value.length;
+                
+                // Mettre à jour le compteur
+                titleInput.addEventListener('input', function() {
+                    const length = this.value.length;
+                    titleLength.textContent = length;
+                    
+                    if (length > 80) {
+                        titleCount.classList.add('warning');
+                    } else {
+                        titleCount.classList.remove('warning');
+                    }
+                    
+                    if (length > 100) {
+                        titleCount.classList.add('danger');
+                    } else {
+                        titleCount.classList.remove('danger');
+                    }
+                });
+            }
+            
+            // Compteur de caractères pour le contenu
+            const contentInput = document.getElementById('id_contenu');
+            const contentCount = document.getElementById('content-count');
+            const contentLength = document.getElementById('content-length');
+            
+            if (contentInput) {
+                // Initialiser le compteur
+                contentLength.textContent = contentInput.value.length;
+                
+                // Mettre à jour le compteur
+                contentInput.addEventListener('input', function() {
+                    const length = this.value.length;
+                    contentLength.textContent = length;
+                    
+                    if (length > 1500) {
+                        contentCount.classList.add('warning');
+                    } else {
+                        contentCount.classList.remove('warning');
+                    }
+                    
+                    if (length > 2000) {
+                        contentCount.classList.add('danger');
+                    } else {
+                        contentCount.classList.remove('danger');
+                    }
+                });
+            }
+            
+            // Améliorer l'affichage du champ fichier
+            const fileInput = document.getElementById('id_image');
+            const fileCustom = document.querySelector('.file-input-custom');
+            
+            if (fileInput && fileCustom) {
+                fileInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const fileName = this.files[0].name;
+                        const fileText = fileCustom.querySelector('.file-text');
+                        fileText.textContent = fileName;
+                        fileCustom.style.borderColor = 'var(--primary-color)';
+                        fileCustom.style.backgroundColor = 'rgba(255, 111, 15, 0.1)';
+                    }
+                });
+            }
+            
+            // Animation d'apparition des sections
+            const sections = document.querySelectorAll('.form-section');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+{% endblock %}

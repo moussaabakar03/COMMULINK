@@ -1,0 +1,228 @@
+{% extends "user/base.html" %}
+{% block body %}
+    
+    <style type="text/css">
+        .fadeIn{
+        background-color: rgba(128, 12, 12, 0.07);
+        }
+        .headerNav{
+            {% comment %} background-color:rgb(204, 159, 123); {% endcomment %}
+            background-color:rgb(134, 96, 65);
+        }
+        .heading {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+            font-size: 32px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .heading:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        .conteneur {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 280px;
+            background-color: #fff;
+        }
+        
+        .item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease, filter 0.4s ease;
+        }
+        
+        .item:hover img {
+            transform: scale(1.1);
+            filter: brightness(70%);
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .item:hover .overlay {
+            opacity: 1;
+        }
+        
+        .overlay-content {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+       
+        .item:hover .overlay-content {
+            transform: translateY(0);
+        }
+        
+        .description {
+            padding: 15px;
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: #6366f1;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .view-more {
+            display: inline-block;
+            background-color: #6366f1;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .view-more:hover {
+            background-color: #4f46e5;
+            transform: scale(1.05);
+        }
+        
+        .no-image {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .conteneur {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 20px;
+            }
+            
+            .heading {
+                font-size: 28px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .conteneur {
+                grid-template-columns: 1fr;
+            }
+            
+            .item {
+                height: auto;
+            }
+            
+            .image-container {
+                height: 180px;
+            }
+        }
+    </style>
+
+    <h1 class="heading" style = "margin-top: 200px;">{{evenement.nom_type_evenement}}</h1>
+    
+    <div class="conteneur">
+        {% for evenement in evenementsFiltrer %}
+            <div class="item">
+                <div class="image-container">
+                    {% if evenement.photo %}
+                        <img src="{{ evenement.photo.url }}" alt="Image de l'événement {{ evenement.titre }}">
+                    {% else %}
+                        <div class="no-image">
+                            <i>📷</i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="overlay">
+                        <div class="overlay-content">
+                            {% if evenement.titre %}
+                                <h3 style  =" color: white;">{{ evenement.titre }}</h3>
+                            {% endif %}
+                            {% if evenement.date %}
+                                <div class="date">{{ evenement.date|date:"d M Y" }}</div>
+                            {% endif %}
+                            <a href="{% url 'detailEvenement' evenement.id %}" class="view-more">Voir plus</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="description">
+                    {% if evenement.titre %}
+                        <div>
+                            <div class="title">{{ evenement.titre }}</div>
+                            <div>{{ evenement.description|truncatechars:80 }}</div>
+                        </div>
+                    {% else %}
+                        <div>{{ evenement.description|truncatechars:100 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+{% comment %} </html> {% endcomment %}
+
+{% endblock %}

@@ -2,7 +2,287 @@
 {% load static %}
 
 {% block body %}
+    
+    <style type="text/css">
+        .heading {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+            font-size: 32px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .heading:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+        
+        .conteneur {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 280px;
+            background-color: #fff;
+        }
+        
+        .item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease, filter 0.4s ease;
+        }
+        
+        .item:hover img {
+            transform: scale(1.1);
+            filter: brightness(70%);
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .item:hover .overlay {
+            opacity: 1;
+        }
+        
+        .overlay-content {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+    
+        .item:hover .overlay-content {
+            transform: translateY(0);
+        }
+        
+        .description {
+            padding: 15px;
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: #6366f1;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .view-more {
+            display: inline-block;
+            background-color: #6366f1;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 15px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .view-more:hover {
+            background-color: #4f46e5;
+            transform: scale(1.05);
+        }
+        
+        .no-image {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .conteneur {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 20px;
+            }
+            
+            .heading {
+                font-size: 28px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .conteneur {
+                grid-template-columns: 1fr;
+            }
+            
+            .item {
+                height: auto;
+            }
+            
+            .image-container {
+                height: 180px;
+            }
+        }
 
+        @media (max-width: 768px) {
+        /* Ajustement de la hauteur des images */
+        .team-item img {
+            height: 250px !important;
+        }
+
+        /* Réduction de la taille du titre */
+        .display-6 {
+            font-size: 1.8rem !important;
+        }
+
+        /* Ajustement des espacements */
+        .container-xxl.py-5 {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        /* Taille des boutons sociaux */
+        .team-social .btn {
+            width: 30px !important;
+            height: 30px !important;
+            margin: 0 2px !important;
+        }
+
+        /* Ajustement de la typographie */
+        .team-text h5 {
+            font-size: 1.1rem;
+        }
+        
+        .team-text p {
+            font-size: 0.9rem;
+        }
+
+        /* Agrandissement des boutons de navigation */
+        .swiper-button-next,
+        .swiper-button-prev {
+            width: 35px !important;
+            height: 35px !important;
+        }
+        
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 1.5rem !important;
+        }
+    }
+
+   .flip-container {
+        perspective: 1000px;
+        min-height: 250px;
+    }
+
+    .flip-card {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+
+    .flip-container:hover .flip-card {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, 
+    .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: white;
+        border-radius: 10px;
+    }
+
+    .flip-card-back {
+        transform: rotateY(180deg);
+    }
+
+    .video-wrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .video-wrapper iframe,
+    .video-wrapper video {
+        width: 100%;
+        height: 200px;
+        min-height: 200px;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .no-video-message {
+        color: #6c757d;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+    }
+    </style>
     
     <!-- Carousel Start -->
     <div class="container-fluid p-0 mb-5">
@@ -121,6 +401,50 @@
     </div>
     <!-- About End -->
 
+    {% comment %} nouveauté  {% endcomment %}
+    <h1 class="heading" id = "dernierEvenement">DERNIÈRS EVENEMENTS</h1>
+    
+    <div class="conteneur">
+        {% for evenement in evenements %}
+            <div class="item">
+                <div class="image-container">
+                    {% if evenement.photo %}
+                        <img src="{{ evenement.photo.url }}" alt="Image de l'événement {{ evenement.titre }}">
+                    {% else %}
+                        <div class="no-image">
+                            <i>📷</i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="overlay">
+                        <div class="overlay-content">
+                            {% if evenement.titre %}
+                                <h3 style = " color: white;">{{ evenement.titre }}</h3>
+                            {% endif %}
+                            {% if evenement.dateHeure %}
+                                <div class="date">{{ evenement.dateHeure|date:"d M Y" }}</div>
+                            {% endif %}
+                            <a href="{% url 'detailEvenement' evenement.id %}" class="view-more">Voir plus</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="description">
+                    {% if evenement.titre %}
+                        <div>
+                            <div class="title">{{ evenement.titre }}</div>
+                            <div>{{ evenement.description|truncatechars:80 }}</div>
+                           
+                        </div>
+                    {% else %}
+                        <div>{{ evenement.description|truncatechars:100 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% comment %} endNouveauté {% endcomment %}
 
     <!-- Causes Start -->
     <div class="container-xxl bg-light my-5 py-5" id = "evenements">
@@ -129,163 +453,43 @@
                 <h1 class="display-6 mb-5">Nos événements</h1>
             </div>
             <div class="row g-4 justify-content-center">
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
-                        <div class="text-center p-4 pt-0">
-                            <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
-                                <small>Soirée culturelle</small>
+                {% for type_evenement in typeEvenement %}
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                        <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
+                            <div class="text-center p-4 pt-0">
+                                <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
+                                    <small>{{type_evenement.nom_type_evenement}}</small>
+                                </div>
+                                <p style = "text-align: center;">{{type_evenement.description_type_evenement}}</p>
                             </div>
-                            <p style = "text-align: center;">Plongez au cœur de la richesse culturelle tchadienne à travers nos soirées animées de danses, musiques traditionnelles et partages culinaires.</p>
-                            {% comment %} <div class="causes-progress bg-light p-3 pt-2">
-                                <div class="d-flex justify-content-between">
-                                    <p class="text-dark">4 <small class="text-body">Goal</small></p>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                                        <span>90%</span>
+                            <div class="position-relative mt-auto">
+                                {% if type_evenement.image_type_evenement != None %}
+                                    <img class="" style="height:510px; width:100%; object-fit: cover;" src="{{ type_evenement.image_type_evenement.url}}" alt="image">
+                                {% else %}
+                                    <div class="no-image">
+                                        <i>📷</i>
                                     </div>
+                                {% endif %}
+                                <div class="causes-overlay">
+                                    <a class="btn btn-outline-primary" href="{% url 'affichageEvenement' type_evenement.id %}">
+                                        Lire plus
+                                        <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
+                                            <i class="fa fa-arrow-right"></i>
+                                        </div>
+                                    </a>
                                 </div>
-                            </div> {% endcomment %}
-                        </div>
-                        <div class="position-relative mt-auto">
-                            <img class="img-fluid" src="{% static 'user/img/soirée.jpg'%}" style="height:510px; width:100%; object-fit: cover;" alt="">
-                            <div class="causes-overlay">
-                                <a class="btn btn-outline-primary" href="{% url 'soireeCulturelle' %}">
-                                    Lire plus
-                                    <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
-                                        <i class="fa fa-arrow-right"></i>
-                                    </div>
-                                </a>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
-                        <div class="text-center p-4 pt-0">
-                            <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
-                                <small>Journée integration</small>
-                            </div>
-                            <p style = "text-align: center;">Une journée dédiée à l'accueil des nouveaux membres avec des activités interactives, des présentations et un esprit fraternel.</p>
-                            <div class="causes-progress bg-light p-3 pt-2">
-                                <div class="d-flex justify-content-between">
-                                    <p class="text-dark">$10,000 <small class="text-body">Goal</small></p>
-                                    <p class="text-dark">$9,542 <small class="text-body">Raised</small></p>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                                        <span>90%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="position-relative mt-auto">
-                            <img class="" style="height:510px; width:100%; object-fit: cover;" src="{% static 'user/img/integration.png'%}" alt="">
-                            <div class="causes-overlay">
-                                <a class="btn btn-outline-primary" href="{% url 'journeeIntegration' %}">
-                                    Lire plus
-                                    <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
-                                        <i class="fa fa-arrow-right"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="causes-item d-flex flex-column bg-white border-top border-5 border-primary rounded-top overflow-hidden h-100">
-                        <div class="text-center p-4 pt-0">
-                            <div class="d-inline-block bg-primary text-white rounded-bottom fs-5 pb-1 px-3 mb-4">
-                                <small>Fêtes</small>
-                            </div>
-                            <p style = "text-align: center;">CommuLink célèbre les grandes fêtes religieuses dans un cadre de respect et de partage, en rassemblant la communauté autour des valeurs spirituelles.</p>
-                            {% comment %} <div class="causes-progress bg-light p-3 pt-2">
-                                <div class="d-flex justify-content-between">
-                                    <p class="text-dark">$10,000 <small class="text-body">Goal</small></p>
-                                    <p class="text-dark">$9,542 <small class="text-body">Raised</small></p>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                                        <span>90%</span>
-                                    </div>
-                                </div>
-                            </div> {% endcomment %}
-                        </div>
-                        <div class="position-relative mt-auto">
-                            <img class="" style="height:510px; width:100%; object-fit: cover;" src="{% static 'user/img/fete.jpg'%}" alt="">
-                            <div class="causes-overlay">
-                                <a class="btn btn-outline-primary" href="{% url 'feteIs' %}">
-                                    Lire plus
-                                    <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
-                                        <i class="fa fa-arrow-right"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     <!-- Causes End -->
 
-
-    <!-- Service Start -->
-    {% comment %} <div class="container-xxl py-5">
-        <div class="container">
-            <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">What We Do</div>
-                <h1 class="display-6 mb-5">Learn More What We Do And Get Involved</h1>
-            </div>
-            <div class="row g-4 justify-content-center">
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="service-item bg-white text-center h-100 p-4 p-xl-5">
-                        <img class="img-fluid mb-4" src="{% static 'user/img/icon-1.png'%}" alt="">
-                        <h4 class="mb-3">Child Education</h4>
-                        <p class="mb-4">Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed vero dolor duo.</p>
-                        <a class="btn btn-outline-primary px-3" href="">
-                            Learn More
-                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
-                                <i class="fa fa-arrow-right"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                    <div class="service-item bg-white text-center h-100 p-4 p-xl-5">
-                        <img class="img-fluid mb-4" src="{% static 'user/img/icon-2.png'%}" alt="">
-                        <h4 class="mb-3">Medical Treatment</h4>
-                        <p class="mb-4">Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed vero dolor duo.</p>
-                        <a class="btn btn-outline-primary px-3" href="">
-                            Learn More
-                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
-                                <i class="fa fa-arrow-right"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                    <div class="service-item bg-white text-center h-100 p-4 p-xl-5">
-                        <img class="img-fluid mb-4" src="{% static 'user/img/icon-3.png'%}" alt="">
-                        <h4 class="mb-3">Pure Drinking Water</h4>
-                        <p class="mb-4">Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed vero dolor duo.</p>
-                        <a class="btn btn-outline-primary px-3" href="">
-                            Learn More
-                            <div class="d-inline-flex btn-sm-square bg-primary text-white rounded-circle ms-2">
-                                <i class="fa fa-arrow-right"></i>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> {% endcomment %}
-    <!-- Service End -->
-
-
     <!-- Team Start -->
     <div class="container-xxl py-5">
-        <div class="container">
+        <div class="container" id = "equipeDirigeante">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
                 <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">Membres Equipes dirigeante</div>
                 <h1 class="display-6 mb-5">Rencontrez notre équipe dynamique.</h1>
@@ -294,163 +498,31 @@
             <div class="swiper myTeamSwiper">
                 <div class="swiper-wrapper">
                   <!-- Team Member Slide Start -->
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/presi.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>Mahamat Ibrahim</h5>
-                                <p class="text-primary">President</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
+                   {% for equipe in equipes %}
+                        <div class="swiper-slide">
+                            <div class="team-item position-relative rounded overflow-hidden">
+                                <div class="overflow-hidden">
+                                    {% if equipe.image != None %}
+                                        <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{{ equipe.image.url }}" alt="image {{ equipe.role }}">
+                                    {% else %}
+                                        <div class="no-image">
+                                            <i>📷</i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="team-text bg-light text-center p-4">
+                                    <h5>{{ equipe.nom }}</h5>
+                                    <p class="text-primary">{{ equipe.role }}</p>
+                                    <div class="team-social text-center">
+                                    <a class="btn btn-square" href="{{ equipe.lienFacebook }}"><i class="fab fa-facebook-f"></i></a>
+                                    <a class="btn btn-square" href="{{ equipe.lienInstagram}}"><i class="fab fa-twitter"></i></a>
+                                    <a class="btn btn-square" href="{{ equipe.lienTwitter}}"><i class="fab fa-instagram"></i></a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
                   <!-- Team Member Slide End -->
-                    <!-- Slide 2 -->
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/porteParole.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>Ahmat</h5>
-                                <p class="text-primary">Porte parole</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 3 -->
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/tresorier.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>Mahamat MOUSSA</h5>
-                                <p class="text-primary">Trésorier</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 4 -->
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>Adam Yaya</h5>
-                                <p class="text-primary">conseiller</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 5 -->
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/acadmique.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>ALI MOUSSA</h5>
-                                <p class="text-primary">Chargé affaire academique et sociale</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 6 -->
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil2.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>Mahamat</h5>
-                                <p class="text-primary">conseiller2</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil3.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>MOUSSA</h5>
-                                <p class="text-primary">conseil3</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil4.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>ISSA</h5>
-                                <p class="text-primary">conseil4</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide">
-                        <div class="team-item position-relative rounded overflow-hidden">
-                            <div class="overflow-hidden">
-                                <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{% static 'user/img/conseil5.png'%}" alt="">
-                            </div>
-                            <div class="team-text bg-light text-center p-4">
-                                <h5>ISSA</h5>
-                                <p class="text-primary">conseil5</p>
-                                <div class="team-social text-center">
-                                <a class="btn btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square" href=""><i class="fab fa-instagram"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
               
                 <!-- Navigation buttons -->
@@ -464,63 +536,52 @@
 
 
     <!-- Testimonial Start -->
-    <div class="container-xxl py-5"  style ="background-color:rgb(248, 243, 243);">
+    <div class="container-xxl py-5" id="temoingnage" style="background-color:rgb(248, 243, 243);">
         <div class="container">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">Témoingnages</div>
-                <h5 class="display-6 mb-2" style = "font-size: 20px;">Découvrez les témoingnages des présidents de différentes communauté résidants au Togo. Sur notre attachement.</h5>
+                <div class="d-inline-block rounded-pill bg-secondary text-primary py-1 px-3 mb-3">Témoignages</div>
+                <h5 class="display-6 mb-2" style="font-size: 20px;">Découvrez les témoignages des présidents de différentes communautés résidant au Togo. Sur notre attachement.</h5>
             </div>
             <div class="owl-carousel testimonial-carousel wow fadeInUp" data-wow-delay="0.1s">
-                <div class="testimonial-item text-center">
-                    <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{% static 'user/img/Conseil5.png'%}" style="width: 100px; height: 100px;">
-                    <div class="testimonial-text rounded text-center p-4">
-                        <p>
-                            « La soirée culturelle organisée par BeriBour228 a été une magnifique célébration de 
-                            nos racines communes. J’ai été particulièrement touché par la façon dont les danses 
-                            traditionnelles ont été présentées avec respect et authenticité. Ces initiatives sont 
-                            essentielles pour maintenir vivantes nos traditions et les transmettre à la jeune génération. »
-                        </p>
-                        <h5 class="mb-1">Saleh</h5>
-                        <span class="fst-italic">Président de la communauté Dagaza</span>
+                {% for temoingnage in temoingnages %}
+                    <div class="testimonial-item text-center flip-container">
+                        <a href ="{{temoingnage.image.url}}" style ="cursor: pointer;">
+                            <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{{temoingnage.image.url}}" style="width: 100px; height: 100px;">
+                        </a>
+                        <div class="flip-card">
+                            <div class="flip-card-front testimonial-text rounded text-center p-4">
+                                <p>{{temoingnage.message}}</p>
+                                <h5 class="mb-1">{{temoingnage.nom}}</h5>
+                                <span class="fst-italic">{{temoingnage.role}}</span>
+                            </div>
+                            
+                            <div class="flip-card-back testimonial-video rounded text-center p-4">
+                                {% if temoingnage.video %}
+                                    <div class="video-wrapper">
+                                        {% if temoingnage.video %}
+                                        {% comment %} <video src ="{{temoingnage.video|safe}}"/> {% endcomment %}
+                                            <video src="{{temoingnage.video.url}}" controls width="100%" height="200"></video>
+                                        {% else %}
+                                            <p> Video non disponible</p>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="no-video-message">
+                                        <p>Vidéo disponible prochainement</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{% static 'user/img/Conseil8.png'%}" style="width: 100px; height: 100px;">
-                    <div class="testimonial-text rounded text-center p-4">
-                        <p>
-                            « BeriBour228 a réussi l’exploit de créer un espace où notre héritage culturel Billala
-                            a pu briller de tous ses feux. Les chants ancestraux et les récits de nos aînés ont 
-                            trouvé un écho particulier lors de cette soirée mémorable. Je tiens à saluer l’organisation 
-                            impeccable et l’attention portée aux détails qui font honneur à nos traditions. »
-                        </p>
-                        <h5 class="mb-1">Hassan</h5>
-                        <span class="fst-italic">Président de la communauté Billala</span>
-                    </div>
-                </div>
-                <div class="testimonial-item text-center">
-                    <img class="img-fluid bg-light rounded-circle p-2 mx-auto mb-4" src="{% static 'user/img/Conseil7.png'%}" style="width: 100px; height: 100px;">
-                    <div class="testimonial-text rounded text-center p-4">
-                        <p>
-                            « Cette soirée culturelle a été un véritable pont entre passé et présent, permettant 
-                            à notre communauté Kanembou de partager ses trésors culturels dans un cadre respectueux 
-                            et valorisant. J’ai été impressionné par la qualité des échanges et la curiosité sincère 
-                            des participants. BeriBour228 démontre qu’il est possible de célébrer nos différences tout 
-                            en renforçant ce qui nous unit.
-                        </p>
-                        <h5 class="mb-1"> Bokhit </h5>
-                        <span class="fst-italic">Président de la communauté Kanembou</span>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
     <!-- Testimonial End -->
 
 
-
-
      <!-- Donate Start -->
-    <div class="container-fluid donate my-5 py-5" 
+    <div class="container-fluid donate my-5 py-5" id = "faireDon"
      style="background-image: url('{% static 'user/img/mainDansMain.jpg' %}'); 
             background-size: cover; 
             background-attachment: fixed; 
@@ -587,26 +648,27 @@
 
 
     <script>
+      
+
         var swiper = new Swiper(".myTeamSwiper", {
-          slidesPerView: 4,
-          spaceBetween: 40,
-          navigation: {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        navigation: {
             nextEl: ".swiper-button-next",
             prevEl: ".swiper-button-prev",
-          },
-          loop: false,
-          breakpoints: {
-            1024: {
-              slidesPerView: 4,
+        },
+        breakpoints: {
+            640: {
+                slidesPerView: 2,
             },
             768: {
-              slidesPerView: 2,
+                slidesPerView: 3,
             },
-            576: {
-              slidesPerView: 1,
-            }
-          }
-        });
+            1024: {
+                slidesPerView: 4,
+            },
+        },
+    });
     </script>
       
 {% endblock %}

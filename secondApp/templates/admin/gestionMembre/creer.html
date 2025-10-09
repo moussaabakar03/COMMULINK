@@ -1,0 +1,164 @@
+{% extends 'admin/base.html' %}
+
+ {% load static %} 
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block style %}{% endblock %}
+
+{% block body %}
+
+<div class="page-inner">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0"><i class="bi bi-person-plus"></i> Nouveau Membre</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Section Informations Personnelles -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2"><i class="bi bi-person-vcard"></i> Informations Personnelles</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.nom.id_for_label }}" class="form-label">Nom</label>
+                                        {{ form.nom }}
+                                        <div class="invalid-feedback">
+                                            Veuillez entrer un nom valide (minimum 2 caractères).
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.prenom.id_for_label }}" class="form-label">Prénom</label>
+                                        {{ form.prenom }}
+                                        <div class="invalid-feedback">
+                                            Veuillez entrer un prénom valide (minimum 2 caractères).
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.sexe.id_for_label }}" class="form-label">Sexe</label>
+                                        {{ form.sexe }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                        {{ form.email }}
+                                        <div class="invalid-feedback">
+                                            Veuillez entrer une adresse email valide.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.telephone.id_for_label }}" class="form-label">Téléphone</label>
+                                        {{ form.telephone }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section Adresse et Profession -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2"><i class="bi bi-geo-alt"></i> Adresse & Profession</h5>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="{{ form.adresse.id_for_label }}" class="form-label">Adresse</label>
+                                        {{ form.adresse }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.profession.id_for_label }}" class="form-label">Profession</label>
+                                        {{ form.profession }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.numeroUrgence.id_for_label }}" class="form-label">Numéro d'urgence</label>
+                                        {{ form.numeroUrgence }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.niveauEtude.id_for_label }}" class="form-label">Niveau d'étude</label>
+                                        {{ form.niveauEtude }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.ecole.id_for_label }}" class="form-label">École/Université</label>
+                                        {{ form.ecole }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section Identité -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2"><i class="bi bi-file-earmark-text"></i> Documents d'identité</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.ner.id_for_label }}" class="form-label">NER</label>
+                                        {{ form.ner }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.keri.id_for_label }}" class="form-label">KERI</label>
+                                        {{ form.keri }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.keribour.id_for_label }}" class="form-label">KERIBOUR</label>
+                                        {{ form.keribour }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.keriBa.id_for_label }}" class="form-label">KERI BA</label>
+                                        {{ form.keriBa }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.keribourBa.id_for_label }}" class="form-label">KERIBOUR BA</label>
+                                        {{ form.keribourBa }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section Photo et Notes -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2"><i class="bi bi-image"></i> Photo & Informations supplémentaires</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="{{ form.photo.id_for_label }}" class="form-label">Photo de profil</label>
+                                        {{ form.photo }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="{{ form.notes.id_for_label }}" class="form-label">Informations supplémentaires</label>
+                                        {{ form.notes }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Boutons de soumission -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'liste_membres' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Retour
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Script pour la validation côté client -->
+<script>
+// Validation Bootstrap (client-side)
+(function () {
+    'use strict'
+    
+    const forms = document.querySelectorAll('.needs-validation')
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

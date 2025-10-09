@@ -1,0 +1,541 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Annonces{% endblock %}
+
+{% block style %}
+<style>
+    :root {
+        --primary-color: #FF6F0F;
+        --secondary-color: #1a2035;
+        --bg-light: #f8f9fa;
+        --text-dark: #212529;
+        --text-light: #ffffff;
+        --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        --radius: 15px;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+        --info-color: #17a2b8;
+    }
+    
+    .page-header {
+        background-color: var(--secondary-color);
+        color: var(--text-light);
+        padding: 2.5rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-header::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(135deg, transparent 33.33%, #f9f7f5 33.33%, #f9f7f5 66.66%, transparent 66.66%);
+        background-size: 20px 20px;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Saira', sans-serif;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .container-custom {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .alert-container {
+        margin-bottom: 2rem;
+    }
+    
+    .alert-custom {
+        border-radius: var(--radius);
+        border: none;
+        box-shadow: var(--shadow);
+        padding: 1rem 1.5rem;
+    }
+    
+    .alert-success {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #155724;
+        border-left: 4px solid var(--success-color);
+    }
+    
+    .alert-error {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #721c24;
+        border-left: 4px solid var(--danger-color);
+    }
+    
+    .alert-info {
+        background-color: rgba(23, 162, 184, 0.15);
+        color: #0c5460;
+        border-left: 4px solid var(--info-color);
+    }
+    
+    .alert-warning {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #856404;
+        border-left: 4px solid var(--warning-color);
+    }
+    
+    .page-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .btn-create {
+        background-color: var(--primary-color);
+        color: var(--text-light);
+        border: none;
+        border-radius: 30px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow);
+    }
+    
+    .btn-create:hover {
+        background-color: #e05b00;
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 0 0.7rem 1.5rem rgba(0, 0, 0, 0.2);
+    }
+    
+    .search-section {
+        margin-bottom: 2rem;
+    }
+    
+    .search-bar {
+        position: relative;
+    }
+    
+    .search-bar input {
+        border-radius: 30px;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #ced4da;
+        width: 100%;
+        transition: box-shadow 0.3s;
+        font-size: 1rem;
+    }
+    
+    .search-bar input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.3);
+        border-color: var(--primary-color);
+    }
+    
+    .search-button {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--primary-color);
+        color: var(--text-light);
+        border: none;
+        border-radius: 30px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .search-button:hover {
+        background-color: #e05b00;
+        transform: translateY(-50%) scale(1.05);
+    }
+    
+    .announcements-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    
+    .announcements-table th {
+        background-color: var(--secondary-color);
+        color: var(--text-light);
+        padding: 1.2rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        font-size: 1rem;
+    }
+    
+    .announcements-table tr {
+        transition: background-color 0.3s;
+    }
+    
+    .announcements-table tr:nth-child(even) {
+        background-color: rgba(134, 96, 65, 0.05);
+    }
+    
+    .announcements-table tr:hover {
+        background-color: rgba(255, 111, 15, 0.1);
+    }
+    
+    .announcements-table td {
+        padding: 1.2rem 1rem;
+        vertical-align: middle;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .status-published {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: var(--success-color);
+    }
+    
+    .status-draft {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #856404;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        border: none;
+        border-radius: 30px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-edit {
+        background-color: var(--info-color);
+        color: var(--text-light);
+    }
+    
+    .btn-edit:hover {
+        background-color: #138496;
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-delete {
+        background-color: var(--danger-color);
+        color: var(--text-light);
+    }
+    
+    .btn-delete:hover {
+        background-color: #c82333;
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-publish {
+        background-color: var(--success-color);
+        color: var(--text-light);
+    }
+    
+    .btn-publish:hover {
+        background-color: #218838;
+        color: var(--text-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: var(--radius);
+    }
+    
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .page-link {
+        background-color: var(--bg-light);
+        border: 1px solid #dee2e6;
+        border-radius: 30px;
+        padding: 0.5rem 1rem;
+        color: var(--secondary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .page-link:hover {
+        background-color: var(--primary-color);
+        color: var(--text-light);
+        border-color: var(--primary-color);
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        color: var(--text-light);
+        border-color: var(--primary-color);
+    }
+    
+    @media(max-width: 768px) {
+        .page-title {
+            font-size: 2rem;
+        }
+        
+        .page-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .announcements-table th, 
+        .announcements-table td {
+            padding: 0.8rem 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container-custom">
+            <div class="page-header-content">
+                <div>
+                    <h1 class="page-title">📢 Gestion des Annonces</h1>
+                    <p class="page-subtitle">Créez et gérez les annonces pour votre communauté</p>
+                </div>
+                <a href="{% url 'creer_annonce' %}" class="btn-create">
+                    <i class="fas fa-plus-circle"></i> Créer une annonce
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-inner">
+        <div class="container-custom">
+            <!-- Messages d'alerte -->
+            {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                <div class="alert-custom alert-{{ message.tags }} alert-dismissible fade show">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Barre de recherche -->
+            <div class="search-section">
+                <form method="get" class="search-bar">
+                    <input type="text" name="search"
+                        placeholder="Rechercher une annonce par titre ou contenu..." 
+                        value="{{ search_query }}">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i> Rechercher
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tableau des annonces -->
+            <div class="table-responsive">
+                <table class="announcements-table">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Date publication</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for annonce in annonces %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-2">
+                                        <i class="fas fa-bullhorn text-primary"></i>
+                                    </div>
+                                    <strong>{{ annonce.titre }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ annonce.date_publication|date:"d/m/Y H:i"|default:"Non publiée" }}</td>
+                            <td>
+                                <span class="status-badge {% if annonce.est_publie %}status-published{% else %}status-draft{% endif %}">
+                                    <i class="fas fa-{% if annonce.est_publie %}check-circle{% else %}clock{% endif %}"></i>
+                                    {% if annonce.est_publie %}Publiée{% else %}Brouillon{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'modifier_annonce' annonce.id %}" class="btn-action btn-edit">
+                                        <i class="fas fa-edit"></i> Modifier
+                                    </a>
+                                    <a href="{% url 'supprimer_annonce' annonce.id %}" class="btn-action btn-delete"
+                                       onclick="return confirm('Voulez-vous vraiment supprimer cette annonce?')">
+                                        <i class="fas fa-trash-alt"></i> Supprimer
+                                    </a>
+                                    {% if not annonce.est_publie %}
+                                    <a href="{% url 'publier_annonce' annonce.id %}" class="btn-action btn-publish">
+                                        <i class="fas fa-paper-plane"></i> Publier
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <i class="fas fa-bullhorn"></i>
+                                    <h3>Aucune annonce trouvée</h3>
+                                    <p>Créez votre première annonce ou ajustez vos critères de recherche</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if annonces.has_other_pages %}
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if annonces.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1&search={{ search_query }}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in annonces.paginator.page_range %}
+                            {% if annonces.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if annonces.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ annonces.paginator.num_pages }}&search={{ search_query }}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    
+    <script>
+        // Animation d'apparition des éléments
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableRows = document.querySelectorAll('.announcements-table tbody tr');
+            
+            tableRows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    row.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+            
+            // Confirmation améliorée pour la suppression
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (!confirm('Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

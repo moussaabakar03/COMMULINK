@@ -1,0 +1,229 @@
+{% load static  %}
+
+<style>/* Couleur de fond principale noire */
+.sidebar,
+.logo-header {
+  background-color: #000000 !important;
+}
+
+/* Contenu du texte en blanc */
+.sidebar .nav a,
+.sidebar .nav p,
+.sidebar .text-section {
+  color: #ffffff !important;
+}
+
+/* Icônes en orange */
+.sidebar .nav i {
+  color: #ff6600 !important; /* Orange */
+}
+
+/* Lien actif et survol : fond orange + texte blanc */
+.sidebar .nav .nav-item.active > a,
+.sidebar .nav a:hover {
+  background-color: #ff6600 !important;
+  color: #ffffff !important;
+}
+
+.sidebar .nav a:hover
+{
+  color: black!important;
+}
+
+/* Sous-items */
+.sidebar .nav .sub-item {
+  color: #ffffff !important;
+}
+
+
+/* Titres de sections */
+.sidebar .nav-section h4 {
+  color: #ff6600 !important;
+}
+
+/* Bordure et caret (flèche) */
+.sidebar .caret {
+  border-top: 6px solid #ff6600 !important;
+}
+
+/* Scrollbar personnalisée */
+.sidebar-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar-wrapper::-webkit-scrollbar-thumb {
+  background-color: #ff6600;
+  border-radius: 10px;
+}
+</style>
+<div class="sidebar" data-background-color="dark">
+    <div class="sidebar-logo">
+      <!-- Logo Header -->
+      <div class="logo-header" data-background-color="dark">
+        <a href="{% url 'admin_dashboard' %}" class="logo">
+          <span style="color:#ff6600">COMMU</span><span style="color:white;">LINK</span>
+        </a>
+        <div class="nav-toggle">
+          <button class="btn btn-toggle toggle-sidebar">
+            <i class="gg-menu-right"></i>
+          </button>
+          <button class="btn btn-toggle sidenav-toggler">
+            <i class="gg-menu-left"></i>
+          </button>
+        </div>
+        <button class="topbar-toggler more">
+          <i class="gg-more-vertical-alt"></i>
+        </button>
+      </div>
+      <!-- End Logo Header -->
+    </div>
+    <div class="sidebar-wrapper scrollbar scrollbar-inner">
+      <div class="sidebar-content">
+        <ul class="nav nav-secondary">
+          <li class="nav-item active">
+            <a
+              data-bs-toggle="collapse"
+              href="#dashboard"
+              class="collapsed"
+              aria-expanded="false"
+            >
+              <i class="fas fa-home"></i>
+              <p>Dashboard</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="dashboard">
+              <ul class="nav nav-collapse">
+                <li>
+                  <a href="{% url 'admin_dashboard' %}">
+                    <span class="sub-item">Dashboard 1</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-section">
+            <span class="sidebar-mini-icon">
+              <i class="fa fa-ellipsis-h"></i>
+            </span>
+            <h4 class="text-section">Components</h4>
+          </li>
+          <li class="nav-item">
+            <a data-bs-toggle="collapse" href="#base">
+              <i class="fas fa-layer-group"></i>
+              <p>Gestion Evenements</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="base">
+              <ul class="nav nav-collapse">
+                <li>
+                  <a href="{% url 'listeCategorie' %}">
+                    <span class="sub-item">Liste Categorie *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'ajoutTypeEvenement' %}">
+                    <span class="sub-item">Ajout Categorie</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'affichageEvenement' %}">
+                    <span class="sub-item">Liste Evenement *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'ajoutEvenement' %}">
+                    <span class="sub-item">Ajout Evenement</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'temoingnages' %}">
+                    <span class="sub-item">Liste Témoingnages *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'ajoutTemoingnages' %}">
+                    <span class="sub-item">Ajout Témoingnage</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+           <li class="nav-item">
+            <a data-bs-toggle="collapse" href="#sidebarLayouts">
+              <i class="fas fa-layer-group"></i>
+              <p>Gestion Membre</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="sidebarLayouts">
+              <ul class="nav nav-collapse">
+                <li>
+                  <a href="{% url 'liste_membres' %}">
+                    <span class="sub-item">Liste Membre *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'creer_membre' %}">
+                    <span class="sub-item">Ajout Membre</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <span class="sub-item">Equipe Dirigeante *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="components/buttons.html">
+                    <span class="sub-item">Ajout Admin *</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          </li>
+           <li class="nav-item">
+            <a data-bs-toggle="collapse" href="#forms">
+              <i class="fas fa-layer-group"></i>
+              <p>Gestion Payements</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="forms">
+              <ul class="nav nav-collapse">
+                <li>
+                  <a href="{% url 'liste_paiements' %}">
+                    <span class="sub-item">Liste Payements *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'ajouter_paiement' %}">
+                    <span class="sub-item">Ajout Payement</span>
+                  </a>
+                </li>
+                
+              </ul>
+            </div>
+          </li>
+          </li>
+           <li class="nav-item">
+            <a data-bs-toggle="collapse" href="#tables">
+              <i class="fas fa-layer-group"></i>
+              <p>Gestion Annonce</p>
+              <span class="caret"></span>
+            </a>
+            <div class="collapse" id="tables">
+              <ul class="nav nav-collapse">
+                <li>
+                  <a href="{% url 'liste_annonces' %}">
+                    <span class="sub-item">Liste Annonces *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'creer_annonce' %}">
+                    <span class="sub-item">Ajout annonce</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
