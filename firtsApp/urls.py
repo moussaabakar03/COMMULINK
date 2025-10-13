@@ -13,15 +13,7 @@ urlpatterns = [
     path('connexion/', views.connexion, name='connexion'),
     
     
-    path('ajoutTypeEvenement/', views.ajoutTypeEvenement, name='ajoutTypeEvenement'),
-    
-    path('ajoutEvenement/', views.ajoutEvenement, name='ajoutEvenement'),
     path('affichageEvenement/<int:id>/', views.affichageEvenement, name='affichageEvenement'),
-    path('detailEvenement/<int:id>/', views.detailEvenement, name='detailEvenement'),
-    
-    
-    path('ajoutMembreEquipe/', views.ajoutMembreEquipe, name='ajoutMembreEquipe'),
-    
-    path('ajoutTemoingnage/', views.ajoutTemoingnage, name='ajoutTemoingnage'),
+    path('detailEvenement/<int:id>/', views.detailEvenement, name='detailEvenement'),    
     
 ]

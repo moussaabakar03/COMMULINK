@@ -28,7 +28,15 @@ urlpatterns = [
     path('creer/', views.creer_membre, name='creer_membre'),
     path('membre/<int:pk>/', views.detail_membre, name='detail_membre'),
     path('membre/<int:pk>/modifier/', views.modifier_membre, name='modifier_membre'),
-    # path('<int:pk>/supprimer/', views.supprimer_membre, name='supprimer_membre'),
+    path('<int:pk>/supprimer/', views.supprimer_membre, name='supprimer_membre'),
+    
+    
+    path('ajoutMembreEquipe/', views.ajoutMembreEquipe, name='ajoutMembreEquipe'),
+    path('liste-EquipeDirigeante/', views.liste_EquipeDirigeante, name='liste_EquipeDirigeante'),
+    path('<int:pk>/modification-MembreEquipeDirigeante/', views.modification_MembreEquipeDirigeante, name='modification_MembreEquipeDirigeante'),
+    path('<int:pk>/supprimer-MembreEquipe/', views.supprimer_MembreEquipe, name='supprimer_MembreEquipe'),
+    
+    
 
     #------------------------URLS ANNONCES------------------------------------
     path('annonces/', views.liste_annonces, name='liste_annonces'),
@@ -41,5 +49,6 @@ urlpatterns = [
     path('paiements/', views.liste_paiements, name='liste_paiements'),
     path('paiements/ajouter/', views.ajouter_paiement, name='ajouter_paiement'),
     path('paiements/rappeler/', views.rappeler_paiements, name='rappeler_paiements'),
+    path('<int:pk>/modifierPaiement/', views.modifierPaiement, name='modifierPaiement'),
 
 ]

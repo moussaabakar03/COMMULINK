@@ -39,8 +39,8 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container-custom text-center">
-            <h1 class="page-title text-white">📋 Liste des Membres</h1>
-            <p class="page-subtitle">Gérez et consultez les informations de tous les membres</p>
+            <h1 class="page-title text-white">📋 Liste des Membres Dirigeante</h1>
+            <p class="page-subtitle">Gérez et consultez les informations de tous les membres de l'equipe dirigeante</p>
         </div>
     </header>
 
@@ -63,9 +63,10 @@
                 <table class="members-table">
                     <thead>
                         <tr>
-                            <th>Nom</th>
-                            <th>Email</th>
-                            <th>Téléphone</th>
+                            <th> Nom & Prenom</th>
+                            <th>Rôle</th>
+                            <th>Réseaux sociaux</th>
+                            <th>Photo</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -77,15 +78,33 @@
                                     <div class="member-avatar me-2">
                                         <i class="fas fa-user-circle text-primary"></i>
                                     </div>
-                                    <strong>{{ membre.nom_complet }}</strong>
+                                    <strong>{{ membre.nom }}</strong>
                                 </div>
                             </td>
-                            <td>{{ membre.email }}</td>
-                            <td>{{ membre.telephone|default:"-" }}</td>
+                            <td>{{ membre.role }}</td>
+                            <td>
+                                <a href="{{  membre.lienFacebook }}" class="btn-details"><i class="fab fa-facebook"></i></a>
+                                <a href="{{  membre.lienInstagram }}" class="btn-details"><i class="fab fa-twitter"></i></a>
+                                <a href="{{  membre.lienTwitter }}" class="btn-details"><i class="fab fa-instagram"></i></a>
+                            </td>
+                            <td>
+                                {% if membre.image %}
+                                    <a href="{{ membre.image.url }}"> <img src="{{  membre.image.url }}" alt = "{{  membre.image.url }}" 
+                                    style = "width: 60px; height: 60px; border-radius: 35%; object-fit: cover; border: 2px solid #e98513ff);"/> </a>
+                                {% else %}
+                                    <img src="" class = "fa fa-user"/>
+                                {% endif %}
+                            </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{% url 'detail_membre' membre.pk %}" class="btn-details">
-                                        <i class="fas fa-eye"></i> Détails
+                                   <a href="{% url 'supprimer_MembreEquipe' membre.pk %}"
+                                        class="btn-details"
+                                        title="Supprimer"
+                                        onclick="return confirm('Voulez-vous vraiment supprimer ce membre de l\'équipe dirigeante ?')">
+                                        <i class="fas fa-trash-alt"></i> 
+                                    </a>
+                                    <a href="{% url 'modification_MembreEquipeDirigeante' membre.pk %}" class="btn-details" title = "Modifier">
+                                        <i class="fas fa-edit"></i> 
                                     </a>
                                 </div>
                             </td>
@@ -95,7 +114,7 @@
                             <td colspan="4">
                                 <div class="empty-state">
                                     <i class="fas fa-users"></i>
-                                    <h3>Aucun membre trouvé</h3>
+                                    <h3>Aucun membre de l'equipe trouvé</h3>
                                     <p>Essayez d'ajuster votre recherche ou vos filtres</p>
                                 </div>
                             </td>

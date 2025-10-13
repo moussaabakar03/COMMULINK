@@ -11,12 +11,8 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.core.mail import send_mass_mail
-from firtsApp.models import TypeEvenement, Evenement, EquipeDirigeante, EvenementImage
 from time import timezone
 import datetime
-# DASHBOARD VIEW
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 from django.db.models import Count
 from firtsApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
 
@@ -48,7 +44,6 @@ def ajoutTypeEvenement(request):
         )
         return redirect('listeCategorie')
     return render(request, 'admin/gestionEvenement/ajoutCategorie.html')
-
 
 def modifierCategorie(request, id):
     categorie = get_object_or_404(TypeEvenement, pk=id)
@@ -83,13 +78,14 @@ def ajoutEvenement(request):
         description = request.POST.get('description')
         type_evenement = request.POST.get('type_evenement')
         images = request.FILES.getlist('photos[]') 
+        prix = request.POST.get("montant")
         
         evenementType = TypeEvenement.objects.get(id=type_evenement)
         
         if images:
             photoCouverture = images[0]
             evenement = Evenement.objects.create(
-                typeEvenement= evenementType, photo=photoCouverture, description=description
+                typeEvenement= evenementType, photo=photoCouverture, description=description, prix = prix
             )
             
             for image in range(0, len(images)):
@@ -127,13 +123,15 @@ def modifierEvenement(request, id):
         description = request.POST.get('description')
         type_evenement = request.POST.get('type_evenement')
         images = request.FILES.getlist('photos[]')
+        prix = request.POST.get("prix")
         evenementType = TypeEvenement.objects.get(pk=int(type_evenement))
         if images:
             photoCouverture = images[0]
             evenement.typeEvenement = evenementType
-            # evenement.titre = titre
+            evenement.prix = prix
             evenement.photo = photoCouverture
             evenement.description = description
+            
             evenement.save()
             # EvenementImage.objects.filter(evenement=evenement).delete()
             
@@ -220,7 +218,7 @@ def supprimerTemoingne(request, id):
 
 def liste_membres(request):
     # Récupérer la requête de recherche
-    search_query = request.GET.get('search', '')
+    search_query = request.GET.get('search', '').strip()
     
     # Filtrer les membres selon la recherche
     if search_query:
@@ -241,8 +239,6 @@ def liste_membres(request):
         'page_obj': page_obj,
         'search_query': search_query,
     })
-
-
 
 def detail_membre(request, pk):
     membre = get_object_or_404(Membre, pk=pk)
@@ -277,11 +273,119 @@ def modifier_membre(request, pk):
             'nom': membre.nom,
             'prenom': membre.prenom,
             'sexe': membre.sexe,
-            # ... tous les autres champs ...
+            'email': membre.email,
+            'telephone': membre.telephone,
+            'adresse': membre.adresse,
+            'profession': membre.profession,
+            'numeroUrgence': membre.numeroUrgence,
+            'niveauEtude': membre.niveauEtude,
+            'ecole': membre.ecole,
+            'photo': membre.photo,
+            'notes': membre.notes,
+            'ner': membre.ner,
+            'keri': membre.keri,
+            'keribour': membre.keribour,
+            'keriBa': membre.keriBa,
+            'keribourBa': membre.keribourBa,
         }
+
         form = MembreForm(initial=initial_data)
     
-    return render(request, 'admin/gestionMembres/modifier.html', {'form': form, 'membre': membre})
+    return render(request, 'admin/gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+
+def supprimer_membre(request, pk):
+    membre = Membre.objects.get(pk=pk).delete()
+    messages.success(request, "Membre supprimé avec succès!")
+    return redirect('liste_membres')
+    
+    
+
+def liste_EquipeDirigeante(request):
+    # Récupérer la requête de recherche
+    search_query = request.GET.get('search', '').strip()
+    
+    # Filtrer les membres selon la recherche
+    if search_query:
+        membres = EquipeDirigeante.objects.filter(
+            Q(nom__icontains=search_query) | 
+            Q(role__icontains=search_query) |
+            Q(lienFacebook__icontains=search_query) |
+            Q(lienTwitter__icontains=search_query) |
+            Q(lienInstagram__icontains=search_query)
+        ).order_by('nom')
+    else:
+        membres = EquipeDirigeante.objects.all().order_by('nom')
+    
+    # Pagination (10 membres par page)
+    paginator = Paginator(membres, 7)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'admin/gestionMembre/listeMembreEquipe.html', {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    })
+
+def ajoutMembreEquipe(request):
+    if request.method == 'POST':
+        nom = request.POST.get('nom')
+        photo = request.FILES.get('photo')
+        role = request.POST.get('role')
+        facebook = request.POST.get('facebook')
+        instagram = request.POST.get('instagram')
+        twitter = request.POST.get('twitter')
+        
+        EquipeDirigeante.objects.create(
+            nom = nom, image = photo, role = role, lienFacebook = facebook, lienInstagram = instagram , lienTwitter = twitter
+        )
+        return redirect("liste_EquipeDirigeante")
+    return render(request, 'admin/gestionMembre/ajoutMembreEquipe.html')
+
+def modification_MembreEquipeDirigeante(request, pk):
+    # Récupérer le membre à modifier ou retourner 404 si non trouvé
+    membre = get_object_or_404(EquipeDirigeante, pk=pk)
+    
+    if request.method == 'POST':
+        # Récupérer les données du formulaire
+        nom = request.POST.get('nom')
+        role = request.POST.get('role')
+        facebook = request.POST.get('facebook')
+        instagram = request.POST.get('instagram')
+        twitter = request.POST.get('twitter')
+        photo = request.FILES.get('photo')
+        
+        # Mettre à jour les champs
+        membre.nom = nom
+        membre.role = role
+        membre.lienFacebook = facebook
+        membre.lienInstagram = instagram
+        membre.lienTwitter = twitter
+        
+        # Mettre à jour la photo seulement si une nouvelle est fournie
+        if photo:
+            membre.image = photo
+        
+        # Sauvegarder les modifications
+        membre.save()
+        
+        # Message de succès (optionnel)
+        messages.success(request, 'Membre modifié avec succès!')
+        
+        # Rediriger vers la liste
+        return redirect("liste_EquipeDirigeante")
+    
+    # Passer le membre au template pour pré-remplir le formulaire
+    context = {
+        'membre': membre
+    }
+    
+    return render(request, 'admin/gestionMembre/modifierMembreEquipe.html', context)
+
+
+def supprimer_MembreEquipe(request, pk):
+    membre = get_object_or_404(EquipeDirigeante, pk=pk).delete()
+    return redirect("liste_EquipeDirigeante")
+
 
 
 #-----------------------------GESTION ANNONCES--------------------------------------------------
@@ -331,8 +435,8 @@ def modifier_annonce(request, id):
             annonce.auteur = request.user 
             
             # Si la case "Publier" est cochée, on met à jour la date de publication
-            if form.cleaned_data['est_publie'] and not annonce.date_publication:
-                annonce.date_publication = timezone.now()
+            # if form.cleaned_data['est_publie'] and not annonce.date_publication:
+            #     annonce.date_publication = timezone.now()
             
             annonce.save()
             
@@ -351,7 +455,6 @@ def modifier_annonce(request, id):
     }
     
     return render(request, 'admin/gestionAnnonce/modifier.html', context)
-
 
 def supprimer_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)
@@ -406,9 +509,6 @@ def ajouter_paiement(request):
             return redirect('liste_paiements')
     else:
         form = PaiementForm()
-    
-    
-    
     return render(request, 'admin/gestionPaiement/ajouter.html',  {'form': form, 'evenements': evenements} )
 
 def rappeler_paiements(request):
@@ -448,3 +548,29 @@ def rappeler_paiements(request):
         return redirect('liste_paiements')
     
     return redirect('liste_paiements')
+
+def modifierPaiement(request, pk):
+    # Récupérer le paiement à modifier ou retourner 404 si non trouvé
+    paiement = get_object_or_404(Paiement, pk=pk)
+    evenements = Evenement.objects.all()
+    
+    if request.method == 'POST':
+        # Passer l'instance existante au formulaire pour la mise à jour
+        form = PaiementForm(request.POST, request.FILES, instance=paiement)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Paiement modifié avec succès!')
+            return redirect('liste_paiements')
+        else:
+            messages.error(request, 'Erreur lors de la modification. Veuillez vérifier les champs.')
+    else:
+        # Pré-remplir le formulaire avec les données existantes
+        form = PaiementForm(instance=paiement)
+    
+    context = {
+        'form': form,
+        'evenements': evenements,
+        'paiement': paiement
+    }
+    
+    return render(request, 'admin/gestionPaiement/modifierPaiment.html', context)

@@ -15,6 +15,8 @@ class Evenement(models.Model):
     description = models.TextField()
     dateHeure = models.DateTimeField(editable=False, auto_now_add=True)
     photo = models.ImageField(upload_to='evenements')
+    prix = models.DecimalField(max_digits=10 ,decimal_places=2, default=0.0, null=True)
+    
     
     def __str__(self):
         return self.typeEvenement.nom_type_evenement

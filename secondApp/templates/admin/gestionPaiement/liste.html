@@ -4,396 +4,335 @@
 {% block title %}Gestion des Paiements{% endblock %}
 
 {% block style %}
-<style>
-    :root {
-        --primary-color: #FF6F0F;
-        --secondary-color: #1a2035;
-        --bg-light: #f8f9fa;
-        --text-dark: #212529;
-        --text-light: #ffffff;
-        --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        --radius: 15px;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
-        --danger-color: #dc3545;
-        --info-color: #17a2b8;
-    }
-    
-    .page-header {
-        background-color: var(--secondary-color);
-        color: var(--text-light);
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .page-header::after {
-        content: "";
-        position: absolute;
-        bottom: -10px;
-        left: 0;
-        right: 0;
-        height: 20px;
-        background: linear-gradient(135deg, transparent 33.33%, #f9f7f5 33.33%, #f9f7f5 66.66%, transparent 66.66%);
-        background-size: 20px 20px;
-    }
-    
-    .page-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        font-family: 'Saira', sans-serif;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    
-    .page-subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
-    }
-    
-    .container-custom {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-    
-    .alert-container {
-        margin-bottom: 2rem;
-    }
-    
-    .alert-custom {
-        border-radius: var(--radius);
-        border: none;
-        box-shadow: var(--shadow);
-        padding: 1rem 1.5rem;
-    }
-    
-    .alert-success {
-        background-color: rgba(40, 167, 69, 0.15);
-        color: #155724;
-        border-left: 4px solid var(--success-color);
-    }
-    
-    .alert-error {
-        background-color: rgba(220, 53, 69, 0.15);
-        color: #721c24;
-        border-left: 4px solid var(--danger-color);
-    }
-    
-    .alert-info {
-        background-color: rgba(23, 162, 184, 0.15);
-        color: #0c5460;
-        border-left: 4px solid var(--info-color);
-    }
-    
-    .alert-warning {
-        background-color: rgba(255, 193, 7, 0.15);
-        color: #856404;
-        border-left: 4px solid var(--warning-color);
-    }
-    
-    .main-card {
-        background-color: white;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-    
-    .card-header-custom {
-        background: linear-gradient(135deg, var(--secondary-color) 0%, #2d3748 100%);
-        color: var(--text-light);
-        padding: 1.5rem 2rem;
-        position: relative;
-    }
-    
-    .card-header-custom::before {
-        content: "\f09d";
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 2.5rem;
-        opacity: 0.2;
-    }
-    
-    .card-title {
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin-bottom: 0;
-        font-family: 'Saira', sans-serif;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .header-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
-    
-    .btn-add {
-        background-color: var(--primary-color);
-        color: var(--text-light);
-        border: none;
-        border-radius: 30px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: var(--shadow);
-    }
-    
-    .btn-add:hover {
-        background-color: #e05b00;
-        color: var(--text-light);
-        transform: translateY(-2px);
-        box-shadow: 0 0.7rem 1.5rem rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-remind {
-        background-color: var(--warning-color);
-        color: #212529;
-        border: none;
-        border-radius: 30px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: var(--shadow);
-    }
-    
-    .btn-remind:hover {
-        background-color: #e0a800;
-        color: #212529;
-        transform: translateY(-2px);
-        box-shadow: 0 0.7rem 1.5rem rgba(0, 0, 0, 0.2);
-    }
-    
-    .card-body-custom {
-        padding: 2rem;
-    }
-    
-    .filter-form {
-        background-color: var(--bg-light);
-        padding: 1.5rem;
-        border-radius: var(--radius);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        margin-bottom: 2rem;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: var(--secondary-color);
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-select {
-        border-radius: 30px;
-        padding: 0.75rem 1.5rem;
-        border: 1px solid #ced4da;
-        transition: box-shadow 0.3s;
-    }
-    
-    .form-select:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.3);
-        border-color: var(--primary-color);
-    }
-    
-    .btn-filter {
-        background-color: var(--secondary-color);
-        color: var(--text-light);
-        border: none;
-        border-radius: 30px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    
-    .btn-filter:hover {
-        background-color: #0f1420;
-        color: var(--text-light);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .payments-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        box-shadow: var(--shadow);
-        border-radius: var(--radius);
-        overflow: hidden;
-    }
-    
-    .payments-table th {
-        background-color: var(--secondary-color);
-        color: var(--text-light);
-        padding: 1.2rem 1rem;
-        text-align: left;
-        font-weight: 600;
-        position: sticky;
-        top: 0;
-        font-size: 1rem;
-    }
-    
-    .payments-table tr {
-        transition: background-color 0.3s;
-    }
-    
-    .payments-table tr:nth-child(even) {
-        background-color: rgba(134, 96, 65, 0.05);
-    }
-    
-    .payments-table tr:hover {
-        background-color: rgba(255, 111, 15, 0.1);
-    }
-    
-    .payments-table td {
-        padding: 1.2rem 1rem;
-        vertical-align: middle;
-        border-top: 1px solid #dee2e6;
-    }
-    
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-    
-    .status-paid {
-        background-color: rgba(40, 167, 69, 0.15);
-        color: var(--success-color);
-    }
-    
-    .status-unpaid {
-        background-color: rgba(220, 53, 69, 0.15);
-        color: var(--danger-color);
-    }
-    
-    .status-pending {
-        background-color: rgba(255, 193, 7, 0.15);
-        color: #856404;
-    }
-    
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .btn-action {
-        border: none;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .btn-edit {
-        background-color: var(--primary-color);
-        color: var(--text-light);
-    }
-    
-    .btn-edit:hover {
-        background-color: #e05b00;
-        color: var(--text-light);
-        transform: translateY(-2px) rotate(15deg);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .btn-info {
-        background-color: var(--info-color);
-        color: var(--text-light);
-    }
-    
-    .btn-info:hover {
-        background-color: #138496;
-        color: var(--text-light);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #6c757d;
-    }
-    
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    
-    .table-responsive {
-        overflow-x: auto;
-        border-radius: var(--radius);
-    }
-    
-    @media(max-width: 768px) {
+    <style>
+        :root {
+            --primary: #FF6F0F;
+            --dark: #1a2035;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .page-header {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 65px;
+            margin-bottom: 2rem;
+        }
+        
         .page-title {
             font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            opacity: 0.9;
+        }
+        
+        .container-custom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Alerts */
+        .alert-custom {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: var(--success);
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: var(--danger);
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-color: var(--info);
+        }
+        
+        /* Card */
+        .main-card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header-custom {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
         }
         
         .card-title {
             font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+        
+        /* Buttons */
+        .btn-add {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-add:hover {
+            background-color: #e05b00;
+            color: var(--white);
+        }
+        
+        .btn-remind {
+            background-color: var(--warning);
+            color: #212529;
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-remind:hover {
+            background-color: #e0a800;
+        }
+        
+        .btn-filter {
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-filter:hover {
+            background-color: #0f1420;
         }
         
         .header-actions {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
         
-        .payments-table th, 
+        /* Form */
+        .filter-form {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-select {
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.1);
+        }
+        
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+        
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+        }
+        
+        .payments-table th {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+        }
+        
         .payments-table td {
-            padding: 0.8rem 0.5rem;
-            font-size: 0.9rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
         }
         
+        .payments-table tr:hover {
+            background-color: rgba(255, 111, 15, 0.05);
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .status-paid {
+            background-color: #d4edda;
+            color: var(--success);
+        }
+        
+        .status-unpaid {
+            background-color: #f8d7da;
+            color: var(--danger);
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        /* Action Buttons */
         .action-buttons {
-            flex-direction: column;
+            display: flex;
+            gap: 0.5rem;
         }
         
         .btn-action {
-            width: 35px;
-            height: 35px;
-            font-size: 0.8rem;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+            text-decoration: none;
         }
-    }
-</style>
+        
+        .btn-action:hover {
+            opacity: 0.8;
+        }
+        
+        .btn-edit {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+            color: var(--white);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Responsive */
+        @media(max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 1rem;
+            }
+            
+            .header-actions .btn-add,
+            .header-actions .btn-remind {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .payments-table th, 
+            .payments-table td {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 {% endblock %}
 
+
 {% block body %}
+
+        <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'user/lib//animate/animate.min.css" rel="stylesheet'%}">
+    <link href="{% static 'user/lib//owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'user/css/bootstrap.min.css'%}" rel="stylesheet">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    
     <!-- Page Header -->
     <header class="page-header">
         <div class="container-custom text-center">
-            <h1 class="page-title">💳 Gestion des Paiements</h1>
+            <h1 class="page-title text-white">💳 Gestion des Paiements</h1>
             <p class="page-subtitle">Gérez et suivez tous les paiements des membres</p>
         </div>
     </header>
@@ -420,7 +359,7 @@
                 <!-- En-tête -->
                 <div class="card-header-custom">
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <h3 class="card-title">
+                        <h3 class="card-title text-secondary">
                             <i class="fas fa-credit-card"></i>
                             Gestion des Paiements
                         </h3>
@@ -522,7 +461,7 @@
                                     <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="#" class="btn-action btn-edit" title="Modifier">
+                                            <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
                                                 <i class="fas fa-sync-alt"></i>
                                             </a>
                                             <a href="#" class="btn-action btn-info" title="Voir preuve">
@@ -552,7 +491,7 @@
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script> {% endcomment %}
     
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>

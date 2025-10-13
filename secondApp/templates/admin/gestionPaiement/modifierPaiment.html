@@ -1,7 +1,7 @@
 {% extends 'admin/base.html' %}
 {% load static %}
 
-{% block title %}Ajouter un Paiement{% endblock %}
+{% block title %}Modifier un Paiement{% endblock %}
 {% block style %}
 
     <!-- Inclure Flatpickr pour le champ datetime -->
@@ -19,20 +19,33 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container-custom text-center">
-            <h1 class="page-title text-white">💳 Ajouter un Paiement</h1>
-            <p class="page-subtitle">Enregistrez un nouveau paiement pour un membre</p>
+            <h1 class="page-title text-white">✏️ Modifier un Paiement</h1>
+            <p class="page-subtitle">Modifiez les informations du paiement</p>
         </div>
     </header>
 
     <div class="page-inner">
         <div class="container-custom">
+            <!-- Messages -->
+            {% if messages %}
+                <div class="messages-container mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
             <!-- Carte du formulaire -->
             <div class="form-card">
                 <!-- En-tête -->
                 <div class="card-header-custom">
                     <h3 class="card-title text-white">
                         <i class="fas fa-cash-register"></i>
-                        Nouveau Paiement
+                        Modification du Paiement #{{ paiement.id }}
                     </h3>
                 </div>
                 
@@ -127,17 +140,43 @@
                                             <i class="fas fa-file-upload"></i>
                                             Preuve de paiement
                                         </label>
+                                        
+                                        {% if paiement.preuve_paiement %}
+                                            <div class="current-file mb-3">
+                                                <div class="file-preview">
+                                                    <i class="fas fa-file-alt"></i>
+                                                    <div class="file-info">
+                                                        <strong>Fichier actuel:</strong>
+                                                        <a href="{{ paiement.preuve_paiement.url }}" target="_blank" class="file-link">
+                                                            {{ paiement.preuve_paiement.name|slice:"15:" }}
+                                                            <i class="fas fa-external-link-alt"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
                                         <div class="file-input-wrapper">
                                             {{ form.preuve_paiement }}
                                             <div class="file-input-custom">
                                                 <i class="fas fa-cloud-upload-alt"></i>
-                                                <div class="file-text">Choisir un fichier</div>
+                                                <div class="file-text">
+                                                    {% if paiement.preuve_paiement %}
+                                                        Choisir un nouveau fichier (optionnel)
+                                                    {% else %}
+                                                        Choisir un fichier
+                                                    {% endif %}
+                                                </div>
                                                 <div class="file-hint">PDF, JPG ou PNG (max. 5MB)</div>
                                             </div>
                                         </div>
                                         <div class="form-text">
                                             <i class="fas fa-info-circle"></i>
-                                            Téléchargez la preuve de paiement (reçu, capture d'écran, etc.)
+                                            {% if paiement.preuve_paiement %}
+                                                Laissez vide pour conserver le fichier actuel
+                                            {% else %}
+                                                Téléchargez la preuve de paiement (reçu, capture d'écran, etc.)
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -150,7 +189,7 @@
                                 <i class="fas fa-arrow-left"></i> Annuler
                             </a>
                             <button type="submit" class="btn-submit">
-                                <i class="fas fa-save"></i> Enregistrer le paiement
+                                <i class="fas fa-save"></i> Mettre à jour le paiement
                             </button>
                         </div>
                     </form>
@@ -161,7 +200,6 @@
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    {% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script> {% endcomment %}
     
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
@@ -209,7 +247,6 @@
                     dateFormat: "Y-m-d H:i",
                     time_24hr: true,
                     locale: "fr",
-                    defaultDate: new Date(),
                     minuteIncrement: 1
                 });
             }
@@ -231,4 +268,79 @@
             }
         });
     </script>
+    
+    <style>
+        /* Styles pour les messages */
+        .messages-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Styles pour le fichier actuel */
+        .current-file {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+        }
+        
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .file-preview i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-info strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--dark);
+        }
+        
+        .file-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-link:hover {
+            text-decoration: underline;
+        }
+        
+        .file-link i {
+            font-size: 0.875rem;
+        }
+    </style>
 {% endblock %}
