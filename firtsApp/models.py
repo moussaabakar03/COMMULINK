@@ -11,7 +11,7 @@ class TypeEvenement(models.Model):
     
 class Evenement(models.Model):
     typeEvenement = models.ForeignKey (TypeEvenement, on_delete=models.CASCADE, related_name= 'evenement')
-    # titre = models.CharField(max_length=200)
+    titre = models.CharField(max_length=200)
     description = models.TextField()
     dateHeure = models.DateTimeField(editable=False, auto_now_add=True)
     photo = models.ImageField(upload_to='evenements')
@@ -19,7 +19,7 @@ class Evenement(models.Model):
     
     
     def __str__(self):
-        return self.typeEvenement.nom_type_evenement
+        return self.titre
 
 class EvenementImage(models.Model):
     evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, related_name='images')

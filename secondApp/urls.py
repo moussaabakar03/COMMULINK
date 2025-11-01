@@ -50,5 +50,6 @@ urlpatterns = [
     path('paiements/ajouter/', views.ajouter_paiement, name='ajouter_paiement'),
     path('paiements/rappeler/', views.rappeler_paiements, name='rappeler_paiements'),
     path('<int:pk>/modifierPaiement/', views.modifierPaiement, name='modifierPaiement'),
+    path('<int:pk>/paiementParEvenement/', views.paiementParEvenement, name='paiementParEvenement'),
 
 ]

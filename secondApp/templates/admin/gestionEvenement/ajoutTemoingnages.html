@@ -288,7 +288,7 @@
                             <select name="evenement" id="evenement" required>
                                 <option value="">Choisir l'événement</option>
                                 {% for event in events %}
-                                    <option value="{{ event.id }}">{{ event.typeEvenement.nom_type_evenement }}</option>
+                                    <option value="{{ event.id }}">{{ event.titre }}</option>
                                 {% endfor %}
                             </select>
                         </div>

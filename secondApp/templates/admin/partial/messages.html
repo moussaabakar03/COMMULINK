@@ -1,0 +1,297 @@
+{% load static %}
+{% if messages %}
+<!-- Chargement de Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Style Bootstrap minimal pour les alertes -->
+<style>
+    /* Styles Bootstrap minimalistes pour les alertes */
+    .alert {
+        position: relative;
+        padding: 1rem 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.375rem;
+    }
+    
+    .alert-dismissible {
+        padding-right: 3rem;
+    }
+    
+    .btn-close {
+        box-sizing: content-box;
+        width: 1em;
+        height: 1em;
+        padding: .25em .25em;
+        color: #000;
+        background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23000' viewBox='0 0 16 16'%3e%3cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+        border: 0;
+        border-radius: .375rem;
+        opacity: .5;
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 2;
+        padding: 1.25rem 1rem;
+    }
+    
+    .btn-close:hover {
+        opacity: .75;
+    }
+    
+    .fade {
+        transition: opacity .15s linear;
+    }
+    
+    .fade:not(.show) {
+        opacity: 0;
+    }
+    
+    /* Styles personnalisés pour les messages */
+    :root {
+        --teal-glacier: #2cb9a9;
+        --pink-swoosh: #ff6b8a;
+        --yellow-canaan: #ffc107;
+        --black-shadow: #333;
+    }
+    
+    /* Animation d'entrée */
+    .message-container .alert {
+        animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        border: none;
+        border-left: 4px solid;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        border-radius: 8px !important;
+        background-color: white;
+    }
+    
+    /* Couleurs de bordure personnalisées */
+    .message-container .alert-success {
+        border-left-color: var(--teal-glacier);
+    }
+    
+    .message-container .alert-error, 
+    .message-container .alert-danger {
+        border-left-color: var(--pink-swoosh);
+    }
+    
+    .message-container .alert-warning {
+        border-left-color: var(--yellow-canaan);
+    }
+    
+    .message-container .alert-info {
+        border-left-color: var(--teal-glacier);
+    }
+    
+    /* Couleur par défaut */
+    .message-container .alert {
+        border-left-color: var(--teal-glacier);
+    }
+    
+    /* Animation */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0) translateY(0);
+        }
+    }
+    
+    /* Animation de fermeture */
+    .message-container .alert.fade {
+        transition: all 0.4s ease-in;
+    }
+    
+    /* Bouton de fermeture */
+    .message-container .btn-close {
+        opacity: 0.5;
+        transition: opacity 0.3s ease;
+    }
+    
+    .message-container .btn-close:hover {
+        opacity: 1;
+    }
+    
+    /* Icône dans un cercle */
+    .message-container .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    /* Texte */
+    .message-container .alert p {
+        color: var(--black-shadow);
+    }
+    
+    /* Classes utilitaires minimales */
+    .position-fixed {
+        position: fixed !important;
+    }
+    
+    .top-0 {
+        top: 0 !important;
+    }
+    
+    .end-0 {
+        right: 0 !important;
+    }
+    
+    .p-3 {
+        padding: 1rem !important;
+    }
+    
+    .d-flex {
+        display: flex !important;
+    }
+    
+    .align-items-center {
+        align-items: center !important;
+    }
+    
+    .flex-grow-1 {
+        flex-grow: 1 !important;
+    }
+    
+    .me-3 {
+        margin-right: 1rem !important;
+    }
+    
+    .mb-0 {
+        margin-bottom: 0 !important;
+    }
+    
+    .fw-medium {
+        font-weight: 500 !important;
+    }
+    
+    .rounded-circle {
+        border-radius: 50% !important;
+    }
+    
+    .bg-success {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+    }
+    
+    .bg-danger {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+    
+    .bg-warning {
+        background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+    
+    .bg-info {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+    }
+    
+    .bg-primary {
+        background-color: rgba(13, 110, 253, 0.1) !important;
+    }
+    
+    .text-success {
+        color: #198754 !important;
+    }
+    
+    .text-danger {
+        color: #dc3545 !important;
+    }
+    
+    .text-warning {
+        color: #ffc107 !important;
+    }
+    
+    .text-info {
+        color: #0dcaf0 !important;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .fs-4 {
+        font-size: 1.5rem !important;
+    }
+</style>
+
+<div class="message-container position-fixed top-0 end-0 p-3" style="z-index: 1100; max-width: 400px;">
+    {% for message in messages %}
+        <div class="alert alert-dismissible fade show {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+            <div class="d-flex align-items-center">
+                <!-- Icône selon le type de message -->
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                    <div class="icon-wrapper bg-success bg-opacity-25 rounded-circle p-2 me-3">
+                        <i class="fa-solid fa-check-circle fs-4 text-success"></i>
+                    </div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <div class="icon-wrapper bg-danger bg-opacity-25 rounded-circle p-2 me-3">
+                        <i class="fa-solid fa-triangle-exclamation fs-4 text-danger"></i>
+                    </div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                    <div class="icon-wrapper bg-warning bg-opacity-25 rounded-circle p-2 me-3">
+                        <i class="fa-solid fa-circle-exclamation fs-4 text-warning"></i>
+                    </div>
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                    <div class="icon-wrapper bg-info bg-opacity-25 rounded-circle p-2 me-3">
+                        <i class="fa-solid fa-circle-info fs-4 text-info"></i>
+                    </div>
+                    {% else %}
+                    <div class="icon-wrapper bg-primary bg-opacity-25 rounded-circle p-2 me-3">
+                        <i class="fa-solid fa-circle-info fs-4 text-primary"></i>
+                    </div>
+                {% endif %}
+
+                <div class="flex-grow-1">
+                    <p class="mb-0 fw-medium">{{ message }}</p>
+                </div>
+                
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Script Bootstrap minimal pour la fermeture des alertes -->
+<script>
+    // Fermeture automatique après 7 secondes
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.message-container .alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                // Fermeture manuelle sans dépendance Bootstrap JS
+                alert.style.opacity = '0';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 400);
+            }, 7000);
+            
+            // Gestionnaire pour le bouton de fermeture
+            const closeButton = alert.querySelector('.btn-close');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 400);
+                });
+            }
+            
+            // Animation au survol
+            alert.addEventListener('mouseenter', () => {
+                alert.style.transform = 'translateX(-5px)';
+            });
+            
+            alert.addEventListener('mouseleave', () => {
+                alert.style.transform = 'translateX(0)';
+            });
+        });
+    });
+</script>
+{% endif %}

@@ -39,6 +39,39 @@
     <link rel="stylesheet" href="{% static 'admin/assets/css/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'admin/assets/css/plugins.min.css' %}" />
     <link rel="stylesheet" href="{% static 'admin/assets/css/kaiadmin.min.css' %}" />
+
+
+    <!-- CSS Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <style>
+
+    .select2-container .select2-selection--single {
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        display: flex;
+        align-items: center;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057;
+        line-height: 38px;
+        padding-left: 10px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 7px;
+        right: 10px;
+    }
+
+    .select2-dropdown {
+        border-radius: 8px;
+    }
+  </style>
+
+
+
     {% block style %}{% endblock %}
   </head>
   <body>
@@ -80,16 +113,20 @@
         </div>
 
         <div class="container">
-        {% block body %}
-          
+        {% include 'admin/partial/messages.html' %}
+          {% block body %}
+            
 
-        {% endblock %}
+          {% endblock %}
         </div>
 
        <!--Footer -->
        {% include 'admin/partial/footer.html' %}
       </div>
     </div>
+
+
+    
     <!--   Core JS Files   -->
     <script src="{% static 'admin/assets/js/core/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'admin/assets/js/core/popper.min.js' %}"></script>
@@ -154,5 +191,27 @@
         fillColor: "rgba(255, 165, 52, .14)",
       });
     </script>
+
+
+
+
+{% comment %} ##################  Champ select filtrage integré. ############################### {% endcomment %}
+    
+    <script>
+        $(document).ready(function() {
+            // Appliquer Select2 à tous les champs <select>
+            $('select').select2({
+                placeholder: "Sélectionnez une option",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+
+    
+    <!-- jQuery et JS Select2 -->
+    {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
   </body>
 </html>

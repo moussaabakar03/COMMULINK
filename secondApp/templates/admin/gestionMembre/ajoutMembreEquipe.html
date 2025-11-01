@@ -11,12 +11,20 @@
     
     {% comment %} css pour la page {% endcomment %}
     <link rel="stylesheet" href="{% static 'admin/assets/css/membres/listeEquipe.css' %}" />
+    <style>
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+    </style>
+
 {% endblock %}
 
 {% block body %}
 <!-- Page Header -->
 <header class="page-header">
-    <div class="container-custom">
+    <div class="container-custom text-center">
         <h1 class="page-title text-white">👤 Nouveau Membre de l'Equipe</h1>
         <p class="page-subtitle">Enregistrez un nouveau membre de l'equipe dirigeante</p>
     </div>

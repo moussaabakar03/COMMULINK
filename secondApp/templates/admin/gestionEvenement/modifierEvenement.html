@@ -334,11 +334,16 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="titre">Titre de l'evenement</label>
+                            <input type="text" id="titre" name="titre" value = "{{ evenement.titre }}" placeholder="Entrez le titre de l'evenement" step = "25" min ="0">
+                        </div>
                         
                         <div class="form-group">
                             <label for="prix">Prix (FCFA)*</label>
-                            <input type="number" id="prix" name="titre" value="{{evenement.prix}}" 
-                                   placeholder="Entrez le prix de l'événement" required>
+                            <input type="number" id="prix" name="prix" value="{{evenement.prix}}" 
+                                   placeholder="Entrez le prix de l'événement" min= 0 step = "25" required>
                         </div>
                         
                         <div class="form-group">

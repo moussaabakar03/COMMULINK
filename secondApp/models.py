@@ -61,7 +61,7 @@ class Membre(models.Model):
     keribourBa = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.prenom} {self.nom}"
+        return f"{self.nom} {self.prenom}"
 
     class Meta:
         verbose_name = "Membre"
@@ -74,7 +74,7 @@ class Membre(models.Model):
     
     @property
     def nom_complet(self):
-        return f"{self.prenom} {self.nom}"
+        return f"{self.nom} {self.prenom}"
 
 
 #--------------------ANNONCES ET PAYEMENTS--------------------------------
@@ -95,14 +95,26 @@ class Paiement(models.Model):
         ('payé', 'Payé'),
         ('non_payé', 'Non payé'),
         ('moitié_payé', 'Moitié payé'),
+        ('avance', 'Avance'),
     ]
     
     membre = models.ForeignKey(Membre, on_delete=models.CASCADE)
     evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE)
-    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    montant = models.IntegerField()
     date_paiement = models.DateTimeField(null=True, blank=True)
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='non_payé')
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES)
     preuve_paiement = models.FileField(upload_to='paiements/', null=True, blank=True)
+
+
+    # def save(self, *args, **kwargs):
+
+    #     super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"{self.membre} - {self.evenement} - {self.statut}"
+    
+    
+
+
+

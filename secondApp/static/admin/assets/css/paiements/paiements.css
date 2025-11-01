@@ -1,0 +1,297 @@
+:root {
+    --primary: #FF6F0F;
+    --dark: #1a2035;
+    --light: #f8f9fa;
+    --white: #ffffff;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --info: #17a2b8;
+    --border: #dee2e6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.page-header {
+    background-color: var(--dark);
+    color: var(--white);
+    padding: 2rem 0;
+    margin-top: 65px;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    opacity: 0.9;
+}
+
+.container-custom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Alerts */
+.alert-custom {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: var(--success);
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: var(--danger);
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-color: var(--info);
+}
+
+/* Card */
+.main-card {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.card-header-custom {
+    background-color: var(--dark);
+    color: var(--white);
+    padding: 1.5rem;
+    border-radius: 8px 8px 0 0;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-body-custom {
+    padding: 1.5rem;
+}
+
+/* Buttons */
+.btn-add {
+    background-color: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-add:hover {
+    background-color: #e05b00;
+    color: var(--white);
+}
+
+.btn-remind {
+    background-color: var(--warning);
+    color: #212529;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-remind:hover {
+    background-color: #e0a800;
+}
+
+.btn-filter {
+    background-color: var(--dark);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+.btn-filter:hover {
+    background-color: #0f1420;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Form */
+.filter-form {
+    background-color: var(--light);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-select {
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border);
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.1);
+}
+
+/* Table */
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.payments-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+}
+
+.payments-table th {
+    background-color: var(--dark);
+    color: var(--white);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+}
+
+.payments-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.payments-table tr:hover {
+    background-color: rgba(255, 111, 15, 0.05);
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.status-paid {
+    background-color: #d4edda;
+    color: var(--success);
+}
+
+.status-unpaid {
+    background-color: #f8d7da;
+    color: var(--danger);
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    border: none;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    text-decoration: none;
+}
+
+.btn-action:hover {
+    opacity: 0.8;
+}
+
+.btn-edit {
+    background-color: var(--primary);
+    color: var(--white);
+}
+
+.btn-info {
+    background-color: var(--info);
+    color: var(--white);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media(max-width: 768px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .header-actions .btn-add,
+    .header-actions .btn-remind {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .payments-table th, 
+    .payments-table td {
+        padding: 0.8rem 0.5rem;
+        font-size: 0.9rem;
+    }
+}

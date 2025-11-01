@@ -41,6 +41,7 @@
         <div class="container-custom text-center">
             <h1 class="page-title text-white">📋 Liste des Membres</h1>
             <p class="page-subtitle">Gérez et consultez les informations de tous les membres</p>
+            <p>Total: <span style = "font-weight: bold; font-size: 20px; ">{{nombreMembre}}</span></p>
         </div>
     </header>
 
@@ -64,8 +65,10 @@
                     <thead>
                         <tr>
                             <th>Nom</th>
-                            <th>Email</th>
+                            <th>Ner</th>
+                            <th>Keri</th>
                             <th>Téléphone</th>
+                            <th>Ecole</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -80,8 +83,10 @@
                                     <strong>{{ membre.nom_complet }}</strong>
                                 </div>
                             </td>
-                            <td>{{ membre.email }}</td>
+                            <td>{{ membre.ner }}</td>
+                            <td>{{ membre.keri }}</td>
                             <td>{{ membre.telephone|default:"-" }}</td>
+                            <td>{{ membre.ecole }}</td>
                             <td>
                                 <div class="action-buttons">
                                     <a href="{% url 'detail_membre' membre.pk %}" class="btn-details">

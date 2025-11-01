@@ -258,7 +258,7 @@
             
             <div class="event-image">
                 {% if evenement.photo %}
-                    <img src="{{ evenement.photo.url }}" alt="{{ evenement.typeEvenement.nom_type_evenement }}">
+                    <img src="{{ evenement.photo.url }}" alt="{{ evenement.titre }}">
                 {% else %}
                     <div class="no-image">
                         <i class="fas fa-calendar-alt"></i>
@@ -267,19 +267,22 @@
                 
                 <div class="event-overlay">
                     <div class="overlay-content">
-                        <h3 class="text-white mb-2">{{ evenement.typeEvenement.nom_type_evenement|default:"Événement sans titre" }}</h3>
+                        <h3 class="text-white mb-2">{{ evenement.titre|default:"Événement sans titre" }}</h3>
                         <div class="event-date mb-3">
                             <i class="far fa-calendar-alt"></i>
                             {{ evenement.dateHeure|date:"d M Y"|default:"Date non spécifiée" }}
                         </div>
                         <a href="{% url 'detailEvenements' evenement.id %}" class="view-btn">Voir détails</a>
+                        <div style = "margin-top:10px;">
+                            <strong> {{ evenement.prix }} FCFA </strong>
+                        </div>
                     </div>
                     
                 </div>
             </div>
             
             <div class="event-details">
-                <h3 class="event-title">{{ evenement.typeEvenement.nom_type_evenement|default:"Événement sans titre" }}</h3>
+                <h3 class="event-title">{{ evenement.titre|default:"Événement sans titre" }}</h3>
                 <p class="event-description">
                     {{ evenement.description|truncatechars:120|default:"Aucune description disponible pour cet événement." }}
                 </p>

@@ -74,7 +74,7 @@ def affichageEvenement(request):
 def ajoutEvenement(request):
     typeEvenem = TypeEvenement.objects.all()
     if request.method == "POST":
-        # titre = request.POST.get('titre')
+        titre = request.POST.get('titre')
         description = request.POST.get('description')
         type_evenement = request.POST.get('type_evenement')
         images = request.FILES.getlist('photos[]') 
@@ -85,7 +85,7 @@ def ajoutEvenement(request):
         if images:
             photoCouverture = images[0]
             evenement = Evenement.objects.create(
-                typeEvenement= evenementType, photo=photoCouverture, description=description, prix = prix
+                typeEvenement= evenementType, photo=photoCouverture, description=description, prix = prix, titre = titre
             )
             
             for image in range(0, len(images)):
@@ -93,6 +93,10 @@ def ajoutEvenement(request):
                     evenement = evenement,
                     image = images[image]
                 )
+        else:
+            evenement = Evenement.objects.create(
+                typeEvenement= evenementType, photo= None, description=description, prix = prix, titre = titre
+            )
         return redirect('affichageEvenement')
     return render(request, 'admin/gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem})
 
@@ -125,16 +129,18 @@ def modifierEvenement(request, id):
         images = request.FILES.getlist('photos[]')
         prix = request.POST.get("prix")
         evenementType = TypeEvenement.objects.get(pk=int(type_evenement))
+        
+        evenement.typeEvenement = evenementType
+        evenement.prix = prix
+        evenement.description = description
+        evenement.titre = titre
+        evenement.save()
+        
         if images:
-            photoCouverture = images[0]
-            evenement.typeEvenement = evenementType
-            evenement.prix = prix
+            photoCouverture = images[0]      
             evenement.photo = photoCouverture
-            evenement.description = description
-            
+                  
             evenement.save()
-            # EvenementImage.objects.filter(evenement=evenement).delete()
-            
           
             for image in range(0, len(images)):
                 EvenementImage.objects.create(
@@ -220,15 +226,28 @@ def liste_membres(request):
     # Récupérer la requête de recherche
     search_query = request.GET.get('search', '').strip()
     
+    nombreMembre = 0
     # Filtrer les membres selon la recherche
     if search_query:
         membres = Membre.objects.filter(
-            Q(nom__icontains=search_query) | 
+            Q(nom__icontains=search_query) |
             Q(prenom__icontains=search_query) |
-            Q(email__icontains=search_query)
+            Q(email__icontains=search_query) |
+            Q(adresse__icontains=search_query) |
+            Q(profession__icontains=search_query) |
+            Q(niveauEtude__icontains=search_query) |
+            Q(ecole__icontains=search_query) |
+            Q(date_inscription__icontains=search_query) |
+            Q(ner__icontains=search_query) |
+            Q(keri__icontains=search_query) |
+            Q(keribour__icontains=search_query) |
+            Q(keriBa__icontains=search_query) |
+            Q(keribourBa__icontains=search_query)
         ).order_by('nom', 'prenom')
+        nombreMembre = membres.count()
     else:
         membres = Membre.objects.all().order_by('nom', 'prenom')
+        nombreMembre = membres.count()
     
     # Pagination (10 membres par page)
     paginator = Paginator(membres, 10)
@@ -238,6 +257,7 @@ def liste_membres(request):
     return render(request, 'admin/gestionMembre/liste.html', {
         'page_obj': page_obj,
         'search_query': search_query,
+        'nombreMembre': nombreMembre
     })
 
 def detail_membre(request, pk):
@@ -486,7 +506,7 @@ def liste_paiements(request):
     
     if evenement_id:
         paiements = paiements.filter(evenement__id=evenement_id)
-    if membre_id:
+    if membre_id: 
         paiements = paiements.filter(membre__id=membre_id)
     
     context = {
@@ -501,53 +521,132 @@ def liste_paiements(request):
 
 def ajouter_paiement(request):
     evenements = Evenement.objects.all()
+    
     if request.method == 'POST':
         form = PaiementForm(request.POST, request.FILES)
+        
         if form.is_valid():
-            paiement = form.save()
-            messages.success(request, 'Paiement enregistré avec succès!')
-            return redirect('liste_paiements')
+            montant = form.cleaned_data['montant']
+            evenement = form.cleaned_data['evenement']
+            membre = form.cleaned_data['membre']
+            date_paiement = form.cleaned_data['date_paiement']
+            preuve_paiement = form.cleaned_data.get('preuve_paiement')
+
+            paiement_existant = Paiement.objects.filter(
+                membre=membre,
+                evenement=evenement
+            ).first()
+
+            # --- Si le paiement existe déjà, on met à jour ---
+            if paiement_existant:
+                paiement_existant.montant += montant
+                paiement_existant.date_paiement = date_paiement or paiement_existant.date_paiement
+                if preuve_paiement:
+                    paiement_existant.preuve_paiement = preuve_paiement
+
+                # --- Déterminer le statut selon le montant cumulé ---
+                prix = paiement_existant.evenement.prix
+                montant_total = paiement_existant.montant
+
+                if montant_total >= prix:
+                    paiement_existant.statut = "payé"
+                elif montant_total >= (prix / 2):
+                    paiement_existant.statut = "moitié_payé"
+                elif montant_total > 0:
+                    paiement_existant.statut = "avance"
+                else:
+                    paiement_existant.statut = "non_payé"
+
+                paiement_existant.save()
+                messages.success(request, 'Paiement mis à jour avec succès !')
+                return redirect('liste_paiements')
+
+            # --- Sinon, créer un nouveau paiement ---
+            else:
+                paiement = form.save(commit=False)
+                prix = evenement.prix
+
+                if montant >= prix:
+                    paiement.statut = "payé"
+                elif montant >= (prix / 2):
+                    paiement.statut = "moitié_payé"
+                elif montant > 0:
+                    paiement.statut = "avance"
+                else:
+                    paiement.statut = "non_payé"
+
+                paiement.save()
+                messages.success(request, 'Nouveau paiement enregistré avec succès !')
+                return redirect('liste_paiements')
+    
     else:
         form = PaiementForm()
-    return render(request, 'admin/gestionPaiement/ajouter.html',  {'form': form, 'evenements': evenements} )
+    
+    return render(request, 'admin/gestionPaiement/ajouter.html', {
+        'form': form,
+        'evenements': evenements
+    })
+
 
 def rappeler_paiements(request):
     if request.method == 'POST':
         event_id = request.POST.get('event_id')
-        # Récupérer les membres avec statut non payé ou moitié payé
-        paiements = Paiement.objects.filter(evenement_id = event_id)
-        
-        # Préparer les emails
+        if not event_id:
+            messages.error(request, "Aucun événement sélectionné.")
+            return redirect('liste_paiements')
+
+        # 🔹 Récupérer les paiements partiels ou non payés
+        paiements = Paiement.objects.filter(
+            evenement_id=event_id,
+            statut__in=['non_payé', 'moitié_payé', 'avance']
+        )
+
+        if not paiements.exists():
+            messages.info(request, "Aucun membre à relancer pour cet événement.")
+            return redirect('liste_paiements')
+
+        # 🔹 Préparer les emails
         email_messages = []
         for paiement in paiements:
-            sujet = f"Rappel de paiement pour {paiement.evenement}"
+            montant_du = paiement.evenement.prix - paiement.montant
+
+            sujet = f"Rappel de paiement - {paiement.evenement.titre}"
             message = f"""
-            Bonjour {paiement.membre.nom_complet},
-            
-            Nous vous rappelons que votre paiement pour l'événement {paiement.evenement}
-            est toujours en statut {paiement.get_statut_display()}.
-            
-            Montant dû: {paiement.montant} €
-            
-            Merci de régulariser votre situation au plus vite.
-            
-            Cordialement,
-            L'équipe d'administration
-            """
-            email_messages.append((
-                sujet,
-                message,
-                'admin@example.com',
-                [paiement.membre.email]
-            ))
-        
-        # Envoyer les emails en masse
-        send_mass_mail(email_messages, fail_silently=False)
-        
-        messages.success(request, f"Rappels envoyés !")
+                Bonjour {paiement.membre.nom_complet},
+
+                Nous vous rappelons que votre paiement pour l'événement **{paiement.evenement.titre}** 
+                est actuellement en statut **{paiement.get_statut_display()}**.
+
+                Montant payé : {paiement.montant} Fcfa  
+                Montant total : {paiement.evenement.prix} Fcfa  
+                Montant restant : {montant_du} Fcfa
+
+                Merci de bien vouloir régulariser votre paiement dans les plus brefs délais.
+
+                Cordialement,  
+                L’équipe d’administration
+                """
+
+            # Vérifier que l’email du membre existe
+            if paiement.membre.email:
+                email_messages.append((
+                    sujet,
+                    message,
+                    'admin@example.com',  # ✅ à remplacer par ton email d’administration réel
+                    [paiement.membre.email]
+                ))
+
+        # 🔹 Envoi des emails
+        if email_messages:
+            send_mass_mail(email_messages, fail_silently=False)
+            messages.success(request, f"Rappels envoyés à {len(email_messages)} membre(s).")
+        else:
+            messages.warning(request, "Aucun membre avec une adresse e-mail valide.")
+
         return redirect('liste_paiements')
-    
+
     return redirect('liste_paiements')
+
 
 def modifierPaiement(request, pk):
     # Récupérer le paiement à modifier ou retourner 404 si non trouvé
@@ -558,6 +657,25 @@ def modifierPaiement(request, pk):
         # Passer l'instance existante au formulaire pour la mise à jour
         form = PaiementForm(request.POST, request.FILES, instance=paiement)
         if form.is_valid():
+            
+            montant = form.cleaned_data['montant']
+            evenement = form.cleaned_data['evenement']
+            
+            # Détermination du statut
+            if montant >= evenement.prix:
+                statut = "payé"
+            elif montant >= (evenement.prix / 2):
+                statut = "moitié_payé"
+            elif montant < (evenement.prix / 2):
+                statut = "avance"
+            else:
+                statut = "non_payé"
+            
+            # Enregistrement du paiement
+            paiement = form.save(commit=False)
+            paiement.statut = statut
+            paiement.save()
+            
             form.save()
             messages.success(request, 'Paiement modifié avec succès!')
             return redirect('liste_paiements')
@@ -574,3 +692,23 @@ def modifierPaiement(request, pk):
     }
     
     return render(request, 'admin/gestionPaiement/modifierPaiment.html', context)
+
+
+def paiementParEvenement(request, pk):
+    evenement = get_object_or_404(Evenement, id = pk)
+    
+    paiements = Paiement.objects.filter(evenement = evenement).order_by('-date_paiement')
+    
+    membre_id = request.GET.get('membre')
+    if membre_id:
+        paiements = paiements.filter(membre__id=membre_id)
+    
+    
+    contexte = {"paiements": paiements, "evenement": evenement, 'membres': Membre.objects.all(),}
+    return render(request, "admin/gestionPaiement/paiementParEvenement.html", contexte)
+    
+    
+    
+    
+    
+
