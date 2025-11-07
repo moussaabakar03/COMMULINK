@@ -250,7 +250,7 @@ def liste_membres(request):
         nombreMembre = membres.count()
     
     # Pagination (10 membres par page)
-    paginator = Paginator(membres, 10)
+    paginator = Paginator(membres, 2)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     

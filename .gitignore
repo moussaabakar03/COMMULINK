@@ -1,0 +1,25 @@
+# Fichiers Python compilés
+*.pyc
+__pycache__/
+
+# Fichiers de logs
+*.log
+
+# Paramètres personnels / secrets
+*.env
+.env
+
+# Base de données locale SQLite
+db.sqlite3
+
+# Configurations IDE
+.idea/
+.vscode/
+
+# Dossiers statiques collectés
+staticfiles/
+media/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
