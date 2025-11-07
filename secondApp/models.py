@@ -61,7 +61,7 @@ class Membre(models.Model):
     keribourBa = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.nom} {self.prenom}"
+        return f"{self.nom} {self.prenom}--- {self.ner}. {self.keri}"
 
     class Meta:
         verbose_name = "Membre"
