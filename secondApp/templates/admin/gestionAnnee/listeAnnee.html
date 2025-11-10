@@ -1,13 +1,11 @@
 {% extends 'admin/base.html' %}
 {% load static %}
 
-{% block title %}Gestion des Paiements{% endblock %}
+{% block title %}Gestion des annees{% endblock %}
 
 {% block style %}
     
     <link rel="stylesheet" href="{% static 'admin/assets/css/paiements/paiements.css' %}" />
-
-    {% comment %} <link rel="stylesheet" href="{% static 'secretaire/css/select2.min.css' %}"> {% endcomment %}
 
     <script src="{% static 'secretaire/js/select2.min.js' %}"></script>
     <!-- CSS Select2 -->
@@ -45,8 +43,8 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container-custom text-center">
-            <h1 class="page-title text-white">💳 Gestion des Paiements</h1>
-            <p class="page-subtitle">Gérez et suivez tous les paiements des membres</p>
+            <h1 class="page-title text-white">💳 Gestion des Annees</h1>
+            <p class="page-subtitle">Gérez Annees</p>
         </div>
     </header>
 
@@ -74,110 +72,46 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <h3 class="card-title text-secondary">
                             <i class="fas fa-credit-card"></i>
-                            Gestion des Paiements
+                            Gestion des annees
                         </h3>
                         <div class="header-actions">
                             <a href="{% url 'ajouter_paiement' %}" class="btn-add">
-                                <i class="fas fa-plus"></i> Ajouter un paiement
+                                <i class="fas fa-plus"></i> Ajouter une Annee
                             </a>
-                            {% if evenement %}
-                            <form method="post" action="{% url 'rappeler_paiements' %}" class="d-inline">
-                                {% csrf_token %}
-                                <input type="number" name="event_id" value="{{evenement.id}}" hidden>
-                                <button type="submit" class="btn-remind">
-                                    <i class="fas fa-bell"></i> Rappeler Paiements
-                                </button>
-                            </form>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
                 
                 <!-- Corps -->
                 <div class="card-body-custom">
-                    <!-- Formulaire de filtrage -->
-                    <form method="get" class="filter-form">
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label for="evenement" class="form-label">
-                                    <i class="fas fa-calendar-alt me-1"></i>
-                                    Événement
-                                </label>
-                                <select name="evenement" id="evenement" class="form-select form-control">
-                                    <option value="">Tous les événements</option>
-                                    {% for evenement in evenements %}
-                                        {% if evenement %}
-                                            <option value="{{ evenement.id }}">
-                                                {{ evenement.titre }}
-                                            </option>
-                                        {% endif %}
-                                    {% endfor %}
-                                </select>
-
-                            </div>
-                            <div class="col-md-5">
-                                <label for="membre" class="form-label">
-                                    <i class="fas fa-user me-1"></i>
-                                    Membre
-                                </label>
-                                <select name="membre" id="membre" class="form-select form-control">
-                                    <option value="">Tous les membres</option>
-                                    {% for membre in membres %}
-                                        <option value="{{ membre.id }}">
-                                            {{ membre.nom_complet }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn-filter">
-                                    <i class="fas fa-filter"></i> Filtrer
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                    
-                    <!-- Tableau des paiements -->
                     <div class="table-responsive">
                         <table class="payments-table">
                             <thead>
                                 <tr>
-                                    <th>Membre</th>
-                                    <th>Événement</th>
-                                    <th>Montant</th>
-                                    <th>Statut</th>
-                                    <th>Date</th>
+                                    <th>#</th>
+                                    <th>Année</th>
+                                    <th>Début</th>
+                                    <th>Fin</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for paiement in paiements %}
+                                {% for annee in annees %}
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="member-avatar me-2">
                                                 <i class="fas fa-user-circle text-primary"></i>
                                             </div>
-                                            <strong>{{ paiement.membre.nom_complet }}</strong>
+                                            <strong>{{ annee.id }}</strong>
                                         </div>
                                     </td>
-                                    <td>{{ paiement.evenement.titre }}</td>
-                                    <td>
-                                        <span class="fw-bold text-primary">{{ paiement.montant }} FCFA</span>
-                                    </td>
-                                    <td>
-                                        <span class="status-badge 
-                                            {% if paiement.statut == 'payé' %}status-paid
-                                            {% elif paiement.statut == 'non_payé' %}status-unpaid
-                                            {% else %}status-pending{% endif %}">
-                                            <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% else %}clock{% endif %}"></i>
-                                            {{ paiement.get_statut_display }}
-                                        </span>
-                                    </td>
-                                    <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ annee.debutAnnee|date:"Y" }}- {{ annee.finAnnee|date:"Y" }}</td>
+                                    <td>{{ annee.debutAnnee|date:"d/m/Y" }}</td>
+                                    <td>{{ annee.finAnnee|date:"d/m/Y" }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
+                                            <a href="{% url 'modifierPaiement' annee.pk %}" class="btn-action btn-edit" title="Modifier">
                                                 <i class="fas fa-sync-alt"></i>
                                             </a>
                                             <a href="#" class="btn-action btn-info" title="Voir preuve">
@@ -190,9 +124,8 @@
                                 <tr>
                                     <td colspan="6">
                                         <div class="empty-state">
-                                            <i class="fas fa-credit-card"></i>
-                                            <h3>Aucun paiement trouvé</h3>
-                                            <p>Essayez d'ajuster vos filtres ou ajoutez un nouveau paiement</p>
+                                            <h3>Aucune Année trouvée</h3>
+                                            <p>Essayez d'ajuster vos filtres ou ajoutez une nouvelle année</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -205,16 +138,9 @@
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    {% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script> {% endcomment %}
-    
-    <!-- Font Awesome -->
-    {% comment %} <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script> {% endcomment %}
-    
 
     <script>
-        // Animation d'apparition des éléments
         document.addEventListener('DOMContentLoaded', function() {
             const tableRows = document.querySelectorAll('.payments-table tbody tr');
             

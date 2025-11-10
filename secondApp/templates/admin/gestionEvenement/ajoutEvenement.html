@@ -330,6 +330,16 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label for="annee">Année pour l'événement*</label>
+                            <select name="annee" id="annee" required>
+                                <option value="">Choisir une année</option>
+                                {% for toutes_annee in toutes_annees %}
+                                    <option value="{{ toutes_annee.id }}">{{ toutes_annee.debutAnnee|date:"Y" }}- {{ toutes_annee.finAnnee|date:"Y" }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         
                         <div class="form-group">
                             <label for="titre">Titre de l'evenement</label>

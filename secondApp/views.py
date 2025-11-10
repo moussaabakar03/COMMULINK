@@ -2,8 +2,8 @@ from django.shortcuts import redirect, render
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import Membre, Annonce, Paiement
-from .forms import MembreForm, AnnonceForm, PaiementForm
+from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
+from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,7 @@ from django.core.mail import send_mass_mail
 from time import timezone
 import datetime
 from django.db.models import Count
-from firtsApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
+# from firtsApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
 
 
 # DASHBOARD VIEW
@@ -73,19 +73,22 @@ def affichageEvenement(request):
 
 def ajoutEvenement(request):
     typeEvenem = TypeEvenement.objects.all()
+    toutes_annees = Annee.objects.all()
     if request.method == "POST":
         titre = request.POST.get('titre')
         description = request.POST.get('description')
         type_evenement = request.POST.get('type_evenement')
         images = request.FILES.getlist('photos[]') 
         prix = request.POST.get("montant")
+        annee_select = request.POST.get("annee")
         
         evenementType = TypeEvenement.objects.get(id=type_evenement)
+        annee = Annee.objects.get(id=annee_select)
         
         if images:
             photoCouverture = images[0]
             evenement = Evenement.objects.create(
-                typeEvenement= evenementType, photo=photoCouverture, description=description, prix = prix, titre = titre
+                typeEvenement= evenementType, photo=photoCouverture, description=description, prix = prix, titre = titre, annee = annee
             )
             
             for image in range(0, len(images)):
@@ -98,7 +101,7 @@ def ajoutEvenement(request):
                 typeEvenement= evenementType, photo= None, description=description, prix = prix, titre = titre
             )
         return redirect('affichageEvenement')
-    return render(request, 'admin/gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem})
+    return render(request, 'admin/gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem, 'toutes_annees': toutes_annees})
 
 def evenementFiltrer(request, id):
     categorieEvenemnt = TypeEvenement.objects.get(id = id)
@@ -121,19 +124,24 @@ def detailEvenements(request, id):
 def modifierEvenement(request, id):
     evenement = Evenement.objects.get(id=id)
     typeEvenement = TypeEvenement.objects.all()
+    toutes_annees = Annee.objects.all()
     imageEvenement = EvenementImage.objects.filter(evenement=evenement)
     if request.method == "POST":
         titre = request.POST.get('titre')
         description = request.POST.get('description')
         type_evenement = request.POST.get('type_evenement')
+        anneeSelect = request.POST.get('annee')
         images = request.FILES.getlist('photos[]')
         prix = request.POST.get("prix")
+        
         evenementType = TypeEvenement.objects.get(pk=int(type_evenement))
+        annee = Annee.objects.get(pk=int(anneeSelect))
         
         evenement.typeEvenement = evenementType
         evenement.prix = prix
         evenement.description = description
         evenement.titre = titre
+        evenement.annee = annee
         evenement.save()
         
         if images:
@@ -150,13 +158,28 @@ def modifierEvenement(request, id):
                 return redirect('affichageEvenement')
         return redirect('affichageEvenement')
         
-    return render(request, 'admin/gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement})
+    return render(request, 'admin/gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "toutes_annees": toutes_annees})
     
 def supprimerEvenement(request, id):
     evenement = Evenement.objects.get(id=id).delete()
     EvenementImage.objects.filter(evenement = evenement).delete()
     return redirect('affichageEvenement')
 
+
+
+def publier_evenement(request, id):
+    evenement = get_object_or_404(Evenement, id=id)
+    evenement.est_publie = True
+    evenement.save()
+    messages.success(request, "Evenement publié avec succès")
+    return redirect('affichageEvenement')
+
+def depublier_evenement(request, id):
+    evenement = get_object_or_404(Evenement, id=id)
+    evenement.est_publie = False
+    evenement.save()
+    messages.success(request, "Evenement dépublié avec succès")
+    return redirect('affichageEvenement')
 
 #-------------------------------------------GESTION TEMOIGNAGES----------------------------------
 
@@ -219,6 +242,7 @@ def supprimerTemoingne(request, id):
     temoingnage = Temoingnage.objects.get(id=id)
     temoingnage.delete()
     return redirect('temoingnages')
+
 
 # --------------------------------GESTION DES MEMBRES----------------------------------------
 
@@ -483,6 +507,40 @@ def supprimer_annonce(request, id):
     messages.success(request, f"L'annonce '{titre_annonce}' a été supprimée avec succès!")
     return redirect('liste_annonces')
 
+
+#---------------------------------GESTION DES ANNEES------------------------------------------
+
+def listeAnnee(request):
+    annees = Annee.objects.all()
+
+    context = {
+        'annees': annees,
+    }
+    return render(request, "admin/gestionAnnee/listeAnnee.html", context)
+
+def ajoutAnnee(request):
+     
+    if request.method == 'POST':
+        form = AnneeForm(request.POST)
+        
+        if form.is_valid():
+            debutAnnee = form.cleaned_data['debutAnnee']
+            finAnnee = form.cleaned_data['finAnnee']
+
+            Annee.objects.create(
+                debutAnnee = debutAnnee,
+                finAnnee = finAnnee
+            )
+            
+            messages.success(request, 'Nouvelle année enregistré avec succès !')
+            return redirect('listeAnnee')
+
+    else:
+        form = AnneeForm()
+        
+    return render(request, "admin/gestionAnnee/ajoutAnnee.html",  {
+        'form': form,
+    })
 
 
 #---------------------------------GESTION DES PAIEMENTS------------------------------------------

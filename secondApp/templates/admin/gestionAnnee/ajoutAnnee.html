@@ -1,0 +1,162 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Ajouter un Paiement{% endblock %}
+{% block style %}
+
+    <!-- Inclure Flatpickr pour le champ datetime -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+
+    {% comment %} css pour la page {% endcomment %}
+    <link rel="stylesheet" href="{% static 'admin/assets/css/paiements/formulairePaiement.css' %}" />
+
+{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container-custom text-center">
+            <h1 class="page-title text-white">💳 Ajouter une année</h1>
+            <p class="page-subtitle">Enregistrez une nouvelle année</p>
+        </div>
+    </header>
+
+    <div class="page-inner">
+        <div class="container-custom">
+            <!-- Carte du formulaire -->
+            <div class="form-card">
+                <!-- En-tête -->
+                <div class="card-header-custom">
+                    <h3 class="card-title text-white">
+                        <i class="fas fa-cash-register"></i>
+                        Nouvelle année
+                    </h3>
+                </div>
+                
+                <!-- Corps -->
+                <div class="card-body-custom">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.debutAnnee.id_for_label }}" class="form-label">
+                                            <i class="fas fa-calendar"></i>
+                                            {{ form.debutAnnee.label }} 
+                                        </label>
+                                        {{ form.debutAnnee }}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-calendar"></i>
+                                            Veuillez entrer un début d'année valide.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.finAnnee.id_for_label }}" class="form-label">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            {{ form.finAnnee.label }} (FCFA)
+                                        </label>
+                                        {{ form.finAnnee }}
+                                        <div class="invalid-feedback">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            Veuillez entrer une fin d'année valide.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons de soumission -->
+                        <div class="form-actions">
+                            <a href="{% url 'liste_paiements' %}" class="btn-cancel">
+                                <i class="fas fa-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-save"></i> Enregistrer l'année
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    
+    <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+    
+    <script>
+        // Validation Bootstrap
+        (function () {
+            'use strict'
+            
+            const forms = document.querySelectorAll('.needs-validation')
+            
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+        
+        // Initialisation du datetime picker
+        document.addEventListener('DOMContentLoaded', function() {
+            // Appliquer les classes CSS aux champs du formulaire
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                if (input.type !== 'file' && input.type !== 'checkbox' && input.type !== 'radio') {
+                    input.classList.add('form-control-custom');
+                }
+                if (input.tagName === 'SELECT') {
+                    input.classList.add('form-select-custom');
+                }
+            });
+            
+            // Initialiser Flatpickr pour le champ datetime
+            if (document.getElementById('id_date_paiement')) {
+                flatpickr("#id_date_paiement", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
+                    time_24hr: true,
+                    locale: "fr",
+                    defaultDate: new Date(),
+                    minuteIncrement: 1
+                });
+            }
+            
+            // Améliorer l'affichage du champ fichier
+            const fileInput = document.getElementById('id_preuve_paiement');
+            const fileCustom = document.querySelector('.file-input-custom');
+            
+            if (fileInput && fileCustom) {
+                fileInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const fileName = this.files[0].name;
+                        const fileText = fileCustom.querySelector('.file-text');
+                        fileText.textContent = fileName;
+                        fileCustom.style.borderColor = 'var(--primary)';
+                        fileCustom.style.backgroundColor = 'rgba(255, 111, 15, 0.1)';
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

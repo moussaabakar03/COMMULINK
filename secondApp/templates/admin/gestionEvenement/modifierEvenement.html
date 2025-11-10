@@ -335,6 +335,23 @@
                             </select>
                         </div>
 
+                        
+                        <div class="form-group">
+                            <label for="annee">Année pour l'événement*</label>
+                            <select name="annee" id="annee" required>
+                                <option value="">Choisir une année</option>
+                                <option value="{{evenement.annee.id}}">{{ evenement.annee.debutAnnee|date:"Y" }}- {{ evenement.annee.finAnnee|date:"Y" }}</option>
+                                {% for toutes_annee in toutes_annees %}
+                                    <option value="{{toutes_annee.id}}" {% if toutes_annee.id == evenement.annee.id %}selected{% endif %}>
+                                        {{ toutes_annee.debutAnnee|date:"Y" }}- {{ toutes_annee.finAnnee|date:"Y" }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        
+
                         <div class="form-group">
                             <label for="titre">Titre de l'evenement</label>
                             <input type="text" id="titre" name="titre" value = "{{ evenement.titre }}" placeholder="Entrez le titre de l'evenement" step = "25" min ="0">

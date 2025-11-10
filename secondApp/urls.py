@@ -17,6 +17,11 @@ urlpatterns = [
     path('modifierEvenement/<int:id>', views.modifierEvenement, name='modifierEvenement'),
     path('supprimerEvenement/<int:id>', views.supprimerEvenement, name='supprimerEvenement'),
     
+    path('depublier-evenement/<int:id>', views.depublier_evenement, name='depublier_evenement'),
+    path('publier-evenement/<int:id>', views.publier_evenement, name='publier_evenement'),
+    
+    
+    
     #----------------------URLS TEMOIGNAGES--------------------------------
     path('ajoutTemoingnages/', views.ajoutTemoingnages, name='ajoutTemoingnages'),
     path('temoingnages/', views.listeTemoingnes, name='temoingnages'),
@@ -45,6 +50,14 @@ urlpatterns = [
     path('annonces/publier/<int:id>/', views.publier_annonce, name='publier_annonce'),
     path('annonces/supprimer/<int:id>/', views.supprimer_annonce, name='supprimer_annonce'),
 
+
+
+    #-----------------------------URLS Annees------------------------------------
+    path('liste-annee/', views.listeAnnee, name='listeAnnee'),
+    path('ajout-annee/', views.ajoutAnnee, name='ajoutAnnee'),
+    
+    
+    
     #-----------------------------URLS PAIEMENTS------------------------------------
     path('paiements/', views.liste_paiements, name='liste_paiements'),
     path('paiements/ajouter/', views.ajouter_paiement, name='ajouter_paiement'),
