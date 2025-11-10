@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import MinLengthValidator, EmailValidator
 from django.utils import timezone
-from .models import Membre
+from .models import Annee, Membre
 
 class MembreForm(forms.Form):
     GENRE_CHOICES = [
@@ -185,4 +185,11 @@ class PaiementForm(forms.ModelForm):
         widgets = {
             'montant': forms.NumberInput(attrs={'min': '0', 'step': '25'}),
         }
+
+
+class AnneeForm(forms.Form):
+    debutAnnee = forms.DateField(label="Début Annee", widget=forms.TextInput(attrs={"type": "date"}))
+    finAnnee = forms.DateField(label="Fin Annee", widget=forms.TextInput(attrs={"type": "date"}))
+        
+        
         

@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from . models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
+from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
+
 
 # Create your views here.
 

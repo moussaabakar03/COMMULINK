@@ -2,15 +2,14 @@ from django.db import models
 from django.db import models
 from django.core.validators import EmailValidator, MinLengthValidator
 from django.utils import timezone
-from firtsApp.models import Evenement
 
 
+class Annee(models.Model):
+    debutAnnee = models.DateField()
+    finAnnee = models.DateField()
 
-# Create your models here.
-from django.db import models
-from django.core.validators import EmailValidator, MinLengthValidator
-from django.utils import timezone
-from firtsApp.models import Evenement
+    def __str__(self):
+        return f"{self.debutAnnee}- {self.finAnnee}"
 
 class Membre(models.Model):
     GENRE_CHOICES = [
@@ -89,6 +88,60 @@ class Annonce(models.Model):
 
     def __str__(self):
         return self.titre
+
+
+
+
+
+# Create your models here.
+class TypeEvenement(models.Model):
+    nom_type_evenement = models.CharField(max_length=100)
+    description_type_evenement = models.TextField()
+    image_type_evenement = models.ImageField(upload_to='images/')
+    
+    def __str__(self):
+        return self.nom_type_evenement
+    
+class Evenement(models.Model):
+    
+    annee = models.ForeignKey(Annee, on_delete=models.CASCADE, related_name="evement", null=True)
+    typeEvenement = models.ForeignKey (TypeEvenement, on_delete=models.CASCADE, related_name= 'evenement')
+    titre = models.CharField(max_length=200)
+    description = models.TextField()
+    dateHeure = models.DateTimeField(editable=False, auto_now_add=True)
+    photo = models.ImageField(upload_to='evenements')
+    prix = models.DecimalField(max_digits=10 ,decimal_places=2, default=0.0, null=True)
+    est_publie = models.BooleanField(default=False)
+    
+    
+    
+    def __str__(self):
+        return self.titre
+
+class EvenementImage(models.Model):
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='evenements/images')
+
+
+class EquipeDirigeante(models.Model):
+    nom = models.CharField(max_length=100)
+    role = models.CharField(max_length=100)
+    lienFacebook = models.CharField(max_length=100)
+    lienInstagram = models.CharField(max_length=100)
+    lienTwitter = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='equipe')
+
+class Temoingnage(models.Model):
+    message = models.TextField()
+    image = models.ImageField(upload_to='temoignage')
+    nom = models.CharField(max_length=100)
+    role = models.CharField(max_length=100)
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, related_name ='temoignage', null=True, blank=True)
+    video = models.FileField(upload_to='videos/')
+
+
+
+
 
 class Paiement(models.Model):
     STATUT_CHOICES = [
