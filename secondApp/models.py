@@ -169,14 +169,7 @@ class Paiement(models.Model):
     
     
 class Reinscription(models.Model):
-    # STATUT_CHOICES = [
-    #     ('actif', 'Actif'),
-    #     ('inactif', 'Inactif'),
-    #     ('suspendu', 'Suspendu'),
-    #     ('en_attente', 'En attente de validation'),
-    # ]
-    
-    # Relations principales
+   
     membre = models.ForeignKey(
         Membre, 
         on_delete=models.CASCADE, 
@@ -188,10 +181,8 @@ class Reinscription(models.Model):
         related_name='reinscriptions'
     )
     
-    # Informations susceptibles de changer chaque année
     username = models.CharField(max_length=20, blank=True, null=True)
     password = models.TextField(blank=True, null=True)
-    # profession = models.CharField(max_length=50)
     numeroUrgence = models.CharField(
         max_length=20, 
         blank=True, 
@@ -208,29 +199,9 @@ class Reinscription(models.Model):
     )
     filiere = models.CharField(max_length=150, blank=True, null= True)
     
-    # Informations de statut et de suivi
-    # statut = models.CharField(
-    #     max_length=20, 
-    #     choices=STATUT_CHOICES, 
-    #     default='en_attente'
-    # )
     
     date_reinscription = models.DateTimeField(auto_now_add=True)
     
-    # date_validation = models.DateTimeField(null=True, blank=True)
-    
-    # Cotisation annuelle (optionnel)
-    # cotisation_payee = models.BooleanField(default=False)
-    # montant_cotisation = models.DecimalField(
-    #     max_digits=10, 
-    #     decimal_places=2, 
-    #     default=0.0, 
-    #     null=True, 
-    #     blank=True
-    # )
-    # date_paiement_cotisation = models.DateTimeField(null=True, blank=True)
-    
-    # Photo mise à jour pour l'année (optionnel)
     photo_annuelle = models.ImageField(
         upload_to='reinscriptions/%Y/',
         blank=True,
@@ -238,38 +209,3 @@ class Reinscription(models.Model):
         verbose_name="Photo de l'année"
     )
     
-    # Notes spécifiques à l'année
-    # notes_annuelles = models.TextField(
-    #     blank=True, 
-    #     null=True, 
-    #     verbose_name="Notes pour cette année"
-    # )
-    
-    # class Meta:
-    #     verbose_name = "Réinscription"
-    #     verbose_name_plural = "Réinscriptions"
-    #     ordering = ['-annee', 'membre_nom', 'membre_prenom']
-    #     # Empêche un membre d'avoir plusieurs inscriptions pour la même année
-    #     unique_together = [['membre', 'annee']]
-    #     indexes = [
-    #         models.Index(fields=['annee', 'statut']),
-    #         models.Index(fields=['membre', 'annee']),
-    #     ]
-    
-    # def _str_(self):
-    #     return f"{self.membre.nom_complet} - {self.annee} ({self.statut})"
-    
-    # @property
-    # def est_actif(self):
-    #     """Vérifie si le membre est actif pour cette année"""
-    #     return self.statut == 'actif' and self.cotisation_payee
-    
-    # def save(self, *args, **kwargs):
-    #     """Validation automatique si la cotisation est payée"""
-    #     if self.cotisation_payee and not self.date_validation:
-    #         self.date_validation = timezone.now()
-    #         if self.statut == 'en_attente':
-    #             self.statut = 'actif'
-    #     super().save(*args, **kwargs)
-
-
