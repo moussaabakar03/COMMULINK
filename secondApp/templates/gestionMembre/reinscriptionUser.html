@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMMULINK - Connexion</title>
+    <title>COMMULINK - Reinscription</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -362,66 +362,165 @@
                 max-width: 400px;
             }
         }
+
+
+
+        /* Pour styliser le champ image comme les autres */
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            transition: border-color 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload input[type="file"] {
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: var(--text-color);
+            width: 100%;
+        }
+
+        .file-upload input[type="file"]::-webkit-file-upload-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .file-upload input[type="file"]::-webkit-file-upload-button:hover {
+            background-color: var(--primary-hover);
+        }
+
     </style>
 </head>
 <body>
     <div class="auth-container">
-       
-        <!-- Formulaire de connexion -->
         <div class="auth-card fade-in">
             <div class="auth-header">
-                <h2>Connexion</h2>
-                <p>Accédez à votre compte COMMULINK</p>
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+                <h2>Réinscription</h2>
+                <p>Complétez vos informations pour vous réinscrire à COMMULINK</p>
             </div>
-            
-            <form id="login-form">
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Username -->
                 <div class="form-group">
-                    <label for="login-username">Nom d'utilisateur</label>
+                    <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
                     <div class="form-control">
                         <span class="form-icon">👤</span>
-                        <input type="text" id="login-username" name="login-username" placeholder="Votre nom d'utilisateur" required>
+                        {{ form.username }}
                     </div>
-                    <div class="error-message" id="login-username-error"></div>
+                    <div class="error-message">{{ form.username.errors }}</div>
                 </div>
-                
+
+                <!-- Password -->
                 <div class="form-group">
-                    <label for="login-password">Mot de passe</label>
+                    <label for="{{ form.password.id_for_label }}">Mot de passe</label>
                     <div class="form-control">
                         <span class="form-icon">🔒</span>
-                        <input type="password" id="login-password" name="login-password" placeholder="Votre mot de passe" required>
-                        <span class="password-toggle" id="login-password-toggle">👁️</span>
+                        {{ form.password }}
+                        <span class="password-toggle" id="password-toggle">👁️</span>
                     </div>
-                    <div class="error-message" id="login-password-error"></div>
+                    <div class="error-message">{{ form.password.errors }}</div>
                 </div>
-                
-                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center;">
-                        <input type="checkbox" id="remember-me" style="margin-right: 8px;">
-                        <label for="remember-me" style="margin-bottom: 0; font-size: 14px;">Se souvenir de moi</label>
+
+                <hr><hr>
+                <span style="color: red; font-weight: bold;">Vos infos susceptibles d'être mises à jour</span>
+                <hr><hr>
+
+                <!-- Numéro d'urgence -->
+                <div class="form-group">
+                    <label for="{{ form.numeroUrgence.id_for_label }}">Numéro d'urgence</label>
+                    <div class="form-control">
+                        <span class="form-icon">📞</span>
+                        {{ form.numeroUrgence }}
                     </div>
-                    <a href="#" style="font-size: 14px; color: var(--primary-color); text-decoration: none;">Mot de passe oublié?</a>
+                    <div class="error-message">{{ form.numeroUrgence.errors }}</div>
                 </div>
-                
-                <button type="submit" class="btn" id="login-btn">Se connecter</button>
-                
-                <div class="divider">ou</div>
-                
-                <div class="social-login">
-                    <button type="button" class="social-btn facebook">
-                        <i>f</i>
-                    </button>
-                    <button type="button" class="social-btn google">
-                        <i>G</i>
-                    </button>
+
+                <!-- Téléphone -->
+                <div class="form-group">
+                    <label for="{{ form.telephone.id_for_label }}">Téléphone</label>
+                    <div class="form-control">
+                        <span class="form-icon">📱</span>
+                        {{ form.telephone }}
+                    </div>
+                    <div class="error-message">{{ form.telephone.errors }}</div>
                 </div>
-                
+
+                <!-- Adresse -->
+                <div class="form-group">
+                    <label for="{{ form.adresse.id_for_label }}">Adresse</label>
+                    <div class="form-control">
+                        <span class="form-icon">📍</span>
+                        {{ form.adresse }}
+                    </div>
+                    <div class="error-message">{{ form.adresse.errors }}</div>
+                </div>
+
+                <!-- École -->
+                <div class="form-group">
+                    <label for="{{ form.ecole.id_for_label }}">École</label>
+                    <div class="form-control">
+                        <span class="form-icon">🏫</span>
+                        {{ form.ecole }}
+                    </div>
+                    <div class="error-message">{{ form.ecole.errors }}</div>
+                </div>
+
+                <!-- Niveau d'étude -->
+                <div class="form-group">
+                    <label for="{{ form.niveauEtude.id_for_label }}">Niveau d'étude</label>
+                    <div class="form-control">
+                        <span class="form-icon">🎓</span>
+                        {{ form.niveauEtude }}
+                    </div>
+                    <div class="error-message">{{ form.niveauEtude.errors }}</div>
+                </div>
+
+                <!-- Filière -->
+                <div class="form-group">
+                    <label for="{{ form.filiere.id_for_label }}">Filière</label>
+                    <div class="form-control">
+                        <span class="form-icon">📘</span>
+                        {{ form.filiere }}
+                    </div>
+                    <div class="error-message">{{ form.filiere.errors }}</div>
+                </div>
+
+                <!-- Photo annuelle -->
+                <div class="form-group">
+                    <label for="{{ form.photo_annuelle.id_for_label }}">Photo de l'année</label>
+                    <div class="form-control file-upload">
+                        <span class="form-icon">📷</span>
+                        {{ form.photo_annuelle }}
+                    </div>
+                    <div class="error-message">{{ form.photo_annuelle.errors }}</div>
+                </div>
+
+                <button type="submit" class="btn" id="login-btn">Valider la réinscription</button>
+
                 <div class="switch-form">
-                    Nouveau sur COMMULINK ? <a href="{% url 'inscription' %}" style="color: red;" id="switch-to-signup">S'inscrire</a>
-                </div>
-                <div class="switch-form">
-                    <a href="{% url 'index' %}" style="color: red; font-weight: bold; font-size: 20px;" id="switch-to-signup">Annuler</a>
+                    <a href="{% url 'index' %}" style="color: red; font-weight: bold; font-size: 20px;">Annuler</a>
                 </div>
             </form>
+
         </div>
     </div>
 </body>

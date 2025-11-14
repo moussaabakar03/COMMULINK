@@ -26,7 +26,9 @@ from django.conf.urls.static import static
 # from commulink import firtsApp
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('adminDjango/', admin.site.urls),
+    path('adminDjango/', admin.site.urls),
+    
     path('', include('firtsApp.urls')),
     path('administrateur/', include('secondApp.urls')),
     

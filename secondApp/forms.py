@@ -3,6 +3,20 @@ from django.core.validators import MinLengthValidator, EmailValidator
 from django.utils import timezone
 from .models import Annee, Membre
 
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from .models import Utilisateur
+
+class UtilisateurCreationForm(UserCreationForm):
+    class Meta:
+        model = Utilisateur
+        fields = ('username', 'email', 'role')
+
+class UtilisateurChangeForm(UserChangeForm):
+    class Meta:
+        model = Utilisateur
+        fields = ('username', 'email', 'role')
+        
+
 class MembreForm(forms.Form):
     GENRE_CHOICES = [
         ('M', 'Masculin'),
@@ -110,7 +124,7 @@ class MembreForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
     )
 
-    def save(self):
+    def save(self, commit=True):
         # Créez une nouvelle instance de Membre avec les données du formulaire
         membre = Membre(
             nom=self.cleaned_data['nom'],
@@ -135,9 +149,12 @@ class MembreForm(forms.Form):
         if 'photo' in self.files:
             membre.photo = self.files['photo']
         
-        membre.save()
+        if commit:
+            membre.save()
         return membre
 
+      
+    
     def update(self, membre):
         # Met à jour une instance existante de Membre
         membre.nom = self.cleaned_data['nom']
@@ -162,7 +179,7 @@ class MembreForm(forms.Form):
         
         membre.save()
         return membre
-    
+
 
 #--------------------------------ANNONCES----------------------------------
 from .models import Annonce, Paiement
@@ -192,4 +209,14 @@ class AnneeForm(forms.Form):
     finAnnee = forms.DateField(label="Fin Annee", widget=forms.TextInput(attrs={"type": "date"}))
         
         
-        
+
+class ReinscriptionForm(forms.Form):
+    username = forms.CharField(max_length=20, label="Nom d'utilisateur")
+    password = forms.CharField(widget=forms.PasswordInput, label="Mot de passe")
+    numeroUrgence = forms.CharField(max_length=20, required=False)
+    telephone = forms.CharField(max_length=20, required=False)  
+    adresse = forms.CharField(max_length=255, required=False)  
+    ecole = forms.CharField(max_length=50, required=False)
+    niveauEtude = forms.CharField(max_length=20, required=False)  
+    filiere = forms.CharField(max_length=150, required=False)
+    photo_annuelle = forms.ImageField(required=False)

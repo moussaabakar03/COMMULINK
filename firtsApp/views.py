@@ -3,9 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
 
-
 # Create your views here.
-
 
 def index(request):
     evenements = Evenement.objects.all().order_by('id')[:5]
@@ -14,14 +12,10 @@ def index(request):
     temoingnages = Temoingnage.objects.all()
     return render(request, 'user/accueil.html', {'evenements': evenements, 'typeEvenement': typeEvenement, 'equipes': equipes, 'temoingnages': temoingnages})
 
-def admin(request):
-    return render(request, 'dynamiquePart/admin.html')
 
 def contact(request):
     return render(request, 'user/contact.html')
 
-def soireeCulturelle(request):
-    return render(request, 'user/soireeCulturelle.html')
 
 def feteIs(request):
     return render(request, 'user/feteIs.html')

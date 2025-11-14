@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Paiements{% endblock %}
+
+{% block style %}
+    
+    <link rel="stylesheet" href="{% static 'assets/css/paiements/paiements.css' %}" />
+
+    {% comment %} <link rel="stylesheet" href="{% static 'secretaire/css/select2.min.css' %}"> {% endcomment %}
+
+    <script src="{% static 'secretaire/js/select2.min.js' %}"></script>
+    <!-- CSS Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+          <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'user/lib//animate/animate.min.css" rel="stylesheet'%}">
+    <link href="{% static 'user/lib//owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'user/css/bootstrap.min.css'%}" rel="stylesheet">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    
+
+{% endblock %}
+
+
+{% block body %}
+
+  
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container-custom text-center">
+            <h1 class="page-title text-white">💳 Paiements: {{evenement}}</h1>
+        </div>
+    </header>
+
+    <div class="page-inner">
+        <div class="container-custom">
+            <!-- Messages d'alerte -->
+            {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                <div class="alert-custom alert-{{ message.tags }} alert-dismissible fade show">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Carte principale -->
+            <div class="main-card">
+                <!-- En-tête -->
+                <div class="card-header-custom">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h3 class="card-title text-secondary">
+                            <i class="fas fa-credit-card"></i>
+                            Gestion des Paiements
+                        </h3>
+                        <div class="header-actions">
+                            <a href="{% url 'ajouter_paiement' %}" class="btn-add">
+                                <i class="fas fa-plus"></i> Ajouter un paiement
+                            </a>
+                            {% if evenement %}
+                            <form method="post" action="{% url 'rappeler_paiements' %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="number" name="event_id" value="{{evenement.id}}" hidden>
+                                <button type="submit" class="btn-remind">
+                                    <i class="fas fa-bell"></i> Rappeler Paiements
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Corps -->
+                <div class="card-body-custom">
+                    <!-- Formulaire de filtrage -->
+                    <form method="get" class="filter-form">
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <label for="membre" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Membre
+                                </label>
+                                <select name="membre" id="membre" class="form-select form-control w-100">
+                                    <option value="">Tous les membres</option>
+                                    {% for membre in membres %}
+                                        <option value="{{ membre.id }}" {% if selected_membre == membre.id %}selected{% endif %}>
+                                            {{ membre.nom_complet }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn-filter">
+                                    <i class="fas fa-filter"></i> Filtrer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Tableau des paiements -->
+                    <div class="table-responsive">
+                        <table class="payments-table">
+                            <thead>
+                                <tr>
+                                    <th>Membre</th>
+                                    <th>Événement</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in paiements %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="member-avatar me-2">
+                                                <i class="fas fa-user-circle text-primary"></i>
+                                            </div>
+                                            <strong>{{ paiement.membre.nom_complet }}</strong>
+                                        </div>
+                                    </td>
+                                    <td>{{ paiement.evenement.titre }}</td>
+                                    <td>
+                                        <span class="fw-bold text-primary">{{ paiement.montant }} FCFA</span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge 
+                                            {% if paiement.statut == 'payé' %}status-paid
+                                            {% elif paiement.statut == 'non_payé' %}status-unpaid
+                                            {% else %}status-pending{% endif %}">
+                                            <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% else %}clock{% endif %}"></i>
+                                            {{ paiement.get_statut_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </a>
+                                            <a href="#" class="btn-action btn-info" title="Voir preuve">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <i class="fas fa-credit-card"></i>
+                                            <h3>Aucun paiement trouvé</h3>
+                                            <p>Essayez d'ajuster vos filtres ou ajoutez un nouveau paiement</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+ 
+    <script>
+        // Animation d'apparition des éléments
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableRows = document.querySelectorAll('.payments-table tbody tr');
+            
+            tableRows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    row.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+{% endblock %}

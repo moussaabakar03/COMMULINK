@@ -148,3 +148,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'shalomgbekou84@gmail.com'
 EMAIL_HOST_PASSWORD = 'ctdq fvqk ixoz iqkc'
 DEFAULT_FROM_EMAIL = 'shalomgbekou84@gmail.com'
+
+
+
+AUTH_USER_MODEL = 'secondApp.Utilisateur'

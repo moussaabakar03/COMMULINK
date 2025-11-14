@@ -3,7 +3,52 @@ from django.db import models
 from django.core.validators import EmailValidator, MinLengthValidator
 from django.utils import timezone
 
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
+
+
+class Utilisateur(AbstractUser):
+    ROLES = [  
+        ("membreLambda", "Membre Lambda"),
+        ("membreEquipe", "Membre de l'équipe")  
+    ]
+    
+    groups = models.ManyToManyField( 
+        Group, 
+        related_name='utilisateur_groups', 
+        blank=True, 
+        help_text='The groups this user belongs to.', 
+        verbose_name='groups'
+    ) 
+    
+    user_permissions = models.ManyToManyField( 
+        Permission, 
+        related_name='utilisateur_user_permissions', 
+        blank=True, 
+        help_text='Specific permissions for this user.', 
+        verbose_name='user permissions'
+    )
+    
+    role = models.CharField(
+        max_length=20, 
+        choices=ROLES,
+        default="membreLambda",  # Valeur par défaut
+        verbose_name="Rôle"
+    )
+
+    class Meta:
+        verbose_name = "Utilisateur"
+        verbose_name_plural = "Utilisateurs"
+
+    def __str__(self):
+        return f"{self.username} ({self.get_role_display()})"  # Affiche le label lisible
+    
+    def est_membre_equipe(self):
+        """Méthode helper pour vérifier le rôle"""
+        return self.role == "membreEquipe"
+    
+    
+    
 class Annee(models.Model):
     debutAnnee = models.DateField()
     finAnnee = models.DateField()
@@ -17,6 +62,8 @@ class Membre(models.Model):
         ('F', 'Féminin'),
         ('A', 'Autre')
     ]
+
+    utilisateur = models.OneToOneField(Utilisateur, on_delete= models.CASCADE, null = True, blank= True, related_name= "membre")
 
     # Informations de base
     nom = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
@@ -124,12 +171,16 @@ class EvenementImage(models.Model):
 
 
 class EquipeDirigeante(models.Model):
+    
+    utilisateur = models.OneToOneField(Utilisateur, on_delete= models.CASCADE, null = True, blank= True, related_name= "equipeDirigeante")
+    
     nom = models.CharField(max_length=100)
     role = models.CharField(max_length=100)
     lienFacebook = models.CharField(max_length=100)
     lienInstagram = models.CharField(max_length=100)
     lienTwitter = models.CharField(max_length=100)
     image = models.ImageField(upload_to='equipe')
+
 
 class Temoingnage(models.Model):
     message = models.TextField()
@@ -178,7 +229,7 @@ class Reinscription(models.Model):
     annee = models.ForeignKey(
         Annee, 
         on_delete=models.CASCADE, 
-        related_name='reinscriptions'
+        related_name='reinscriptions' 
     )
     
     username = models.CharField(max_length=20, blank=True, null=True)
@@ -199,7 +250,7 @@ class Reinscription(models.Model):
     )
     filiere = models.CharField(max_length=150, blank=True, null= True)
     
-    
+    adresse = models.CharField(max_length=150, null = True, blank=True)
     date_reinscription = models.DateTimeField(auto_now_add=True)
     
     photo_annuelle = models.ImageField(

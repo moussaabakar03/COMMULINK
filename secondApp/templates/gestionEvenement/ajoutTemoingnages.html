@@ -1,0 +1,392 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ajouter Témoignage{% endblock %}
+
+{% block style %}
+    <style>
+        :root {
+            --primary: #FF6F0F;
+            --dark: #1a2035;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .page-header {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            opacity: 0.9;
+        }
+        
+        .container-custom {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Card */
+        .form-card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header-custom {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-body-custom {
+            padding: 2rem;
+        }
+        
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* File Input */
+        .file-input-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            background-color: var(--light);
+            min-height: 150px;
+            text-align: center;
+        }
+        
+        .file-input-container:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+        }
+        
+        .file-preview {
+            max-height: 120px;
+            margin-top: 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .file-name {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--primary);
+        }
+        
+        /* Media Grid */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .btn-cancel {
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #0f1420;
+            color: var(--white);
+        }
+        
+        .btn-submit {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-submit:hover {
+            background-color: #e05b00;
+        }
+        
+        /* Responsive */
+        @media(max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.25rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn-cancel,
+            .btn-submit {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .media-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container-custom text-center">
+        <h1 class="page-title text-white">➕ Ajouter un Témoignage</h1>
+        <p class="page-subtitle">Créez un nouveau témoignage pour un événement</p>
+    </div>
+</header>
+
+<div class="page-inner">
+    <div class="container-custom">
+        <!-- Carte du formulaire -->
+        <div class="form-card">
+            <!-- En-tête -->
+            <div class="card-header-custom">
+                <h3 class="card-title text-white">
+                    <i class="fas fa-quote-left"></i>
+                    Nouveau Témoignage
+                </h3>
+            </div>
+            
+            <!-- Corps -->
+            <div class="card-body-custom">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Section Informations -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Informations du témoignage
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="evenement">Événement*</label>
+                            <select name="evenement" id="evenement" required>
+                                <option value="">Choisir l'événement</option>
+                                {% for event in events %}
+                                    <option value="{{ event.id }}">{{ event.titre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nom">Nom et Prénom*</label>
+                            <input type="text" id="nom" name="nom" placeholder="Entrez le nom et prénom" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="role">Rôle*</label>
+                            <input type="text" id="role" name="role" placeholder="Entrez le rôle" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message*</label>
+                            <textarea id="message" name="message" placeholder="Écrivez le message..." required></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Médias -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-photo-video"></i>
+                            Photo et Vidéo
+                        </h4>
+                        
+                        <div class="media-grid">
+                            <!-- Photo -->
+                            <div class="form-group">
+                                <label>Photo</label>
+                                <div class="file-input-container">
+                                    <span>📁 Cliquez pour sélectionner la photo</span>
+                                    <input type="file" id="photo" name="image" class="file-input" accept="image/*">
+                                    <img id="photoPreview" class="file-preview" src="#" alt="Aperçu" style="display: none;">
+                                </div>
+                            </div>
+                            
+                            <!-- Vidéo -->
+                            <div class="form-group">
+                                <label>Vidéo</label>
+                                <div class="file-input-container">
+                                    <span>🎥 Cliquez pour sélectionner la vidéo</span>
+                                    <input type="file" id="video" name="video" class="file-input" accept="video/*">
+                                    <div id="videoFileName" class="file-name"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Boutons -->
+                    <div class="form-actions">
+                        <a href="{% url 'temoingnages' %}" class="btn-cancel">
+                            <i class="fas fa-arrow-left"></i> Annuler
+                        </a>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aperçu de la photo
+        const photoInput = document.getElementById("photo");
+        const photoPreview = document.getElementById("photoPreview");
+        
+        if (photoInput) {
+            photoInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        photoPreview.src = e.target.result;
+                        photoPreview.style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    photoPreview.style.display = "none";
+                }
+            });
+        }
+        
+        // Nom de la vidéo sélectionnée
+        const videoInput = document.getElementById("video");
+        const videoFileName = document.getElementById("videoFileName");
+        
+        if (videoInput) {
+            videoInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                videoFileName.textContent = file ? file.name : "";
+            });
+        }
+    });
+</script>
+{% endblock %}
