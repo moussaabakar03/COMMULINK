@@ -1,0 +1,403 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Ajouter Catégorie{% endblock %}
+
+{% block style %}
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #FF6F0F;
+            --dark: #1a2035;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --danger: #dc3545;
+        }
+        
+        /* Header */
+        .page-header {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            opacity: 0.9;
+        }
+        
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Form Container */
+        .form-container {
+            max-width: 1000px;
+            margin: 0 auto 3rem;
+            padding: 0 1rem;
+        }
+        
+        .form-container h1 {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin-bottom: 2rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* Form */
+        .new-added-form {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.1);
+        }
+        
+        .form-group input[type="text"]::placeholder,
+        .form-group textarea::placeholder {
+            color: #999;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 2.5rem;
+            text-align: center;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area:hover {
+            background-color: rgba(255, 111, 15, 0.05);
+            border-color: var(--primary);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .upload-area p {
+            margin: 0;
+            color: #666;
+        }
+        
+        .upload-area p:first-of-type {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        /* Preview Container */
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .preview-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .preview-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            line-height: 1;
+        }
+        
+        .preview-item:hover .remove-btn {
+            opacity: 1;
+        }
+        
+        .preview-item .remove-btn:hover {
+            background-color: #c82333;
+        }
+        
+        /* Submit Button */
+        .new-added-form button[type="submit"] {
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+        
+        .new-added-form button[type="submit"]:hover {
+            background-color: #e05b00;
+        }
+        
+        /* Responsive */
+        @media(max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .form-container h1 {
+                font-size: 1.25rem;
+            }
+            
+            .new-added-form {
+                padding: 1.5rem;
+            }
+            
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+            
+            .upload-area i {
+                font-size: 2.5rem;
+            }
+            
+            .preview-item {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container-custom text-center">
+            <h1 class="page-title text-white">📂 Nouvelle Catégorie d'Événement</h1>
+            <p class="page-subtitle">Créez une nouvelle catégorie pour organiser vos événements</p>
+        </div>
+    </header>
+
+    <div class="form-container">
+        <h1>Formulaire Catégorie Événement</h1>
+        
+        <form class="new-added-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group" style="margin-top: 20px!important;">
+                <label for="nom">
+                    <i class="fas fa-tag"></i>
+                    Nom de la catégorie
+                </label>
+                <input type="text" id="nom" name="nom" placeholder="Entrez le nom de la catégorie" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">
+                    <i class="fas fa-align-left"></i>
+                    Description
+                </label>
+                <textarea id="description" name="description" placeholder="Écrivez une description détaillée de la catégorie..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-image"></i>
+                    Image de la catégorie
+                </label>
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Glissez-déposez votre image ici</p>
+                    <p>ou cliquez pour sélectionner une image</p>
+                    <input type="file" id="fileInput" accept="image/*" name="image" required>
+                </div>
+                
+                <div class="preview-container" id="previewContainer"></div>
+            </div>
+            
+            <button type="submit">
+                <i class="fas fa-save"></i>
+                Enregistrer la catégorie
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const previewContainer = document.getElementById('previewContainer');
+            
+            // Gestion du clic sur la zone d'upload
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            // Gestion du drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadArea.style.backgroundColor = 'rgba(255, 111, 15, 0.1)';
+                uploadArea.style.borderColor = '#FF6F0F';
+            }
+            
+            function unhighlight() {
+                uploadArea.style.backgroundColor = '#fafafa';
+                uploadArea.style.borderColor = '#dee2e6';
+            }
+            
+            // Gestion des fichiers déposés
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+            
+            // Gestion des fichiers sélectionnés
+            fileInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+            
+            // Affichage des prévisualisations
+            function handleFiles(files) {
+                // Vider le conteneur avant d'ajouter la nouvelle image
+                previewContainer.innerHTML = '';
+                
+                if (files.length > 0) {
+                    const file = files[0]; // Une seule image
+                    
+                    if (!file.type.match('image.*')) {
+                        alert('Veuillez sélectionner une image valide');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-btn';
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.type = 'button';
+                        removeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            previewItem.remove();
+                            fileInput.value = '';
+                        });
+                        
+                        previewItem.appendChild(img);
+                        previewItem.appendChild(removeBtn);
+                        previewContainer.appendChild(previewItem);
+                    }
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    </script>
+{% endblock %}

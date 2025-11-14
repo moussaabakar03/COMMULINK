@@ -64,5 +64,10 @@ urlpatterns = [
     path('paiements/rappeler/', views.rappeler_paiements, name='rappeler_paiements'),
     path('<int:pk>/modifierPaiement/', views.modifierPaiement, name='modifierPaiement'),
     path('<int:pk>/paiementParEvenement/', views.paiementParEvenement, name='paiementParEvenement'),
+    
+    
+    
+    path('reinscriptionUser/', views.reinscriptionUser, name='reinscriptionUser'),
+    
 
 ]

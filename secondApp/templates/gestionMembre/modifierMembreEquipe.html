@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% load static %} 
+
+{% block title %}Modifier Membre Équipe{% endblock %}
+
+{% block style %}
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+     {% comment %} css pour la page {% endcomment %}
+    <link rel="stylesheet" href="{% static 'assets/css/membres/listeEquipe.css' %}" />
+    <style>
+        /* Current Image Preview */
+        .current-image {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .current-image img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .current-image p {
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container-custom">
+        <h1 class="page-title text-white">✏️ Modifier Membre de l'Équipe</h1>
+        <p class="page-subtitle">Modifiez les informations du membre de l'équipe dirigeante</p>
+    </div>
+</header>
+
+<div class="form-container">
+    <h1>Formulaire Modification membre Équipe</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <form class="new-added-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group" style="margin-top: 20px!important;">
+            <label for="nom">Nom et Prénom</label>
+            <input type="text" id="nom" name="nom" value="{{ membre.nom }}" placeholder="Entrez le nom et prénom" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="role">Rôle</label>
+            <input type="text" id="role" name="role" value="{{ membre.role }}" placeholder="Entrez le rôle" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="facebook">Les réseaux sociaux</label>
+            <input type="text" id="facebook" name="facebook" value="{{ membre.lienFacebook }}" placeholder="Entrez le lien Facebook" required>
+            <input type="text" id="instagram" name="instagram" value="{{ membre.lienInstagram }}" placeholder="Entrez le lien Instagram" required>
+            <input type="text" id="twitter" name="twitter" value="{{ membre.lienTwitter }}" placeholder="Entrez le lien Twitter" required>
+        </div>
+
+        <div class="form-group">
+            <label>Photo actuelle</label>
+            {% if membre.image %}
+                <div class="current-image">
+                    <img src="{{ membre.image.url }}" alt="{{ membre.nom }}">
+                    <p>Photo actuelle du membre</p>
+                </div>
+            {% endif %}
+            
+            <div class="file-input-container">
+                <label for="photo" class="file-input-label">
+                    <div class="file-input-icon">📁</div>
+                    <span>Cliquez pour changer la photo (optionnel)</span>
+                    <div id="fileName" class="file-name"></div>
+                </label>
+                <input type="file" id="photo" name="photo" class="file-input" accept="image/*">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <a href="{% url 'liste_EquipeDirigeante' %}" class="btn-cancel">Annuler</a>
+            <button type="submit">Mettre à jour</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Script pour afficher le nom du fichier sélectionné
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('photo');
+        const fileName = document.getElementById('fileName');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    fileName.textContent = '📎 ' + e.target.files[0].name;
+                } else {
+                    fileName.textContent = '';
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

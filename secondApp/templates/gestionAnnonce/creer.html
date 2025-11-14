@@ -1,0 +1,611 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Créer Annonce{% endblock %}
+
+{% block style %}
+    <style>
+        :root {
+            --primary: #FF6F0F;
+            --dark: #1a2035;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .page-header {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            {% comment %} margin-top: 65px; {% endcomment %}
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            opacity: 0.9;
+        }
+        
+        .container-custom {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Card */
+        .form-card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header-custom {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card-body-custom {
+            padding: 2rem;
+        }
+        
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-control-custom,
+        .form-textarea-custom {
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control-custom:focus,
+        .form-textarea-custom:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.1);
+        }
+        
+        .form-control-custom.is-invalid,
+        .form-textarea-custom.is-invalid {
+            border-color: var(--danger);
+        }
+        
+        .form-textarea-custom {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        
+        .invalid-feedback {
+            display: none;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--danger);
+            font-weight: 500;
+        }
+        
+        .was-validated .form-control-custom:invalid ~ .invalid-feedback,
+        .was-validated .form-textarea-custom:invalid ~ .invalid-feedback,
+        .form-control-custom.is-invalid ~ .invalid-feedback,
+        .form-textarea-custom.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+        
+        /* Character Count */
+        .character-count {
+            font-size: 0.875rem;
+            color: #6c757d;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+        
+        .character-count.warning {
+            color: var(--warning);
+        }
+        
+        .character-count.danger {
+            color: var(--danger);
+        }
+        
+        /* File Input */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-custom {
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+            background-color: var(--light);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .file-input-custom:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-input-custom i {
+            font-size: 2rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .file-input-custom .file-text {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+        
+        .file-input-custom .file-hint {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
+        /* Current Image */
+        .current-image {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--light);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        
+        .current-image img {
+            max-height: 200px;
+            border-radius: 6px;
+        }
+        
+        /* Checkbox */
+        .form-check-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background-color: var(--light);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        
+        .form-check-input-custom {
+            width: 1.2em;
+            height: 1.2em;
+            border-radius: 0.25em;
+            border: 2px solid #adb5bd;
+        }
+        
+        .form-check-input-custom:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .form-check-label-custom {
+            font-weight: 500;
+            color: var(--dark);
+            cursor: pointer;
+        }
+        
+        /* Creation Info */
+        .creation-info {
+            background-color: var(--light);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+            margin-top: 1rem;
+        }
+        
+        .creation-info p {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .btn-cancel {
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #0f1420;
+            color: var(--white);
+        }
+        
+        .btn-submit {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 2rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-submit:hover {
+            background-color: #e05b00;
+        }
+        
+        /* Responsive */
+        @media(max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.25rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn-cancel,
+            .btn-submit {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .form-textarea-custom {
+                min-height: 150px;
+            }
+        }
+    </style>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container-custom text-center">
+        <h1 class="page-title text-white">
+            {% if form.instance.id %}✏️ Modifier l'Annonce{% else %}📢 Créer une Annonce{% endif %}
+        </h1>
+        <p class="page-subtitle">
+            {% if form.instance.id %}Modifiez les détails de votre annonce{% else %}Rédigez une nouvelle annonce pour votre communauté{% endif %}
+        </p>
+    </div>
+</header>
+
+<div class="page-inner">
+    <div class="container-custom">
+        <!-- Carte du formulaire -->
+        <div class="form-card">
+            <!-- En-tête -->
+            <div class="card-header-custom">
+                <h3 class="card-title text-white">
+                    <i class="fas fa-bullhorn"></i>
+                    {% if form.instance.id %}Modifier l'Annonce{% else %}Nouvelle Annonce{% endif %}
+                </h3>
+            </div>
+            
+            <!-- Corps -->
+            <div class="card-body-custom">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Section Contenu -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-edit"></i>
+                            Contenu de l'annonce
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.titre.id_for_label }}" class="form-label">
+                                <i class="fas fa-heading"></i>
+                                Titre*
+                            </label>
+                            {{ form.titre }}
+                            <div class="character-count" id="title-count">
+                                <span id="title-length">0</span>/100 caractères
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Veuillez entrer un titre valide.
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.contenu.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                Contenu*
+                            </label>
+                            {{ form.contenu }}
+                            <div class="character-count" id="content-count">
+                                <span id="content-length">0</span>/2000 caractères
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Veuillez entrer un contenu valide.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section Image -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-image"></i>
+                            Image illustrative
+                        </h4>
+                        
+                        <div class="form-group">
+                            <div class="file-input-wrapper">
+                                {{ form.image }}
+                                <div class="file-input-custom">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <div class="file-text">Choisir une image</div>
+                                    <div class="file-hint">JPG, PNG ou GIF (max. 5MB)</div>
+                                </div>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Une image illustrative rend votre annonce plus attrayante
+                            </div>
+                            
+                            {% if form.instance.id and form.instance.image %}
+                            <div class="current-image">
+                                <div class="d-flex align-items-center gap-3 mb-2">
+                                    <i class="fas fa-image text-primary"></i>
+                                    <strong>Image actuelle :</strong>
+                                </div>
+                                <div class="d-flex flex-column flex-md-row gap-3 align-items-start">
+                                    <img src="{{ form.instance.image.url }}" 
+                                         class="img-fluid"
+                                         alt="Image actuelle de l'annonce">
+                                    <div class="form-check-custom mt-2 mt-md-0">
+                                        <input class="form-check-input-custom" 
+                                               type="checkbox" 
+                                               name="image-clear" 
+                                               id="image-clear">
+                                        <label class="form-check-label-custom" for="image-clear">
+                                            Supprimer l'image actuelle
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Section Publication (uniquement pour modification) -->
+                    {% if form.instance.id %}
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-cog"></i>
+                            Paramètres de publication
+                        </h4>
+                        
+                        <div class="form-group">
+                            <div class="form-check-custom">
+                                {{ form.est_publie }}
+                                <label class="form-check-label-custom" for="{{ form.est_publie.id_for_label }}">
+                                    Publier cette annonce
+                                </label>
+                            </div>
+                            
+                            <div class="creation-info">
+                                <p>
+                                    <i class="fas fa-calendar-plus"></i>
+                                    <strong>Créée le :</strong> {{ form.instance.date_creation|date:"d/m/Y à H:i" }}
+                                </p>
+                                {% if form.instance.date_publication %}
+                                <p>
+                                    <i class="fas fa-paper-plane"></i>
+                                    <strong>Publiée le :</strong> {{ form.instance.date_publication|date:"d/m/Y à H:i" }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Boutons de soumission -->
+                    <div class="form-actions">
+                        <a href="{% url 'liste_annonces' %}" class="btn-cancel">
+                            <i class="fas fa-arrow-left"></i> Retour à la liste
+                        </a>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-save"></i> 
+                            {% if form.instance.id %}Mettre à jour{% else %}Créer l'annonce{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+
+<script>
+    // Validation Bootstrap
+    (function () {
+        'use strict'
+        
+        const forms = document.querySelectorAll('.needs-validation')
+        
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+    // Initialisation du formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        // Appliquer les classes CSS aux champs du formulaire
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            if (input.type !== 'file' && input.type !== 'checkbox' && input.type !== 'hidden') {
+                if (input.tagName === 'TEXTAREA') {
+                    input.classList.add('form-textarea-custom');
+                } else if (input.type === 'checkbox') {
+                    input.classList.add('form-check-input-custom');
+                } else {
+                    input.classList.add('form-control-custom');
+                }
+            }
+        });
+        
+        // Compteur de caractères pour le titre
+        const titleInput = document.getElementById('id_titre');
+        const titleCount = document.getElementById('title-count');
+        const titleLength = document.getElementById('title-length');
+        
+        if (titleInput) {
+            titleLength.textContent = titleInput.value.length;
+            
+            titleInput.addEventListener('input', function() {
+                const length = this.value.length;
+                titleLength.textContent = length;
+                
+                titleCount.classList.toggle('warning', length > 80);
+                titleCount.classList.toggle('danger', length > 100);
+            });
+        }
+        
+        // Compteur de caractères pour le contenu
+        const contentInput = document.getElementById('id_contenu');
+        const contentCount = document.getElementById('content-count');
+        const contentLength = document.getElementById('content-length');
+        
+        if (contentInput) {
+            contentLength.textContent = contentInput.value.length;
+            
+            contentInput.addEventListener('input', function() {
+                const length = this.value.length;
+                contentLength.textContent = length;
+                
+                contentCount.classList.toggle('warning', length > 1500);
+                contentCount.classList.toggle('danger', length > 2000);
+            });
+        }
+        
+        // Améliorer l'affichage du champ fichier
+        const fileInput = document.getElementById('id_image');
+        const fileCustom = document.querySelector('.file-input-custom');
+        
+        if (fileInput && fileCustom) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const fileName = this.files[0].name;
+                    const fileText = fileCustom.querySelector('.file-text');
+                    fileText.textContent = fileName;
+                    fileCustom.style.borderColor = 'var(--primary)';
+                    fileCustom.style.backgroundColor = 'rgba(255, 111, 15, 0.1)';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

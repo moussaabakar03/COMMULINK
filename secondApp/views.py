@@ -2,8 +2,8 @@ from django.shortcuts import redirect, render
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
-from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm
+from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
+from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm, ReinscriptionForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
@@ -17,10 +17,14 @@ from django.db.models import Count
 # from firtsApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
 
 
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+
+
 # DASHBOARD VIEW
 
 def admin_dashboard(request):
-    return render(request, "admin/index.html")
+    return render(request, "index.html")
 
 
 
@@ -29,7 +33,7 @@ def admin_dashboard(request):
 def listeCategorie(request):
     typeEvenement = TypeEvenement.objects.annotate(nombreEvenemnet=Count('evenement'))
     
-    return render(request, 'admin/gestionEvenement/listeCategorie.html', {
+    return render(request, 'gestionEvenement/listeCategorie.html', {
         'typeEvenement': typeEvenement
     })
 
@@ -43,7 +47,7 @@ def ajoutTypeEvenement(request):
             nom_type_evenement=nom,  image_type_evenement=photo, description_type_evenement=description
         )
         return redirect('listeCategorie')
-    return render(request, 'admin/gestionEvenement/ajoutCategorie.html')
+    return render(request, 'gestionEvenement/ajoutCategorie.html')
 
 def modifierCategorie(request, id):
     categorie = get_object_or_404(TypeEvenement, pk=id)
@@ -54,7 +58,7 @@ def modifierCategorie(request, id):
         categorie.save()
 
         return redirect('listeCategorie')
-    return render(request, 'admin/gestionEvenement/modifierCategorie.html', { 'categorie': categorie })
+    return render(request, 'gestionEvenement/modifierCategorie.html', { 'categorie': categorie })
 
 def supprimerCategorie(request, id):
     categorie = get_object_or_404(TypeEvenement, pk=id)
@@ -69,7 +73,7 @@ def supprimerCategorie(request, id):
 
 def affichageEvenement(request):
     evenements = Evenement.objects.all().order_by('-id')
-    return render(request, 'admin/gestionEvenement/listeEvenement.html', {'evenements': evenements})
+    return render(request, 'gestionEvenement/listeEvenement.html', {'evenements': evenements})
 
 def ajoutEvenement(request):
     typeEvenem = TypeEvenement.objects.all()
@@ -101,12 +105,12 @@ def ajoutEvenement(request):
                 typeEvenement= evenementType, photo= None, description=description, prix = prix, titre = titre
             )
         return redirect('affichageEvenement')
-    return render(request, 'admin/gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem, 'toutes_annees': toutes_annees})
+    return render(request, 'gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem, 'toutes_annees': toutes_annees})
 
 def evenementFiltrer(request, id):
     categorieEvenemnt = TypeEvenement.objects.get(id = id)
     evenements = Evenement.objects.filter(typeEvenement__id=id)
-    return render(request, "admin/gestionEvenement/evenementFiltrer.html", {"evenements": evenements,"categorieEvenemnt": categorieEvenemnt})
+    return render(request, "gestionEvenement/evenementFiltrer.html", {"evenements": evenements,"categorieEvenemnt": categorieEvenemnt})
 
 def detailEvenements(request, id):
     evenement = Evenement.objects.get(id=id)
@@ -115,7 +119,7 @@ def detailEvenements(request, id):
     
     evenementImage = EvenementImage.objects.filter(evenement=evenement).order_by('id')[3:]
     nosPremiersPhotos = EvenementImage.objects.filter(evenement=evenement).order_by('-id')[:3]
-    return render(request, 'admin/gestionEvenement/detailEvenement.html', 
+    return render(request, 'gestionEvenement/detailEvenement.html', 
                   {'evenement': evenement, 'evenementImage': evenementImage, 'nosPremiersPhotos':nosPremiersPhotos, 
                    'temoingnages': temoingnages})
 
@@ -158,7 +162,7 @@ def modifierEvenement(request, id):
                 return redirect('affichageEvenement')
         return redirect('affichageEvenement')
         
-    return render(request, 'admin/gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "toutes_annees": toutes_annees})
+    return render(request, 'gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "toutes_annees": toutes_annees})
     
 def supprimerEvenement(request, id):
     evenement = Evenement.objects.get(id=id).delete()
@@ -185,7 +189,7 @@ def depublier_evenement(request, id):
 
 def listeTemoingnes(request):
     temoingnages = Temoingnage.objects.all()
-    return render(request, 'admin/gestionEvenement/listeTemoingnes.html', {'temoingnages': temoingnages})
+    return render(request, 'gestionEvenement/listeTemoingnes.html', {'temoingnages': temoingnages})
 
 
     
@@ -214,7 +218,7 @@ def ajoutTemoingnages(request):
 
         return redirect(reverse('detailEvenements', kwargs={'id': evenements.id}) + '#temoingnages')
 
-    return render(request, 'admin/gestionEvenement/ajoutTemoingnages.html', {'events': events})
+    return render(request, 'gestionEvenement/ajoutTemoingnages.html', {'events': events})
 
 
 def modifierTemoingnes(request, id):
@@ -236,7 +240,7 @@ def modifierTemoingnes(request, id):
         temoingnage.video = video
         temoingnage.save()
         return redirect('temoingnages')
-    return render(request, 'admin/gestionEvenement/modifierTemoingnes.html', {'temoingnage': temoingnage, 'events': evenements})
+    return render(request, 'gestionEvenement/modifierTemoingnes.html', {'temoingnage': temoingnage, 'events': evenements})
 
 def supprimerTemoingne(request, id):
     temoingnage = Temoingnage.objects.get(id=id)
@@ -278,7 +282,7 @@ def liste_membres(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'admin/gestionMembre/liste.html', {
+    return render(request, 'gestionMembre/liste.html', {
         'page_obj': page_obj,
         'search_query': search_query,
         'nombreMembre': nombreMembre
@@ -288,20 +292,95 @@ def detail_membre(request, pk):
     membre = get_object_or_404(Membre, pk=pk)
     
 
-    return render(request, 'admin/gestionMembre/detail.html', {
+    return render(request, 'gestionMembre/detail.html', {
         'membre': membre
     })
+
+# def creer_membre(request):
+#     if request.method == 'POST':
+#         form = MembreForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('liste_membres')
+#     else:
+#         form = MembreForm()
+     
+#     return render(request, 'gestionMembre/creer.html', {'form': form})
 
 def creer_membre(request):
     if request.method == 'POST':
         form = MembreForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            # 1. Créer l'utilisateur
+            nom = form.cleaned_data['nom']
+            prenom = form.cleaned_data['prenom']
+            email = form.cleaned_data['email']
+            telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+            
+            # Vérifier si l'email existe déjà
+            if Utilisateur.objects.filter(email=email).exists():
+                form.add_error('email', 'Un utilisateur avec cet email existe déjà.')
+                return render(request, 'gestionMembre/creer.html', {'form': form})
+            
+            utilisateur = Utilisateur.objects.create(
+                username=email,
+                email=email,
+                password=make_password(telephone),
+                first_name=nom,
+                last_name=prenom,
+                role="membreLambda",
+                is_active=True,
+            )
+            
+            # 2. Créer le membre
+            membre = Membre(
+                utilisateur=utilisateur,
+                nom=nom,
+                prenom=prenom,
+                sexe=form.cleaned_data['sexe'],
+                email=email,
+                telephone=telephone,
+                adresse=form.cleaned_data.get('adresse', ''),
+                profession=form.cleaned_data['profession'],
+                numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
+                niveauEtude=form.cleaned_data.get('niveauEtude', ''),
+                ecole=form.cleaned_data.get('ecole', ''),
+                ner=form.cleaned_data.get('ner', ''),
+                keri=form.cleaned_data.get('keri', ''),
+                keribour=form.cleaned_data.get('keribour', ''),
+                keriBa=form.cleaned_data.get('keriBa', ''),
+                keribourBa=form.cleaned_data.get('keribourBa', ''),
+                notes=form.cleaned_data.get('notes', ''),
+            )
+            
+            # Gestion de la photo
+            if form.cleaned_data.get('photo'):
+                membre.photo = form.cleaned_data['photo']
+            
+            membre.save()
+
+            # 3. Créer la réinscription pour l'année active
+            annee_active = Annee.objects.order_by('-id').first()
+            if annee_active:
+                Reinscription.objects.create(
+                    membre=membre,
+                    annee=annee_active,
+                    username=email,
+                    password=telephone,
+                    numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
+                    ecole=form.cleaned_data.get('ecole', ''),
+                    niveauEtude=form.cleaned_data.get('niveauEtude', ''),
+                    photo_annuelle=form.cleaned_data.get('photo'),
+                    filiere=form.cleaned_data.get('filiere', '')
+                )
+
+            messages.success(request, f'Le membre {nom} {prenom} a été créé avec succès.')
             return redirect('liste_membres')
     else:
         form = MembreForm()
-    
-    return render(request, 'admin/gestionMembre/creer.html', {'form': form})
+
+    return render(request, 'gestionMembre/creer.html', {'form': form})
+
 
 def modifier_membre(request, pk):
     membre = Membre.objects.get(pk=pk)
@@ -335,7 +414,7 @@ def modifier_membre(request, pk):
 
         form = MembreForm(initial=initial_data)
     
-    return render(request, 'admin/gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+    return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
 
 def supprimer_membre(request, pk):
     membre = Membre.objects.get(pk=pk).delete()
@@ -365,7 +444,7 @@ def liste_EquipeDirigeante(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'admin/gestionMembre/listeMembreEquipe.html', {
+    return render(request, 'gestionMembre/listeMembreEquipe.html', {
         'page_obj': page_obj,
         'search_query': search_query,
     })
@@ -379,11 +458,19 @@ def ajoutMembreEquipe(request):
         instagram = request.POST.get('instagram')
         twitter = request.POST.get('twitter')
         
+        utilisateur = Utilisateur.objects.create(
+            username = role,
+            password = make_password(role),
+            role="membreEquipe",
+            is_active=True,
+            is_staff = True
+        )
+        
         EquipeDirigeante.objects.create(
-            nom = nom, image = photo, role = role, lienFacebook = facebook, lienInstagram = instagram , lienTwitter = twitter
+            utilisateur = utilisateur, nom = nom, image = photo, role = role, lienFacebook = facebook, lienInstagram = instagram , lienTwitter = twitter
         )
         return redirect("liste_EquipeDirigeante")
-    return render(request, 'admin/gestionMembre/ajoutMembreEquipe.html')
+    return render(request, 'gestionMembre/ajoutMembreEquipe.html')
 
 def modification_MembreEquipeDirigeante(request, pk):
     # Récupérer le membre à modifier ou retourner 404 si non trouvé
@@ -423,7 +510,7 @@ def modification_MembreEquipeDirigeante(request, pk):
         'membre': membre
     }
     
-    return render(request, 'admin/gestionMembre/modifierMembreEquipe.html', context)
+    return render(request, 'gestionMembre/modifierMembreEquipe.html', context)
 
 
 def supprimer_MembreEquipe(request, pk):
@@ -443,7 +530,7 @@ def liste_annonces(request):
     else:
         annonces = Annonce.objects.all().order_by('-date_creation')
 
-    return render(request, 'admin/gestionAnnonce/liste.html', {'annonces': annonces})
+    return render(request, 'gestionAnnonce/liste.html', {'annonces': annonces})
 
 
 # @login_required
@@ -458,7 +545,7 @@ def creer_annonce(request):
             return redirect('liste_annonces')
     else:
         form = AnnonceForm()
-    return render(request, 'admin/gestionAnnonce/creer.html', {'form': form})
+    return render(request, 'gestionAnnonce/creer.html', {'form': form})
 
 # @login_required
 def publier_annonce(request, id):
@@ -498,7 +585,7 @@ def modifier_annonce(request, id):
         'btn_submit': 'Mettre à jour',
     }
     
-    return render(request, 'admin/gestionAnnonce/modifier.html', context)
+    return render(request, 'gestionAnnonce/modifier.html', context)
 
 def supprimer_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)
@@ -516,7 +603,7 @@ def listeAnnee(request):
     context = {
         'annees': annees,
     }
-    return render(request, "admin/gestionAnnee/listeAnnee.html", context)
+    return render(request, "gestionAnnee/listeAnnee.html", context)
 
 def ajoutAnnee(request):
      
@@ -538,7 +625,7 @@ def ajoutAnnee(request):
     else:
         form = AnneeForm()
         
-    return render(request, "admin/gestionAnnee/ajoutAnnee.html",  {
+    return render(request, "gestionAnnee/ajoutAnnee.html",  {
         'form': form,
     })
 
@@ -575,7 +662,7 @@ def liste_paiements(request):
         'selected_membre': int(membre_id) if membre_id else None,
         'evenement': evenement,
     }
-    return render(request, 'admin/gestionPaiement/liste.html', context)
+    return render(request, 'gestionPaiement/liste.html', context)
 
 def ajouter_paiement(request):
     evenements = Evenement.objects.all()
@@ -640,7 +727,7 @@ def ajouter_paiement(request):
     else:
         form = PaiementForm()
     
-    return render(request, 'admin/gestionPaiement/ajouter.html', {
+    return render(request, 'gestionPaiement/ajouter.html', {
         'form': form,
         'evenements': evenements
     })
@@ -749,7 +836,7 @@ def modifierPaiement(request, pk):
         'paiement': paiement
     }
     
-    return render(request, 'admin/gestionPaiement/modifierPaiment.html', context)
+    return render(request, 'gestionPaiement/modifierPaiment.html', context)
 
 
 def paiementParEvenement(request, pk):
@@ -763,10 +850,56 @@ def paiementParEvenement(request, pk):
     
     
     contexte = {"paiements": paiements, "evenement": evenement, 'membres': Membre.objects.all(),}
-    return render(request, "admin/gestionPaiement/paiementParEvenement.html", contexte)
-    
-    
-    
-    
-    
+    return render(request, "gestionPaiement/paiementParEvenement.html", contexte)
+
+
+
+def reinscriptionUser(request):
+    if request.method == 'POST':
+        form = ReinscriptionForm(request.POST, request.FILES)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+
+            if not user:
+                form.add_error(None, "Nom d'utilisateur ou mot de passe incorrect.")
+                return render(request, "gestionMembre/reinscriptionUser.html", {'form': form})
+
+            try:
+                membre = Membre.objects.get(utilisateur=user)
+            except Membre.DoesNotExist:
+                messages.error(request, "Aucun membre associé à cet utilisateur.")
+                return render(request, "gestionMembre/reinscriptionUser.html", {'form': form})
+
+            annee_active = Annee.objects.order_by('-id').first()
+            if not annee_active:
+                messages.error(request, "Aucune année active trouvée.")
+                return render(request, "gestionMembre/reinscriptionUser.html", {'form': form})
+
+            if Reinscription.objects.filter(membre=membre, annee=annee_active).exists():
+                messages.warning(request, "Vous êtes déjà réinscrit pour cette année.")
+                return redirect("index")
+
+            Reinscription.objects.create(
+                membre=membre,
+                annee=annee_active,
+                numeroUrgence=form.cleaned_data.get('numeroUrgence'),
+                adresse=form.cleaned_data.get('adresse'),
+                ecole=form.cleaned_data.get('ecole'),
+                niveauEtude=form.cleaned_data.get('niveauEtude'),
+                filiere=form.cleaned_data.get('filiere'),
+                photo_annuelle=form.cleaned_data.get('photo_annuelle')
+            )
+
+            messages.success(request, "Votre réinscription a été effectuée avec succès!")
+            return redirect("index")
+    else:
+        form = ReinscriptionForm()
+
+    return render(request, "gestionMembre/reinscriptionUser.html", {'form': form})
+
+
+
+
 

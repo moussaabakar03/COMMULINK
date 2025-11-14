@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Catégories d'Événements{% endblock %}
+
+{% block style %}
+    <style>
+        :root {
+            --primary: #FF6F0F;
+            --dark: #1a2035;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .page-header {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 50px;
+        }
+        
+        /* Add Button */
+        .btn-add {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-add:hover {
+            background-color: #e05b00;
+            color: var(--white);
+        }
+        
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .table {
+            margin-bottom: 0;
+            background: var(--white);
+        }
+        
+        .table thead {
+            background-color: var(--dark);
+        }
+        
+        .table thead th {
+            color: var(--white);
+            font-weight: 500;
+            padding: 1rem;
+            border: none;
+        }
+        
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(255, 111, 15, 0.05);
+        }
+        
+        /* Image Thumbnail */
+        .img-thumbnail {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+        
+        .img-placeholder {
+            width: 80px;
+            height: 60px;
+            background-color: var(--light);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+        
+        /* Description */
+        .description-container {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Badge */
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        /* Action Buttons */
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: var(--white);
+        }
+        
+        .btn-outline-success {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: #28a745;
+            color: var(--white);
+        }
+        
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: var(--white);
+        }
+        
+        /* Pagination */
+        .pagination {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .page-link {
+            background-color: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .page-link:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        .page-item.disabled .page-link {
+            background-color: var(--white);
+            color: #6c757d;
+            cursor: default;
+        }
+        
+        /* Modal */
+        .modal-content {
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .modal-body img {
+            border-radius: 6px;
+        }
+        
+        /* Responsive */
+        @media(max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .table thead th,
+            .table tbody td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .img-thumbnail,
+            .img-placeholder {
+                width: 60px;
+                height: 45px;
+            }
+            
+            .description-container {
+                max-width: 150px;
+            }
+            
+            .d-flex.gap-2 {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-sm {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container-custom">
+        <div>
+        </div>
+        <h1 class="page-title text-white">📂 Catégories d'Événements</h1>
+        <a href="{% url 'ajoutTypeEvenement' %}" class="btn-add">
+            <i class="fas fa-plus-circle"></i> Ajouter une catégorie
+        </a>
+    </div>
+</header>
+
+<div class="page-inner">
+    <div class="container-custom">
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom de la catégorie</th>
+                        <th>Description</th>
+                        <th>Nombre d'événements</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for type_evenement in typeEvenement %}
+                    <tr>
+                        <td>
+                            {% if type_evenement.image_type_evenement %}
+                                <img src="{{ type_evenement.image_type_evenement.url }}" 
+                                     class="img-thumbnail" 
+                                     alt="{{ type_evenement.nom_type_evenement }}"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#imagePreviewModal"
+                                     onclick="showImagePreview('{{ type_evenement.image_type_evenement.url }}')">
+                            {% else %}
+                                <div class="img-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold">{{ type_evenement.nom_type_evenement }}</td>
+                        <td>
+                            <div class="description-container" 
+                                 data-bs-toggle="tooltip" 
+                                 title="{{ type_evenement.description_type_evenement }}">
+                                {{ type_evenement.description_type_evenement|truncatechars:60 }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ type_evenement.nombreEvenemnet }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'evenementFiltrer' type_evenement.id %}" 
+                                   class="btn btn-sm btn-outline-primary"
+                                   data-bs-toggle="tooltip" 
+                                   title="Voir les événements">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'modifierCategorie' type_evenement.id %}" 
+                                   class="btn btn-sm btn-outline-success"
+                                   data-bs-toggle="tooltip" 
+                                   title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'supprimerCategorie' type_evenement.id %}" 
+                                   class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('Voulez-vous supprimer cette catégorie ?')"
+                                   data-bs-toggle="tooltip" 
+                                   title="Supprimer">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                        Précédent
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                        Suivant
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Preview Image -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-0">
+                <img src="" id="modalPreviewImage" class="img-fluid" alt="Preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activation des tooltips Bootstrap
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    // Preview des images en modal
+    function showImagePreview(imageSrc) {
+        document.getElementById('modalPreviewImage').src = imageSrc;
+    }
+</script>
+{% endblock %}
