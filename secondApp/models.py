@@ -77,7 +77,7 @@ class Membre(models.Model):
     telephone = models.CharField(max_length=20, blank=True, null=True)
     
     # Adresse
-    adresse = models.TextField(blank=True, null=True)
+    adresse = models.TextField(blank=True, null=True, unique=False)
     profession = models.CharField(max_length=50)
     numeroUrgence = models.CharField(max_length=20, blank=True, null=True)
     niveauEtude = models.CharField(max_length=20, blank=True, null=True)
@@ -191,33 +191,6 @@ class Temoingnage(models.Model):
     video = models.FileField(upload_to='videos/')
 
 
-
-
-
-class Paiement(models.Model):
-    STATUT_CHOICES = [
-        ('payé', 'Payé'),
-        ('non_payé', 'Non payé'),
-        ('moitié_payé', 'Moitié payé'),
-        ('avance', 'Avance'),
-    ]
-    
-    membre = models.ForeignKey(Membre, on_delete=models.CASCADE)
-    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE)
-    montant = models.IntegerField()
-    date_paiement = models.DateTimeField(null=True, blank=True)
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES)
-    preuve_paiement = models.FileField(upload_to='paiements/', null=True, blank=True)
-
-
-    # def save(self, *args, **kwargs):
-
-    #     super().save(*args, **kwargs)
-
-
-    def __str__(self):
-        return f"{self.membre} - {self.evenement} - {self.statut}"
-    
     
 class Reinscription(models.Model):
    
@@ -232,18 +205,18 @@ class Reinscription(models.Model):
         related_name='reinscriptions' 
     )
     
-    username = models.CharField(max_length=20, blank=True, null=True)
+    username = models.CharField(max_length=150, blank=True, null=True)
     password = models.TextField(blank=True, null=True)
     numeroUrgence = models.CharField(
-        max_length=20, 
+        max_length=150, 
         blank=True, 
         null=True,
         verbose_name="Numéro d'urgence"
     )
    
-    ecole = models.CharField(max_length=50, blank=True, null=True)
+    ecole = models.CharField(max_length=150, blank=True, null=True)
     niveauEtude = models.CharField(
-        max_length=20, 
+        max_length=150, 
         blank=True, 
         null=True,
         verbose_name="Niveau d'étude"
@@ -259,4 +232,32 @@ class Reinscription(models.Model):
         null=True,
         verbose_name="Photo de l'année"
     )
+    
+    def __str__(self):
+        return f"{self.membre.nom_complet}  *{self.membre.ner}- {self.membre.keri}* ({self.membre.ecole})"
+
+
+class Paiement(models.Model):
+    STATUT_CHOICES = [
+        ('payé', 'Payé'),
+        ('non_payé', 'Non payé'),
+        ('moitié_payé', 'Moitié payé'),
+        ('avance', 'Avance'),
+    ]
+    
+    membre_Reinscris = models.ForeignKey(Reinscription, on_delete=models.CASCADE, null=True, blank=True)
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE)
+    montant = models.IntegerField()
+    date_paiement = models.DateTimeField(null=True, blank=True)
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES)
+    preuve_paiement = models.FileField(upload_to='paiements/', null=True, blank=True)
+
+
+    # def save(self, *args, **kwargs):
+
+    #     super().save(*args, **kwargs)
+
+
+    def __str__(self):
+        return f"{self.membre} - {self.evenement} - {self.statut}"
     

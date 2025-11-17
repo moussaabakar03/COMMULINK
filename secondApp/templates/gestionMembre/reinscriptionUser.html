@@ -409,9 +409,11 @@
     <div class="auth-container">
         <div class="auth-card fade-in">
             <div class="auth-header">
+                {% if messages %}
                 {% for message in messages %}
                     {{message}}
                 {% endfor %}
+                {% endif %}
                 <h2>Réinscription</h2>
                 <p>Complétez vos informations pour vous réinscrire à COMMULINK</p>
             </div>
