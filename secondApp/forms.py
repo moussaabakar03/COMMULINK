@@ -211,12 +211,12 @@ class AnneeForm(forms.Form):
         
 
 class ReinscriptionForm(forms.Form):
-    username = forms.CharField(max_length=20, label="Nom d'utilisateur")
+    username = forms.CharField(max_length=120, label="Nom d'utilisateur")
     password = forms.CharField(widget=forms.PasswordInput, label="Mot de passe")
-    numeroUrgence = forms.CharField(max_length=20, required=False)
-    telephone = forms.CharField(max_length=20, required=False)  
+    numeroUrgence = forms.CharField(max_length=120, required=False)
+    telephone = forms.CharField(max_length=120, required=False)  
     adresse = forms.CharField(max_length=255, required=False)  
-    ecole = forms.CharField(max_length=50, required=False)
-    niveauEtude = forms.CharField(max_length=20, required=False)  
+    ecole = forms.CharField(max_length=150, required=False)
+    niveauEtude = forms.CharField(max_length=120, required=False)  
     filiere = forms.CharField(max_length=150, required=False)
     photo_annuelle = forms.ImageField(required=False)

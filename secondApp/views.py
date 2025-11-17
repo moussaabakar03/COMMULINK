@@ -278,7 +278,7 @@ def liste_membres(request):
         nombreMembre = membres.count()
     
     # Pagination (10 membres par page)
-    paginator = Paginator(membres, 2)
+    paginator = Paginator(membres, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -291,9 +291,11 @@ def liste_membres(request):
 def detail_membre(request, pk):
     membre = get_object_or_404(Membre, pk=pk)
     
+    reinscriptionMembres = membre.reinscriptions.all()
 
     return render(request, 'gestionMembre/detail.html', {
-        'membre': membre
+        'membre': membre,
+        "reinscriptionMembres": reinscriptionMembres
     })
 
 # def creer_membre(request):
@@ -311,16 +313,16 @@ def creer_membre(request):
     if request.method == 'POST':
         form = MembreForm(request.POST, request.FILES)
         if form.is_valid():
-            # 1. Créer l'utilisateur
+
             nom = form.cleaned_data['nom']
             prenom = form.cleaned_data['prenom']
             email = form.cleaned_data['email']
             telephone = form.cleaned_data.get('telephone') or "defaultpass123"
             
-            # Vérifier si l'email existe déjà
             if Utilisateur.objects.filter(email=email).exists():
-                form.add_error('email', 'Un utilisateur avec cet email existe déjà.')
+                messages.error(request, 'Un utilisateur avec cet email existe déjà.')
                 return render(request, 'gestionMembre/creer.html', {'form': form})
+            
             
             utilisateur = Utilisateur.objects.create(
                 username=email,
@@ -367,6 +369,7 @@ def creer_membre(request):
                     annee=annee_active,
                     username=email,
                     password=telephone,
+                    adresse=form.cleaned_data.get('adresse', ''),
                     numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
                     ecole=form.cleaned_data.get('ecole', ''),
                     niveauEtude=form.cleaned_data.get('niveauEtude', ''),
@@ -673,12 +676,12 @@ def ajouter_paiement(request):
         if form.is_valid():
             montant = form.cleaned_data['montant']
             evenement = form.cleaned_data['evenement']
-            membre = form.cleaned_data['membre']
+            membre_Reinscris = form.cleaned_data['membre_Reinscris']
             date_paiement = form.cleaned_data['date_paiement']
             preuve_paiement = form.cleaned_data.get('preuve_paiement')
 
             paiement_existant = Paiement.objects.filter(
-                membre=membre,
+                membre_Reinscris=membre_Reinscris,
                 evenement=evenement
             ).first()
 
@@ -777,7 +780,7 @@ def rappeler_paiements(request):
                 email_messages.append((
                     sujet,
                     message,
-                    'admin@example.com',  # ✅ à remplacer par ton email d’administration réel
+                    'admin@example.com', 
                     [paiement.membre.email]
                 ))
 
@@ -844,12 +847,19 @@ def paiementParEvenement(request, pk):
     
     paiements = Paiement.objects.filter(evenement = evenement).order_by('-date_paiement')
     
+    # 2. Récupérer les IDs des membres déjà réinscrits et ayant fait un paiement
+    membres_ayant_paye = paiements.values_list('membre_Reinscris_id', flat=True)
+
+    # 3. Trouver les réinscriptions de l'année en excluant ceux qui ont payé
+    reinscris = Reinscription.objects.filter(annee=evenement.annee).exclude(id__in=membres_ayant_paye)
+
+    
     membre_id = request.GET.get('membre')
     if membre_id:
         paiements = paiements.filter(membre__id=membre_id)
     
     
-    contexte = {"paiements": paiements, "evenement": evenement, 'membres': Membre.objects.all(),}
+    contexte = {"paiements": paiements, "evenement": evenement, 'membres': Membre.objects.all(), "reinscris": reinscris}
     return render(request, "gestionPaiement/paiementParEvenement.html", contexte)
 
 
@@ -863,7 +873,7 @@ def reinscriptionUser(request):
             user = authenticate(request, username=username, password=password)
 
             if not user:
-                form.add_error(None, "Nom d'utilisateur ou mot de passe incorrect.")
+                messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
                 return render(request, "gestionMembre/reinscriptionUser.html", {'form': form})
 
             try:

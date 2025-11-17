@@ -102,7 +102,7 @@
                                     <i class="fas fa-user me-1"></i>
                                     Membre
                                 </label>
-                                <select name="membre" id="membre" class="form-select form-control w-100">
+                                <select name="membreReinscris_id" id="membreReinscris_id" class="form-select form-control w-100">
                                     <option value="">Tous les membres</option>
                                     {% for membre in membres %}
                                         <option value="{{ membre.id }}" {% if selected_membre == membre.id %}selected{% endif %}>
@@ -133,51 +133,90 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for paiement in paiements %}
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="member-avatar me-2">
-                                                <i class="fas fa-user-circle text-primary"></i>
+                                {% for reinscri in reinscris %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="member-avatar me-2">
+                                                    <i class="fas fa-user-circle text-primary"></i>
+                                                </div>
+                                                <strong>{{ reinscri.membre.nom_complet }}</strong>
                                             </div>
-                                            <strong>{{ paiement.membre.nom_complet }}</strong>
-                                        </div>
-                                    </td>
-                                    <td>{{ paiement.evenement.titre }}</td>
-                                    <td>
-                                        <span class="fw-bold text-primary">{{ paiement.montant }} FCFA</span>
-                                    </td>
-                                    <td>
-                                        <span class="status-badge 
-                                            {% if paiement.statut == 'payé' %}status-paid
-                                            {% elif paiement.statut == 'non_payé' %}status-unpaid
-                                            {% else %}status-pending{% endif %}">
-                                            <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% else %}clock{% endif %}"></i>
-                                            {{ paiement.get_statut_display }}
-                                        </span>
-                                    </td>
-                                    <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
-                                                <i class="fas fa-sync-alt"></i>
-                                            </a>
-                                            <a href="#" class="btn-action btn-info" title="Voir preuve">
-                                                <i class="fas fa-file-alt"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="6">
-                                        <div class="empty-state">
-                                            <i class="fas fa-credit-card"></i>
-                                            <h3>Aucun paiement trouvé</h3>
-                                            <p>Essayez d'ajuster vos filtres ou ajoutez un nouveau paiement</p>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td>{{ evenement.titre }}</td>
+                                        <td>-</td>
+                                        <td><span class="fw-bold text-primary">Non payé</span></td>
+                                        <td>-</td>
+                                        {% comment %} <td>
+                                            <span class="fw-bold text-primary">{{ reinscri.montant }} FCFA</span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge 
+                                                {% if paiement.statut == 'payé' %}status-paid
+                                                {% elif paiement.statut == 'non_payé' %}status-unpaid
+                                                {% else %}status-pending{% endif %}">
+                                                <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% else %}clock{% endif %}"></i>
+                                                {{ paiement.get_statut_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td> {% endcomment %}
+                                        <td>
+                                            {% comment %} <div class="action-buttons">
+                                                <a href="" class="btn-action btn-edit" title="Modifier">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </a>
+                                                <a href="#" class="btn-action btn-info" title="Voir preuve">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                            </div>  {% endcomment %}
+
+                                            {% comment %} <div class="action-buttons">
+                                                <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </a>
+                                                <a href="#" class="btn-action btn-info" title="Voir preuve">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                            </div>  {% endcomment %}
+                                            -
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                {% for paiement in paiements %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="member-avatar me-2">
+                                                    <i class="fas fa-user-circle text-primary"></i>
+                                                </div>
+                                                <strong>{{ paiement.membre_Reinscris.membre.nom_complet }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>{{ evenement.titre }}</td>
+                                        <td>
+                                            <span class="fw-bold text-primary">{{ paiement.montant }} FCFA</span>
+                                        </td> 
+                                        <td>
+                                            <span class="status-badge 
+                                                {% if paiement.statut == 'payé' %}status-paid
+                                                {% elif paiement.statut == 'non_payé' %}status-unpaid
+                                                {% else %}status-pending{% endif %}">
+                                                <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% else %}clock{% endif %}"></i>
+                                                {{ paiement.get_statut_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </a>
+                                                <a href="#" class="btn-action btn-info" title="Voir preuve">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                            </div>  
+                                        </td>
+                                    </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
