@@ -54,7 +54,9 @@ class Annee(models.Model):
     finAnnee = models.DateField()
 
     def __str__(self):
-        return f"{self.debutAnnee}- {self.finAnnee}"
+        # Format plus lisible pour l'affichage dans les filtres
+        return f"{self.debutAnnee.year}-{self.finAnnee.year}"
+    
 
 class Membre(models.Model):
     GENRE_CHOICES = [
@@ -82,6 +84,7 @@ class Membre(models.Model):
     numeroUrgence = models.CharField(max_length=20, blank=True, null=True)
     niveauEtude = models.CharField(max_length=20, blank=True, null=True)
     ecole = models.CharField(max_length=20, blank=True, null=True)
+    filiere = models.CharField(max_length=150, blank=True, null= True)
 
 
     
@@ -249,13 +252,17 @@ class Paiement(models.Model):
     evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE)
     montant = models.IntegerField()
     date_paiement = models.DateTimeField(null=True, blank=True)
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES)
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, null=True, blank=True)
     preuve_paiement = models.FileField(upload_to='paiements/', null=True, blank=True)
 
+    reste_a_payer = models.IntegerField(null=True, blank=True) 
 
-    # def save(self, *args, **kwargs):
-
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if self.evenement.prix > self.montant:
+            self.reste_a_payer = self.evenement.prix - self.montant
+        else:
+            self.reste_a_payer = 0
+        super().save(*args, **kwargs)
 
 
     def __str__(self):

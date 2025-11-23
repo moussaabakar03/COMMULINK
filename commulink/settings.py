@@ -152,3 +152,5 @@ DEFAULT_FROM_EMAIL = 'shalomgbekou84@gmail.com'
 
 
 AUTH_USER_MODEL = 'secondApp.Utilisateur'
+
+

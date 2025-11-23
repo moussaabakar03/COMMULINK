@@ -5,6 +5,8 @@ from .models import Annee, Membre
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import Utilisateur
+from django.contrib.auth import authenticate
+
 
 class UtilisateurCreationForm(UserCreationForm):
     class Meta:
@@ -15,6 +17,7 @@ class UtilisateurChangeForm(UserChangeForm):
     class Meta:
         model = Utilisateur
         fields = ('username', 'email', 'role')
+
         
 
 class MembreForm(forms.Form):
@@ -202,6 +205,7 @@ class PaiementForm(forms.ModelForm):
         widgets = {
             'montant': forms.NumberInput(attrs={'min': '0', 'step': '25'}),
         }
+        exclude = ['evenement', 'statut'] 
 
 
 class AnneeForm(forms.Form):

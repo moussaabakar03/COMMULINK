@@ -132,6 +132,15 @@
                         <div class="info-item">
                             <div class="info-label">
                                 <i class="fas fa-user-tie"></i>
+                                Filière
+                            </div>
+                            <div class="info-value {% if not membre.filiere %}empty{% endif %}">
+                                {{ membre.filiere|default:"Non renseigné" }}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-user-tie"></i>
                                 Université/Ecole
                             </div>
                             <div class="info-value {% if not membre.ecole %}empty{% endif %}">
@@ -230,21 +239,19 @@
                                 {% for reinscriptionMembre in reinscriptionMembres %}
                                 <tr>
                                     <td>{{ reinscriptionMembre.annee.debutAnnee|date:"Y" }}- {{ reinscriptionMembre.annee.finAnnee|date:"Y" }}</td>
-                                    <td>{{reinscriptionMembre.ecole}}</td>
-                                    <td>{{reinscriptionMembre.niveau}}</td>
-                                    <td>{{reinscriptionMembre.adresse}}</td>
-                                    <td>
-                                        {% if reinscriptionMembre.photo_annuelle %}
-                                            <img src="{{ reinscriptionMembre.photo_annuelle.url }}" 
-                                                class="testimonial-image" 
-                                                alt="{{ reinscriptionMembre.membre.nom }}" style ="width: 100px; height: 90px; object-fit: cover; border-radius: 50%;">
-                                        {% else %}
-                                            <div class="testimonial-image d-flex align-items-center justify-content-center bg-light">
-                                                <i class="fas fa-user text-muted"></i>
-                                            </div>
-                                        {% endif %}
-                                    </td>
+                                    <td>{{reinscriptionMembre.ecole|default:"Non renseigné"}}</td>
+                                    <td>{{reinscriptionMembre.niveau|default:"Non renseigné"}}</td>
+                                    <td>{{reinscriptionMembre.adresse|default:"Non renseigné"}}</td>
 
+                                    <td>
+                                        <div class="member-avatar me-2">
+                                            {% if reinscriptionMembre.photo_annuelle %}
+                                                <img src="{{ reinscriptionMembre.photo_annuelle.url }}" alt="{{ reinscriptionMembre.membre.membre.nom_complet }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                            {% else %}
+                                                <i class="fas fa-user-circle"></i>
+                                            {% endif %}
+                                        </div>
+                                    </td>
                                 </tr>
                                 {% empty %}
                                 <tr>

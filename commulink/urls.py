@@ -22,6 +22,8 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+from secondApp import views
+
 
 # from commulink import firtsApp
 
@@ -31,6 +33,8 @@ urlpatterns = [
     
     path('', include('firtsApp.urls')),
     path('administrateur/', include('secondApp.urls')),
+    
+    
     
 ]
 

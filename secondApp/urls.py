@@ -34,6 +34,8 @@ urlpatterns = [
     path('membre/<int:pk>/', views.detail_membre, name='detail_membre'),
     path('membre/<int:pk>/modifier/', views.modifier_membre, name='modifier_membre'),
     path('<int:pk>/supprimer/', views.supprimer_membre, name='supprimer_membre'),
+    path('liste-reinscription', views.liste_reinscriptions, name='listeReinscription'),
+    
     
     
     path('ajoutMembreEquipe/', views.ajoutMembreEquipe, name='ajoutMembreEquipe'),
@@ -64,6 +66,7 @@ urlpatterns = [
     path('paiements/rappeler/', views.rappeler_paiements, name='rappeler_paiements'),
     path('<int:pk>/modifierPaiement/', views.modifierPaiement, name='modifierPaiement'),
     path('<int:pk>/paiementParEvenement/', views.paiementParEvenement, name='paiementParEvenement'),
+    path('<int:pk>/ajout-Paiement-Evenement/', views.ajoutPaiementEvenement, name='ajoutPaiementEvenement'),
     
     
     

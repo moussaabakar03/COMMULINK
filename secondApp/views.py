@@ -1,5 +1,6 @@
 from django.shortcuts import redirect, render
 
+
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
@@ -385,13 +386,27 @@ def creer_membre(request):
     return render(request, 'gestionMembre/creer.html', {'form': form})
 
 
-def modifier_membre(request, pk):
+def modidfier_membre(request, pk):
     membre = Membre.objects.get(pk=pk)
     
     if request.method == 'POST':
         form = MembreForm(request.POST, request.FILES)
         if form.is_valid():
+            
+            
+            email = form.cleaned_data['email']
+            telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+            
+            if Utilisateur.objects.filter(email=email).exists():
+                messages.error(request, 'Un utilisateur avec cet email existe déjà.')
+                return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+            
+            
+            membre.utilisateur.username = email
+            membre.utilisateur.password=make_password(telephone),
+
             form.update(membre)
+            messages.success(request, "Membre modifié avec succès!")
             return redirect('liste_membres')
     else:
         # Initialiser le formulaire avec les données du membre
@@ -419,12 +434,255 @@ def modifier_membre(request, pk):
     
     return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
 
+
+
+
+
+def modifier_membre(request, pk):
+    membre = Membre.objects.get(pk=pk)
+    utilisateur = membre.utilisateur
+
+    if request.method == 'POST':
+        form = MembreForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+
+            # Vérifier doublon email sans compter le compte actuel
+            if Utilisateur.objects.filter(email=email).exclude(pk=utilisateur.pk).exists():
+                messages.error(request, 'Un utilisateur avec cet email existe déjà.')
+                return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+
+            # Mettre à jour le compte utilisateur
+            utilisateur.username = email
+            utilisateur.email = email
+            utilisateur.password = make_password(telephone)
+            utilisateur.save()
+
+            # Mettre à jour le membre
+            form.update(membre)
+
+            messages.success(request, "Membre modifié avec succès!")
+            return redirect('liste_membres')
+
+    else:
+        initial_data = {
+            'nom': membre.nom,
+            'prenom': membre.prenom,
+            'sexe': membre.sexe,
+            'email': membre.email,
+            'telephone': membre.telephone,
+            'adresse': membre.adresse,
+            'profession': membre.profession,
+            'numeroUrgence': membre.numeroUrgence,
+            'niveauEtude': membre.niveauEtude,
+            'ecole': membre.ecole,
+            'photo': membre.photo,
+            'notes': membre.notes,
+            'ner': membre.ner,
+            'keri': membre.keri,
+            'keribour': membre.keribour,
+            'keriBa': membre.keriBa,
+            'keribourBa': membre.keribourBa,
+        }
+
+        form = MembreForm(initial=initial_data)
+
+    return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+
+
+
+
+
 def supprimer_membre(request, pk):
     membre = Membre.objects.get(pk=pk).delete()
     messages.success(request, "Membre supprimé avec succès!")
     return redirect('liste_membres')
     
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+from .models import Reinscription, Annee
+
+def listess_reinscriptions(request):
+    """
+    Vue pour afficher la liste des réinscriptions avec recherche et filtres
+    """
+    # Récupérer tous les réinscriptions
+    reinscriptions = Reinscription.objects.select_related('membre', 'annee').all()
     
+    # ========== RECHERCHE ==========
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        reinscriptions = reinscriptions.filter(
+            Q(membre__nom_complet__icontains=search_query) |
+            Q(ecole__icontains=search_query) |
+            Q(filiere__icontains=search_query) |
+            Q(niveauEtude__icontains=search_query) |
+            Q(membre__ner__icontains=search_query) |
+            Q(membre__keri__icontains=search_query)
+        )
+    
+    # ========== FILTRES ==========
+    # Filtre par année
+    annee_filter = request.GET.get('annee', '').strip()
+    if annee_filter:
+        reinscriptions = reinscriptions.filter(annee_id=annee_filter)
+    
+    # Filtre par école
+    ecole_filter = request.GET.get('ecole', '').strip()
+    if ecole_filter:
+        reinscriptions = reinscriptions.filter(ecole=ecole_filter)
+    
+    # Filtre par niveau
+    niveau_filter = request.GET.get('niveau', '').strip()
+    if niveau_filter:
+        reinscriptions = reinscriptions.filter(niveauEtude=niveau_filter)
+    
+    # ========== DONNÉES POUR LES FILTRES ==========
+    # Liste des années disponibles
+    annees = Annee.objects.all().order_by('-id')
+    
+    # Liste des écoles uniques (sans doublons et sans valeurs nulles)
+    ecoles = Reinscription.objects.exclude(
+        ecole__isnull=True
+    ).exclude(
+        ecole__exact=''
+    ).values_list('ecole', flat=True).distinct().order_by('ecole')
+    
+    # Liste des niveaux uniques
+    niveaux = Reinscription.objects.exclude(
+        niveauEtude__isnull=True
+    ).exclude(
+        niveauEtude__exact=''
+    ).values_list('niveauEtude', flat=True).distinct().order_by('niveauEtude')
+    
+    # ========== STATISTIQUES ==========
+    nombreReinscriptions = reinscriptions.count()
+    
+    # ========== TRI ==========
+    # Trier par date de réinscription (les plus récentes en premier)
+    reinscriptions = reinscriptions.order_by('-date_reinscription')
+    
+    # ========== PAGINATION ==========
+    paginator = Paginator(reinscriptions, 15)  # 15 réinscriptions par page
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    # ========== CONTEXTE ==========
+    context = {
+        'page_obj': page_obj,
+        'nombreReinscriptions': nombreReinscriptions,
+        'search_query': search_query,
+        'annees': annees,
+        'ecoles': ecoles,
+        'niveaux': niveaux,
+        'annee_filter': annee_filter,
+        'ecole_filter': ecole_filter,
+        'niveau_filter': niveau_filter,
+    }
+    
+    return render(request, 'gestionMembre/listeReinscription.html', context)
+
+from django.shortcuts import render
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
+from .models import Reinscription, Annee
+
+def liste_reinscriptions(request):
+    # Récupérer tous les paramètres de filtrage
+    search_query = request.GET.get('search', '')
+    annee_id = request.GET.get('annee', '')
+    ecole_filter = request.GET.get('ecole', '')
+    niveau_filter = request.GET.get('niveau', '')
+    filiere_filter = request.GET.get('filiere', '')
+
+    total_reinscris = Reinscription.objects.all().count()
+    # Récupérer toutes les réinscriptions avec les relations
+    reinscriptions = Reinscription.objects.select_related('membre', 'annee').all().order_by('-date_reinscription')
+
+    # Appliquer les filtres
+    if search_query:
+        reinscriptions = reinscriptions.filter(
+            Q(membre__nom__icontains=search_query) |
+            Q(ecole__icontains=search_query) |
+            Q(niveauEtude__icontains=search_query) |
+            Q(filiere__icontains=search_query) |
+            Q(membre__ner__icontains=search_query) |
+            Q(membre__keri__icontains=search_query)
+        )
+
+    if annee_id:
+        reinscriptions = reinscriptions.filter(annee_id=annee_id)
+
+    if ecole_filter:
+        reinscriptions = reinscriptions.filter(ecole=ecole_filter)
+
+    if niveau_filter:
+        reinscriptions = reinscriptions.filter(niveauEtude=niveau_filter)
+
+    if filiere_filter:
+        reinscriptions = reinscriptions.filter(filiere=filiere_filter)
+
+    # Calculer les statistiques
+    total_reinscriptions = reinscriptions.count()
+    
+    # Réinscriptions de cette année
+    debut_annee = timezone.now().replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    annee_actuelle = Annee.objects.last()
+    reinscriptions_cette_annee = Reinscription.objects.filter(annee=annee_actuelle).count()
+    
+    # Réinscriptions du dernier mois
+    il_y_a_un_mois = timezone.now() - timedelta(days=30)
+    reinscriptions_dernier_mois = Reinscription.objects.filter(
+        date_reinscription__gte=il_y_a_un_mois
+    ).count()
+
+    # Préparer les données pour les filtres
+    annees = Annee.objects.all().order_by('-debutAnnee')  # Supposons que le modèle Annee a un champ 'nom'
+    
+    # Récupérer les valeurs distinctes pour les filtres
+    ecoles = Reinscription.objects.exclude(ecole__isnull=True).exclude(ecole__exact='').values_list('ecole', flat=True).distinct().order_by('ecole')
+    niveaux = Reinscription.objects.exclude(niveauEtude__isnull=True).exclude(niveauEtude__exact='').values_list('niveauEtude', flat=True).distinct().order_by('niveauEtude')
+    filieres = Reinscription.objects.exclude(filiere__isnull=True).exclude(filiere__exact='').values_list('filiere', flat=True).distinct().order_by('filiere')
+
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(reinscriptions, 20)  # 20 réinscriptions par page
+    
+    try:
+        page_obj = paginator.page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    context = {
+        'page_obj': page_obj,
+        'total_reinscris': total_reinscris,
+        'nombreReinscription': total_reinscriptions,
+        'search_query': search_query,
+        'stats': {
+            'total': total_reinscriptions,
+            'cette_annee': reinscriptions_cette_annee,
+            'dernier_mois': reinscriptions_dernier_mois,
+        },
+        'annees': annees,
+        'annee_selectionnee': annee_id,
+        'ecoles': ecoles,
+        'ecole_selectionnee': ecole_filter,
+        'niveaux': niveaux,
+        'niveau_selectionne': niveau_filter,
+        'filieres': filieres,
+        'filiere_selectionnee': filiere_filter,
+    }
+
+    return render(request, 'gestionMembre/listeReinscription.html', context)
+
+
 
 def liste_EquipeDirigeante(request):
     # Récupérer la requête de recherche
@@ -690,6 +948,7 @@ def ajouter_paiement(request):
                 paiement_existant.montant += montant
                 paiement_existant.date_paiement = date_paiement or paiement_existant.date_paiement
                 if preuve_paiement:
+                    
                     paiement_existant.preuve_paiement = preuve_paiement
 
                 # --- Déterminer le statut selon le montant cumulé ---
@@ -735,6 +994,70 @@ def ajouter_paiement(request):
         'evenements': evenements
     })
 
+def ajoutPaiementEvenement(request, pk):
+    evenement = get_object_or_404(Evenement, id=pk)
+
+    if request.method == 'POST':
+        form = PaiementForm(request.POST, request.FILES)
+        if form.is_valid():
+            montant = form.cleaned_data['montant']
+            membre_Reinscris = form.cleaned_data['membre_Reinscris']
+            date_paiement = form.cleaned_data['date_paiement']
+            preuve_paiement = form.cleaned_data.get('preuve_paiement')
+
+            paiement_existant = Paiement.objects.filter(
+                membre_Reinscris=membre_Reinscris,
+                evenement=evenement
+            ).first()
+
+            if paiement_existant:
+                paiement_existant.montant += montant
+                paiement_existant.date_paiement = date_paiement or paiement_existant.date_paiement
+                if preuve_paiement:
+                    paiement_existant.preuve_paiement = preuve_paiement
+
+                prix = evenement.prix
+                montant_total = paiement_existant.montant
+
+                if montant_total >= prix:
+                    paiement_existant.statut = "payé"
+                elif montant_total >= (prix / 2):
+                    paiement_existant.statut = "moitié_payé"
+                elif montant_total > 0:
+                    paiement_existant.statut = "avance"
+                else:
+                    paiement_existant.statut = "non_payé"
+
+                paiement_existant.save()
+                return redirect('paiementParEvenement', pk=pk)
+
+            else:
+                paiement = form.save(commit=False)
+                paiement.evenement = evenement   
+                prix = evenement.prix
+
+                if montant >= prix:
+                    paiement.statut = "payé"
+                elif montant >= (prix / 2):
+                    paiement.statut = "moitié_payé"
+                elif montant > 0:
+                    paiement.statut = "avance"
+                else:
+                    paiement.statut = "non_payé"
+
+                paiement.save()
+                messages.success(request, 'Nouveau paiement enregistré avec succès !')
+                return redirect('paiementParEvenement', pk=pk)
+        else:
+            messages.error(request, "Erreur : formulaire non valide")
+    else:
+        form = PaiementForm()
+
+    return render(request, "gestionPaiement/ajoutPaiementEvenement.html", {
+        'form': form,
+        'evenement': evenement
+    })
+
 
 def rappeler_paiements(request):
     if request.method == 'POST':
@@ -743,59 +1066,168 @@ def rappeler_paiements(request):
             messages.error(request, "Aucun événement sélectionné.")
             return redirect('liste_paiements')
 
-        # 🔹 Récupérer les paiements partiels ou non payés
-        paiements = Paiement.objects.filter(
+        evenement = get_object_or_404(Evenement, id=event_id)
+        
+        # Récupérer tous les cas
+        paiements_existants = Paiement.objects.filter(
             evenement_id=event_id,
             statut__in=['non_payé', 'moitié_payé', 'avance']
         )
+        
+        membres_ayant_paye = paiements_existants.values_list('membre_Reinscris_id', flat=True)
+        
+        reinscriptions_sans_paiement = Reinscription.objects.filter(
+            annee=evenement.annee
+        ).exclude(id__in=membres_ayant_paye)
 
-        if not paiements.exists():
-            messages.info(request, "Aucun membre à relancer pour cet événement.")
-            return redirect('liste_paiements')
-
-        # 🔹 Préparer les emails
         email_messages = []
-        for paiement in paiements:
+        compteurs = {
+            'non_payes': 0,
+            'partiels': 0,
+            'sans_paiement': 0
+        }
+
+        # Cas 1: Paiements existants
+        for paiement in paiements_existants:
             montant_du = paiement.evenement.prix - paiement.montant
 
             sujet = f"Rappel de paiement - {paiement.evenement.titre}"
-            message = f"""
-                Bonjour {paiement.membre.nom_complet},
+            message = f"""Bonjour {paiement.membre_Reinscris.membre.nom_complet},
 
-                Nous vous rappelons que votre paiement pour l'événement **{paiement.evenement.titre}** 
-                est actuellement en statut **{paiement.get_statut_display()}**.
+Nous vous rappelons que votre paiement pour l'événement **{paiement.evenement.titre}** 
+est actuellement en statut **{paiement.get_statut_display()}**.
 
-                Montant payé : {paiement.montant} Fcfa  
-                Montant total : {paiement.evenement.prix} Fcfa  
-                Montant restant : {montant_du} Fcfa
+Montant payé : {paiement.montant} Fcfa  
+Montant total : {paiement.evenement.prix} Fcfa  
+Montant restant : {montant_du} Fcfa
 
-                Merci de bien vouloir régulariser votre paiement dans les plus brefs délais.
+Merci de bien vouloir régulariser votre paiement dans les plus brefs délais.
 
-                Cordialement,  
-                L’équipe d’administration
-                """
+Cordialement,  
+L'équipe d'administration"""
 
-            # Vérifier que l’email du membre existe
-            if paiement.membre.email:
+            if paiement.membre_Reinscris.membre.email:
                 email_messages.append((
                     sujet,
-                    message,
+                    message.strip(),
                     'admin@example.com', 
-                    [paiement.membre.email]
+                    [paiement.membre_Reinscris.membre.email]
                 ))
+                
+                # Compter par statut
+                if paiement.statut == 'non_payé':
+                    compteurs['non_payes'] += 1
+                else:
+                    compteurs['partiels'] += 1
 
-        # 🔹 Envoi des emails
+        # Cas 2: Membres sans paiement
+        for reinscription in reinscriptions_sans_paiement:
+            sujet = f"Rappel de paiement - {evenement.titre}"
+            message = f"""Bonjour {reinscription.membre.nom_complet},
+
+Nous vous rappelons que vous n'avez pas encore effectué de paiement pour l'événement **{evenement.titre}**.
+
+Montant total à payer : {evenement.prix} Fcfa  
+Statut : Non payé
+
+Merci de bien vouloir effectuer votre paiement dans les plus brefs délais.
+
+Cordialement,  
+L'équipe d'administration"""
+
+            if reinscription.membre.email:
+                email_messages.append((
+                    sujet,
+                    message.strip(),
+                    'admin@example.com', 
+                    [reinscription.membre.email]
+                ))
+                compteurs['sans_paiement'] += 1
+
+        # Envoi des emails
         if email_messages:
-            send_mass_mail(email_messages, fail_silently=False)
-            messages.success(request, f"Rappels envoyés à {len(email_messages)} membre(s).")
+            try:
+                send_mass_mail(email_messages, fail_silently=False)
+                messages.success(request, 
+                    f"Rappels envoyés à {len(email_messages)} membre(s): "
+                    f"{compteurs['non_payes']} non payés, "
+                    f"{compteurs['partiels']} partiellement payés, "
+                    f"{compteurs['sans_paiement']} sans paiement."
+                )
+            except Exception as e:
+                messages.error(request, f"Erreur lors de l'envoi des emails: {str(e)}")
         else:
-            messages.warning(request, "Aucun membre avec une adresse e-mail valide.")
+            messages.warning(request, "Aucun membre avec une adresse e-mail valide à rappeler.")
 
-        return redirect('liste_paiements')
+        return redirect('paiementParEvenement', pk=event_id)
 
     return redirect('liste_paiements')
 
 
+
+# def rappeler_paiements(request):
+#     if request.method == 'POST':
+#         event_id = request.POST.get('event_id')
+#         if not event_id:
+#             messages.error(request, "Aucun événement sélectionné.")
+#             return redirect('liste_paiements')
+
+#         # 🔹 Récupérer les paiements partiels ou non payés
+#         paiements = Paiement.objects.filter(
+#             evenement_id=event_id,
+#             statut__in=['non_payé', 'moitié_payé', 'avance']
+#         )
+
+#         if not paiements.exists():
+#             messages.info(request, "Aucun membre à relancer pour cet événement.")
+#             return redirect('liste_paiements')
+
+#         # 🔹 Préparer les emails
+#         email_messages = []
+#         for paiement in paiements:
+#             montant_du = paiement.evenement.prix - paiement.montant
+
+#             sujet = f"Rappel de paiement - {paiement.evenement.titre}"
+#             message = f"""
+#                 Bonjour {paiement.membre.nom_complet},
+
+#                 Nous vous rappelons que votre paiement pour l'événement **{paiement.evenement.titre}** 
+#                 est actuellement en statut **{paiement.get_statut_display()}**.
+
+#                 Montant payé : {paiement.montant} Fcfa  
+#                 Montant total : {paiement.evenement.prix} Fcfa  
+#                 Montant restant : {montant_du} Fcfa
+
+#                 Merci de bien vouloir régulariser votre paiement dans les plus brefs délais.
+
+#                 Cordialement,  
+#                 L’équipe d’administration
+#                 """
+
+#             # Vérifier que l’email du membre existe
+#             if paiement.membre.email:
+#                 email_messages.append((
+#                     sujet,
+#                     message,
+#                     'admin@example.com', 
+#                     [paiement.membre.email]
+#                 ))
+
+#         # 🔹 Envoi des emails
+#         if email_messages:
+#             send_mass_mail(email_messages, fail_silently=False)
+#             messages.success(request, f"Rappels envoyés à {len(email_messages)} membre(s).")
+#         else:
+#             messages.warning(request, "Aucun membre avec une adresse e-mail valide.")
+
+#         return redirect('liste_paiements')
+
+#     return redirect('liste_paiements')
+
+
+
+
+ 
 def modifierPaiement(request, pk):
     # Récupérer le paiement à modifier ou retourner 404 si non trouvé
     paiement = get_object_or_404(Paiement, pk=pk)
