@@ -36,7 +36,7 @@
 {% block body %}
 <!-- Page Header -->
 <header class="page-header">
-    <div class="container-custom">
+    <div class="container-custom"  style="display: block!important; margin: 0 auto!important;">
         <h1 class="page-title text-white">✏️ Modifier Membre de l'Équipe</h1>
         <p class="page-subtitle">Modifiez les informations du membre de l'équipe dirigeante</p>
     </div>
@@ -93,8 +93,8 @@
         </div>
         
         <div class="button-group">
-            <a href="{% url 'liste_EquipeDirigeante' %}" class="btn-cancel">Annuler</a>
             <button type="submit">Mettre à jour</button>
+            <a type="button"  href="{% url 'liste_EquipeDirigeante' %}" class="btn btn-danger w-100 mt-3">Annuler</a>
         </div>
     </form>
 </div>

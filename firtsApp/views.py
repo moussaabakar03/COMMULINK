@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from commulink.utils.decorators import membre_required
+from commulink.utils.decorators import admin_required, membre_required
 from firtsApp.forms import ConnexionForm
 from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, Membre, Temoingnage, TypeEvenement
 from django.contrib.auth.decorators import login_required
@@ -24,10 +24,7 @@ def connexion(request):
             utilisateur = form.get_user()
             login(request, utilisateur)
 
-            if utilisateur.is_superuser:
-                messages.success(request, f"Bienvenue {utilisateur}")
-                return redirect(reverse('admin_dashboard'))
-            elif utilisateur.role == "membreEquipe":
+            if utilisateur.is_superuser or utilisateur.role == "membreEquipe":
                 messages.success(request, f"Bienvenue {utilisateur}")
                 return redirect(reverse('admin_dashboard'))
             
@@ -44,7 +41,10 @@ def connexion(request):
     return render(request, 'user/connexion.html', {"form": form})
 
 
-
+def deconnexion(request):
+    logout(request)
+    messages.success(request, "Vous êtes déconnecté avec succès!")
+    return redirect("index")
 
 
 def index(request):
@@ -54,10 +54,8 @@ def index(request):
     temoingnages = Temoingnage.objects.all()
     return render(request, 'user/accueil.html', {'evenements': evenements, 'typeEvenement': typeEvenement, 'equipes': equipes, 'temoingnages': temoingnages})
 
-
 def contact(request):
     return render(request, 'user/contact.html')
-
 
 def feteIs(request):
     return render(request, 'user/feteIs.html')
@@ -78,6 +76,7 @@ def affichageEvenement(request, id):
 
 @login_required
 @membre_required
+@admin_required
 def detailEvenement(request, id):
     evenement = Evenement.objects.get(id=id)
     evenementImage = EvenementImage.objects.filter(evenement=evenement)

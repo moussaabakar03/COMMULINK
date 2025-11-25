@@ -3,6 +3,8 @@ from django.shortcuts import redirect, render
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
+from commulink.utils.decorators import admin_required
 from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
 from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm, ReinscriptionForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -24,6 +26,8 @@ from django.contrib.auth.hashers import make_password
 
 # DASHBOARD VIEW
 
+@login_required
+@admin_required
 def admin_dashboard(request):
     return render(request, "index.html")
 
@@ -31,6 +35,8 @@ def admin_dashboard(request):
 
 #----------------------------------GESTION DES EVENEMENTS--------------------------------------
 
+@login_required
+@admin_required
 def listeCategorie(request):
     typeEvenement = TypeEvenement.objects.annotate(nombreEvenemnet=Count('evenement'))
     
@@ -38,6 +44,10 @@ def listeCategorie(request):
         'typeEvenement': typeEvenement
     })
 
+
+
+@login_required
+@admin_required
 def ajoutTypeEvenement(request):
     if request.method == 'POST':
         nom = request.POST.get('nom')
@@ -50,6 +60,9 @@ def ajoutTypeEvenement(request):
         return redirect('listeCategorie')
     return render(request, 'gestionEvenement/ajoutCategorie.html')
 
+
+@login_required
+@admin_required
 def modifierCategorie(request, id):
     categorie = get_object_or_404(TypeEvenement, pk=id)
     if request.method == 'POST':
@@ -61,6 +74,10 @@ def modifierCategorie(request, id):
         return redirect('listeCategorie')
     return render(request, 'gestionEvenement/modifierCategorie.html', { 'categorie': categorie })
 
+
+
+@login_required
+@admin_required
 def supprimerCategorie(request, id):
     categorie = get_object_or_404(TypeEvenement, pk=id)
     categorie.delete()
@@ -72,13 +89,17 @@ def supprimerCategorie(request, id):
 #     return render(request, 'dynamiquePart/affichageEvenement.html', {'evenement': evenement, 'evenementsFiltrer': evenementsFiltrer})
 
 
+@login_required
+@admin_required
 def affichageEvenement(request):
     evenements = Evenement.objects.all().order_by('-id')
     return render(request, 'gestionEvenement/listeEvenement.html', {'evenements': evenements})
 
+@login_required
+@admin_required
 def ajoutEvenement(request):
     typeEvenem = TypeEvenement.objects.all()
-    toutes_annees = Annee.objects.all()
+    toutes_annees = Annee.objects.all().order_by("-id")
     if request.method == "POST":
         titre = request.POST.get('titre')
         description = request.POST.get('description')
@@ -108,11 +129,15 @@ def ajoutEvenement(request):
         return redirect('affichageEvenement')
     return render(request, 'gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem, 'toutes_annees': toutes_annees})
 
+@login_required
+@admin_required
 def evenementFiltrer(request, id):
     categorieEvenemnt = TypeEvenement.objects.get(id = id)
     evenements = Evenement.objects.filter(typeEvenement__id=id)
     return render(request, "gestionEvenement/evenementFiltrer.html", {"evenements": evenements,"categorieEvenemnt": categorieEvenemnt})
 
+@login_required
+@admin_required
 def detailEvenements(request, id):
     evenement = Evenement.objects.get(id=id)
     
@@ -126,6 +151,8 @@ def detailEvenements(request, id):
 
 
 
+@login_required
+@admin_required
 def modifierEvenement(request, id):
     evenement = Evenement.objects.get(id=id)
     typeEvenement = TypeEvenement.objects.all()
@@ -164,7 +191,10 @@ def modifierEvenement(request, id):
         return redirect('affichageEvenement')
         
     return render(request, 'gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "toutes_annees": toutes_annees})
-    
+
+
+@login_required
+@admin_required    
 def supprimerEvenement(request, id):
     evenement = Evenement.objects.get(id=id).delete()
     EvenementImage.objects.filter(evenement = evenement).delete()
@@ -172,6 +202,8 @@ def supprimerEvenement(request, id):
 
 
 
+@login_required
+@admin_required
 def publier_evenement(request, id):
     evenement = get_object_or_404(Evenement, id=id)
     evenement.est_publie = True
@@ -179,6 +211,9 @@ def publier_evenement(request, id):
     messages.success(request, "Evenement publié avec succès")
     return redirect('affichageEvenement')
 
+
+@login_required
+@admin_required
 def depublier_evenement(request, id):
     evenement = get_object_or_404(Evenement, id=id)
     evenement.est_publie = False
@@ -188,13 +223,18 @@ def depublier_evenement(request, id):
 
 #-------------------------------------------GESTION TEMOIGNAGES----------------------------------
 
+
+@login_required
+@admin_required
 def listeTemoingnes(request):
     temoingnages = Temoingnage.objects.all()
     return render(request, 'gestionEvenement/listeTemoingnes.html', {'temoingnages': temoingnages})
 
 
     
-    
+
+@login_required
+@admin_required    
 def ajoutTemoingnages(request):
     events = Evenement.objects.all()
 
@@ -222,6 +262,8 @@ def ajoutTemoingnages(request):
     return render(request, 'gestionEvenement/ajoutTemoingnages.html', {'events': events})
 
 
+@login_required
+@admin_required
 def modifierTemoingnes(request, id):
     temoingnage = Temoingnage.objects.get(id=id)
     evenements = Evenement.objects.all()
@@ -243,6 +285,8 @@ def modifierTemoingnes(request, id):
         return redirect('temoingnages')
     return render(request, 'gestionEvenement/modifierTemoingnes.html', {'temoingnage': temoingnage, 'events': evenements})
 
+@login_required
+@admin_required
 def supprimerTemoingne(request, id):
     temoingnage = Temoingnage.objects.get(id=id)
     temoingnage.delete()
@@ -251,6 +295,8 @@ def supprimerTemoingne(request, id):
 
 # --------------------------------GESTION DES MEMBRES----------------------------------------
 
+@login_required
+@admin_required
 def liste_membres(request):
     # Récupérer la requête de recherche
     search_query = request.GET.get('search', '').strip()
@@ -279,7 +325,7 @@ def liste_membres(request):
         nombreMembre = membres.count()
     
     # Pagination (10 membres par page)
-    paginator = Paginator(membres, 10)
+    paginator = Paginator(membres, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -289,6 +335,8 @@ def liste_membres(request):
         'nombreMembre': nombreMembre
     })
 
+@login_required
+@admin_required
 def detail_membre(request, pk):
     membre = get_object_or_404(Membre, pk=pk)
     
@@ -299,17 +347,9 @@ def detail_membre(request, pk):
         "reinscriptionMembres": reinscriptionMembres
     })
 
-# def creer_membre(request):
-#     if request.method == 'POST':
-#         form = MembreForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('liste_membres')
-#     else:
-#         form = MembreForm()
-     
-#     return render(request, 'gestionMembre/creer.html', {'form': form})
 
+@login_required
+@admin_required
 def creer_membre(request):
     if request.method == 'POST':
         form = MembreForm(request.POST, request.FILES)
@@ -386,6 +426,8 @@ def creer_membre(request):
     return render(request, 'gestionMembre/creer.html', {'form': form})
 
 
+@login_required
+@admin_required
 def modidfier_membre(request, pk):
     membre = Membre.objects.get(pk=pk)
     
@@ -435,9 +477,8 @@ def modidfier_membre(request, pk):
     return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
 
 
-
-
-
+@login_required
+@admin_required
 def modifier_membre(request, pk):
     membre = Membre.objects.get(pk=pk)
     utilisateur = membre.utilisateur
@@ -493,8 +534,8 @@ def modifier_membre(request, pk):
 
 
 
-
-
+@login_required
+@admin_required
 def supprimer_membre(request, pk):
     membre = Membre.objects.get(pk=pk).delete()
     messages.success(request, "Membre supprimé avec succès!")
@@ -505,85 +546,91 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Reinscription, Annee
 
-def listess_reinscriptions(request):
-    """
-    Vue pour afficher la liste des réinscriptions avec recherche et filtres
-    """
-    # Récupérer tous les réinscriptions
-    reinscriptions = Reinscription.objects.select_related('membre', 'annee').all()
+# def listess_reinscriptions(request):
+#     """
+#     Vue pour afficher la liste des réinscriptions avec recherche et filtres
+#     """
+#     # Récupérer tous les réinscriptions
+#     reinscriptions = Reinscription.objects.select_related('membre', 'annee').all()
     
-    # ========== RECHERCHE ==========
-    search_query = request.GET.get('search', '').strip()
-    if search_query:
-        reinscriptions = reinscriptions.filter(
-            Q(membre__nom_complet__icontains=search_query) |
-            Q(ecole__icontains=search_query) |
-            Q(filiere__icontains=search_query) |
-            Q(niveauEtude__icontains=search_query) |
-            Q(membre__ner__icontains=search_query) |
-            Q(membre__keri__icontains=search_query)
-        )
+#     # ========== RECHERCHE ==========
+#     search_query = request.GET.get('search', '').strip()
+#     if search_query:
+#         reinscriptions = reinscriptions.filter(
+#             Q(membre__nom_complet__icontains=search_query) |
+#             Q(membre__nom__icontains=search_query) |
+#             Q(membre__prenom__icontains=search_query) |
+#             Q(ecole__icontains=search_query) |
+#             Q(filiere__icontains=search_query) |
+#             Q(niveauEtude__icontains=search_query) |
+#             Q(membre__ner__icontains=search_query) |
+#             Q(membre__keri__icontains=search_query)
+#         )
     
-    # ========== FILTRES ==========
-    # Filtre par année
-    annee_filter = request.GET.get('annee', '').strip()
-    if annee_filter:
-        reinscriptions = reinscriptions.filter(annee_id=annee_filter)
+#     # ========== FILTRES ==========
+#     # Filtre par année
+#     annee_filter = request.GET.get('annee', '').strip()
+#     if annee_filter:
+#         reinscriptions = reinscriptions.filter(annee_id=annee_filter)
     
-    # Filtre par école
-    ecole_filter = request.GET.get('ecole', '').strip()
-    if ecole_filter:
-        reinscriptions = reinscriptions.filter(ecole=ecole_filter)
+#     # Filtre par école
+#     ecole_filter = request.GET.get('ecole', '').strip()
+#     if ecole_filter:
+#         reinscriptions = reinscriptions.filter(ecole=ecole_filter)
     
-    # Filtre par niveau
-    niveau_filter = request.GET.get('niveau', '').strip()
-    if niveau_filter:
-        reinscriptions = reinscriptions.filter(niveauEtude=niveau_filter)
+#     # Filtre par niveau
+#     niveau_filter = request.GET.get('niveau', '').strip()
+#     if niveau_filter:
+#         reinscriptions = reinscriptions.filter(niveauEtude=niveau_filter)
     
-    # ========== DONNÉES POUR LES FILTRES ==========
-    # Liste des années disponibles
-    annees = Annee.objects.all().order_by('-id')
+#     # ========== DONNÉES POUR LES FILTRES ==========
+#     # Liste des années disponibles
+#     annees = Annee.objects.all().order_by('-id')
     
-    # Liste des écoles uniques (sans doublons et sans valeurs nulles)
-    ecoles = Reinscription.objects.exclude(
-        ecole__isnull=True
-    ).exclude(
-        ecole__exact=''
-    ).values_list('ecole', flat=True).distinct().order_by('ecole')
+#     # Liste des écoles uniques (sans doublons et sans valeurs nulles)
+#     ecoles = Reinscription.objects.exclude(
+#         ecole__isnull=True
+#     ).exclude(
+#         ecole__exact=''
+#     ).values_list('ecole', flat=True).distinct().order_by('ecole')
     
-    # Liste des niveaux uniques
-    niveaux = Reinscription.objects.exclude(
-        niveauEtude__isnull=True
-    ).exclude(
-        niveauEtude__exact=''
-    ).values_list('niveauEtude', flat=True).distinct().order_by('niveauEtude')
+#     # Liste des niveaux uniques
+#     niveaux = Reinscription.objects.exclude(
+#         niveauEtude__isnull=True
+#     ).exclude(
+#         niveauEtude__exact=''
+#     ).values_list('niveauEtude', flat=True).distinct().order_by('niveauEtude')
     
-    # ========== STATISTIQUES ==========
-    nombreReinscriptions = reinscriptions.count()
+#     # ========== STATISTIQUES ==========
+#     nombreReinscriptions = reinscriptions.count()
     
-    # ========== TRI ==========
-    # Trier par date de réinscription (les plus récentes en premier)
-    reinscriptions = reinscriptions.order_by('-date_reinscription')
+#     # ========== TRI ==========
+#     # Trier par date de réinscription (les plus récentes en premier)
+#     reinscriptions = reinscriptions.order_by('-date_reinscription')
     
-    # ========== PAGINATION ==========
-    paginator = Paginator(reinscriptions, 15)  # 15 réinscriptions par page
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
+#     # ========== PAGINATION ==========
     
-    # ========== CONTEXTE ==========
-    context = {
-        'page_obj': page_obj,
-        'nombreReinscriptions': nombreReinscriptions,
-        'search_query': search_query,
-        'annees': annees,
-        'ecoles': ecoles,
-        'niveaux': niveaux,
-        'annee_filter': annee_filter,
-        'ecole_filter': ecole_filter,
-        'niveau_filter': niveau_filter,
-    }
+#     paginator = Paginator(reinscriptions, 3)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'gestionMembre/listeReinscription.html', context)
+#     # ========== CONTEXTE ==========
+#     context = {
+#         'page_obj': page_obj,
+#         'nombreReinscriptions': nombreReinscriptions,
+#         'search_query': search_query,
+#         'annees': annees,
+#         'ecoles': ecoles,
+#         'niveaux': niveaux,
+#         'annee_filter': annee_filter,
+#         'ecole_filter': ecole_filter,
+#         'niveau_filter': niveau_filter,
+#     }
+    
+#     return render(request, 'gestionMembre/listeReinscription.html', context)
+
+
+
 
 from django.shortcuts import render
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -592,25 +639,39 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Reinscription, Annee
 
+@login_required
+@admin_required
 def liste_reinscriptions(request):
     # Récupérer tous les paramètres de filtrage
-    search_query = request.GET.get('search', '')
-    annee_id = request.GET.get('annee', '')
-    ecole_filter = request.GET.get('ecole', '')
-    niveau_filter = request.GET.get('niveau', '')
-    filiere_filter = request.GET.get('filiere', '')
+    search_query = request.GET.get('search', '').strip()
+    annee_id = request.GET.get('annee', '').strip()
+    ecole_filter = request.GET.get('ecole', '').strip()
+    niveau_filter = request.GET.get('niveau', '').strip()
+    filiere_filter = request.GET.get('filiere', '').strip()
 
     total_reinscris = Reinscription.objects.all().count()
     # Récupérer toutes les réinscriptions avec les relations
     reinscriptions = Reinscription.objects.select_related('membre', 'annee').all().order_by('-date_reinscription')
 
+    from django.db.models import Value, CharField
+    from django.db.models.functions import Concat
+    from django.db.models import Q
+
+    reinscriptions = reinscriptions.annotate(
+        nom_complet=Concat(
+            'membre__nom', Value(' '), 'membre__prenom',
+            output_field=CharField()
+        )
+    )
     # Appliquer les filtres
     if search_query:
         reinscriptions = reinscriptions.filter(
+            Q(nom_complet__icontains=search_query) |
             Q(membre__nom__icontains=search_query) |
+            Q(membre__prenom__icontains=search_query) |
             Q(ecole__icontains=search_query) |
-            Q(niveauEtude__icontains=search_query) |
             Q(filiere__icontains=search_query) |
+            Q(niveauEtude__icontains=search_query) |
             Q(membre__ner__icontains=search_query) |
             Q(membre__keri__icontains=search_query)
         )
@@ -651,7 +712,7 @@ def liste_reinscriptions(request):
 
     # Pagination
     page = request.GET.get('page', 1)
-    paginator = Paginator(reinscriptions, 20)  # 20 réinscriptions par page
+    paginator = Paginator(reinscriptions, 5)  # 20 réinscriptions par page
     
     try:
         page_obj = paginator.page(page)
@@ -684,6 +745,8 @@ def liste_reinscriptions(request):
 
 
 
+@login_required
+@admin_required
 def liste_EquipeDirigeante(request):
     # Récupérer la requête de recherche
     search_query = request.GET.get('search', '').strip()
@@ -701,7 +764,7 @@ def liste_EquipeDirigeante(request):
         membres = EquipeDirigeante.objects.all().order_by('nom')
     
     # Pagination (10 membres par page)
-    paginator = Paginator(membres, 7)
+    paginator = Paginator(membres, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -710,6 +773,8 @@ def liste_EquipeDirigeante(request):
         'search_query': search_query,
     })
 
+@login_required
+@admin_required
 def ajoutMembreEquipe(request):
     if request.method == 'POST':
         nom = request.POST.get('nom')
@@ -733,6 +798,8 @@ def ajoutMembreEquipe(request):
         return redirect("liste_EquipeDirigeante")
     return render(request, 'gestionMembre/ajoutMembreEquipe.html')
 
+@login_required
+@admin_required
 def modification_MembreEquipeDirigeante(request, pk):
     # Récupérer le membre à modifier ou retourner 404 si non trouvé
     membre = get_object_or_404(EquipeDirigeante, pk=pk)
@@ -774,6 +841,8 @@ def modification_MembreEquipeDirigeante(request, pk):
     return render(request, 'gestionMembre/modifierMembreEquipe.html', context)
 
 
+@login_required
+@admin_required
 def supprimer_MembreEquipe(request, pk):
     membre = get_object_or_404(EquipeDirigeante, pk=pk).delete()
     return redirect("liste_EquipeDirigeante")
@@ -783,6 +852,8 @@ def supprimer_MembreEquipe(request, pk):
 #-----------------------------GESTION ANNONCES--------------------------------------------------
 
 
+@login_required
+@admin_required
 def liste_annonces(request):
     search_query = request.GET.get("search", "")
 
@@ -794,7 +865,9 @@ def liste_annonces(request):
     return render(request, 'gestionAnnonce/liste.html', {'annonces': annonces})
 
 
-# @login_required
+
+@login_required
+@admin_required
 def creer_annonce(request):
     if request.method == 'POST':
         form = AnnonceForm(request.POST, request.FILES)
@@ -808,7 +881,9 @@ def creer_annonce(request):
         form = AnnonceForm()
     return render(request, 'gestionAnnonce/creer.html', {'form': form})
 
-# @login_required
+
+@login_required
+@admin_required
 def publier_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)
     annonce.est_publie = True
@@ -817,6 +892,8 @@ def publier_annonce(request, id):
     messages.success(request, "Annonce publiée avec succès")
     return redirect('liste_annonces')
 
+@login_required
+@admin_required
 def modifier_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)
     
@@ -848,6 +925,8 @@ def modifier_annonce(request, id):
     
     return render(request, 'gestionAnnonce/modifier.html', context)
 
+@login_required
+@admin_required
 def supprimer_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)
     titre_annonce = annonce.titre
@@ -858,6 +937,8 @@ def supprimer_annonce(request, id):
 
 #---------------------------------GESTION DES ANNEES------------------------------------------
 
+@login_required
+@admin_required
 def listeAnnee(request):
     annees = Annee.objects.all()
 
@@ -866,6 +947,8 @@ def listeAnnee(request):
     }
     return render(request, "gestionAnnee/listeAnnee.html", context)
 
+@login_required
+@admin_required
 def ajoutAnnee(request):
      
     if request.method == 'POST':
@@ -893,6 +976,8 @@ def ajoutAnnee(request):
 
 #---------------------------------GESTION DES PAIEMENTS------------------------------------------
 
+@login_required
+@admin_required
 def liste_paiements(request):
     # Récupération des paramètres de filtrage
     event_id = request.GET.get("event_id")
@@ -913,7 +998,7 @@ def liste_paiements(request):
     if evenement_id:
         paiements = paiements.filter(evenement__id=evenement_id)
     if membre_id: 
-        paiements = paiements.filter(membre__id=membre_id)
+        paiements = paiements.filter(membre_Reinscris__membre__id=membre_id)
     
     context = {
         'paiements': paiements,
@@ -925,6 +1010,8 @@ def liste_paiements(request):
     }
     return render(request, 'gestionPaiement/liste.html', context)
 
+@login_required
+@admin_required
 def ajouter_paiement(request):
     evenements = Evenement.objects.all()
     
@@ -994,6 +1081,8 @@ def ajouter_paiement(request):
         'evenements': evenements
     })
 
+@login_required
+@admin_required
 def ajoutPaiementEvenement(request, pk):
     evenement = get_object_or_404(Evenement, id=pk)
 
@@ -1059,6 +1148,8 @@ def ajoutPaiementEvenement(request, pk):
     })
 
 
+@login_required
+@admin_required
 def rappeler_paiements(request):
     if request.method == 'POST':
         event_id = request.POST.get('event_id')
@@ -1227,7 +1318,9 @@ L'équipe d'administration"""
 
 
 
- 
+
+@login_required
+@admin_required 
 def modifierPaiement(request, pk):
     # Récupérer le paiement à modifier ou retourner 404 si non trouvé
     paiement = get_object_or_404(Paiement, pk=pk)
@@ -1274,6 +1367,8 @@ def modifierPaiement(request, pk):
     return render(request, 'gestionPaiement/modifierPaiment.html', context)
 
 
+@login_required
+@admin_required
 def paiementParEvenement(request, pk):
     evenement = get_object_or_404(Evenement, id = pk)
     
@@ -1286,16 +1381,25 @@ def paiementParEvenement(request, pk):
     reinscris = Reinscription.objects.filter(annee=evenement.annee).exclude(id__in=membres_ayant_paye)
 
     
-    membre_id = request.GET.get('membre')
+    membre_id = request.GET.get('membreReinscris_id')
     if membre_id:
-        paiements = paiements.filter(membre__id=membre_id)
+        paiements = paiements.filter(membre_Reinscris__membre__id=membre_id)
     
     
-    contexte = {"paiements": paiements, "evenement": evenement, 'membres': Membre.objects.all(), "reinscris": reinscris}
+    contexte = {
+        "paiements": paiements, 
+        "evenement": evenement, 
+        'membres': Membre.objects.all(), 
+        "reinscris": reinscris,
+        'selected_membre': int(membre_id) if membre_id else None,
+        
+        }
     return render(request, "gestionPaiement/paiementParEvenement.html", contexte)
 
 
 
+@login_required
+@admin_required
 def reinscriptionUser(request):
     if request.method == 'POST':
         form = ReinscriptionForm(request.POST, request.FILES)

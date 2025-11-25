@@ -80,15 +80,6 @@
                             <a href="{% url 'ajouter_paiement' %}" class="btn-add">
                                 <i class="fas fa-plus"></i> Ajouter un paiement
                             </a>
-                            {% if evenement %}
-                            <form method="post" action="{% url 'rappeler_paiements' %}" class="d-inline">
-                                {% csrf_token %}
-                                <input type="number" name="event_id" value="{{evenement.id}}" hidden>
-                                <button type="submit" class="btn-remind">
-                                    <i class="fas fa-bell"></i> Rappeler Paiements
-                                </button>
-                            </form>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -124,7 +115,7 @@
                                     <option value="">Tous les membres</option>
                                     {% for membre in membres %}
                                         <option value="{{ membre.id }}">
-                                            {{ membre.nom_complet }}
+                                            {{ membre.nom_complet }}- {{ membre.ner }}. {{ membre.keri }}
                                         </option>
                                     {% endfor %}
                                 </select>

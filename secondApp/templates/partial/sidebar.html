@@ -216,8 +216,6 @@
               </ul>
             </div>
           </li>
-
-          
           </li>
            <li class="nav-item">
             <a data-bs-toggle="collapse" href="#annee">
@@ -241,6 +239,26 @@
             </div>
           </li>
         </ul>
+
+        
+  <ul class="nav nav-secondary" style="margin-top: 150px;">
+            <li class="nav-section">
+                <button type="button" class="btn btn-warning" onclick="copyReinscriptionLink()" title="Copier le lien">
+                    Copier le lien Reinscription
+                </button>
+            </li>
+        </ul>
+
+        <script>
+        function copyReinscriptionLink() {
+            const url = "{% url 'reinscriptionUser' %}";
+            navigator.clipboard.writeText(url).then(function() {
+                alert("Lien de la page reinscription copié avec succès !");
+            });
+        }
+        </script>
       </div>
     </div>
   </div>
+
+

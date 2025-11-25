@@ -105,8 +105,8 @@
                                 <select name="membreReinscris_id" id="membreReinscris_id" class="form-select form-control w-100">
                                     <option value="">Tous les membres</option>
                                     {% for membre in membres %}
-                                        <option value="{{ membre.id }}" {% if selected_membre == membre.id %}selected{% endif %}>
-                                            {{ membre.nom_complet }}
+                                        <option value="{{ membre.id }}" {% if selected_membre == membre.id %}{% endif %}>
+                                            {{ membre.nom_complet }}- {{ membre.ner }}. {{ membre.keri }}
                                         </option>
                                     {% endfor %}
                                 </select>

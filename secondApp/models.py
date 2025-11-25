@@ -141,8 +141,6 @@ class Annonce(models.Model):
 
 
 
-
-
 # Create your models here.
 class TypeEvenement(models.Model):
     nom_type_evenement = models.CharField(max_length=100)
@@ -267,4 +265,6 @@ class Paiement(models.Model):
 
     def __str__(self):
         return f"{self.membre} - {self.evenement} - {self.statut}"
+    
+    
     
