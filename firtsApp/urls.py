@@ -15,5 +15,7 @@ urlpatterns = [
     
     path('affichageEvenement/<int:id>/', views.affichageEvenement, name='affichageEvenement'),
     path('detailEvenement/<int:id>/', views.detailEvenement, name='detailEvenement'),    
+    path('a-propos/', views.AboutView.as_view(), name='about'),
+    path('faq/', views.FAQView.as_view(), name='faq'),
     
 ]

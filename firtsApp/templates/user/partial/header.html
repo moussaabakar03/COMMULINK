@@ -1,16 +1,79 @@
 <style>
-    .sociaux a i:hover
-    {
-        color: #FF6F0F;
-    }
-    ..dropdown-item{
-        transition: all 1.5s ease-in-out;
-        font-weight: bold;
-    }
-    .dropdown-item:hover
-    {
-        color: #FF6F0F;
-    }
+        .sociaux a i:hover {
+            color: #FF6F0F;
+        }
+        .dropdown-item {
+            transition: all 0.3s ease-in-out;
+            font-weight: bold;
+        }
+        .dropdown-item:hover {
+            color: #FF6F0F;
+            background-color: transparent;
+        }
+
+        /* Styles pour le header au départ */
+        .headerNav {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .headerNav.scrolled {
+            background: rgba(0, 0, 0, 0.9) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Couleurs initiales (au départ) */
+        .headerNav:not(.scrolled) .navbar-nav .nav-link {
+            color: white !important;
+        }
+        
+        .headerNav:not(.scrolled) .navbar-brand .text-white,
+        .headerNav:not(.scrolled) .navbar-brand .text-primary {
+            color: white !important;
+        }
+        
+        .headerNav:not(.scrolled) .top-bar {
+            background: transparent !important;
+        }
+
+        /* Couleurs après scroll */
+        .headerNav.scrolled .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .headerNav.scrolled .navbar-nav .nav-link:hover,
+        .headerNav.scrolled .navbar-nav .nav-link.active {
+            color: #FF6F0F !important;
+        }
+
+        .headerNav.scrolled .navbar-brand .text-primary {
+            color: #FF6F0F !important;
+        }
+        
+        .headerNav.scrolled .navbar-brand .text-white {
+            color: white !important;
+        }
+
+        /* Correction pour le bouton de connexion */
+        .headerNav:not(.scrolled) .btn-outline-primary {
+            border-color: white !important;
+            color: white !important;
+        }
+        
+        .headerNav:not(.scrolled) .btn-outline-primary:hover {
+            background-color: white !important;
+            color: #FF6F0F !important;
+        }
+
+        .headerNav:not(.scrolled) .btn-outline-primary .btn-sm-square {
+            background-color: white !important;
+            color: #FF6F0F !important;
+        }
+
+        /* Styles pour les liens actifs */
+        .nav-link.active {
+            color: #FF6F0F !important;
+            font-weight: bold;
+        }
 </style>
 
 <!-- Navbar Start -->
@@ -31,50 +94,115 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark py-lg-0 px-lg-5 wow fadeIn" data-wow-delay="0.1s">
         <a href="{% url 'index' %}" class="navbar-brand ms-4 ms-lg-0">
-            <h1 class="fw-bold text-primary m-0">COMMU<span class="text-white">LINK</span></h1>
+            <h1 class="fw-bold m-0 text-white">COMMULINK</h1>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="{% url 'index' %}" class="nav-item nav-link active">Accueil</a>
-                <a href="" class="nav-item nav-link">A propos</a>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav ms-auto p-4 p-lg-0">
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Explorer</a>
-                            <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
-                                <a href="{% url 'index' %}#evenements" class="dropdown-item">Nos évenements</a>
-                                <a href="{% url 'index' %}#dernierEvenement" class="dropdown-item">Nos Evenements recent</a>
-                                <a href="{% url 'index' %}#equipeDirigeante" class="dropdown-item">Notre Equipe</a>
-                                <a href="{% url 'index' %}#temoingnage" class="dropdown-item">Nos Temoingnages</a>
-                                <a href="{% url 'index' %}#faireDon" class="dropdown-item">Faire un don</a>
-                            </div>
-                        </div>
+                <a href="{% url 'index' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">Accueil</a>
+                <a href="{% url 'about' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">A propos</a>
+                
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle explorer-toggle" data-bs-toggle="dropdown">Explorer</a>
+                    <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
+                        <a href="{% url 'index' %}#evenements" class="dropdown-item">Nos évenements</a>
+                        <a href="{% url 'index' %}#dernierEvenement" class="dropdown-item">Nos Evenements recent</a>
+                        <a href="{% url 'index' %}#equipeDirigeante" class="dropdown-item">Notre Equipe</a>
+                        <a href="{% url 'index' %}#temoingnage" class="dropdown-item">Nos Temoingnages</a>
+                        <a href="{% url 'index' %}#faireDon" class="dropdown-item">Faire un don</a>
                     </div>
                 </div>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav ms-auto p-4 p-lg-0">
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Contact</a>
-                            <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
-                                <a href="{% url 'contact' %}" class="dropdown-item">Contact</a>
-                                <a href="" class="dropdown-item">FAQ</a>
-                            </div>
-                        </div>
+                
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle contact-toggle" data-bs-toggle="dropdown">Contact</a>
+                    <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
+                        <a href="{% url 'contact' %}" class="dropdown-item">Contact</a>
+                        <a href="{% url 'faq' %}" class="dropdown-item">FAQ</a>
                     </div>
                 </div>
+                
+                <div class=" nav-item dropdown">
+                    <a class="btn btn-outline-primary py-2 px-3" href="{% url 'connexion' %}">
+                        Connexion
+                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                            <i class="fa fa-arrow-right"></i>
+                        </div>
+                    </a>
+                </div>
             </div>
-            <div class="d-none d-lg-flex ms-2">
-                <a class="btn btn-outline-primary py-2 px-3" href="{% url 'connexion' %}">
-                    Connexion
-                    <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
-                        <i class="fa fa-arrow-right"></i>
-                    </div>
-                </a>
-            </div>
+           
         </div>
     </nav>
 </div>
 <!-- Navbar End -->
+
+<script>
+    // Script pour gérer le changement de couleur au scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const header = document.querySelector('.headerNav');
+        
+        function updateHeader() {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        }
+        
+        // Initial check
+        updateHeader();
+        
+        // Listen for scroll events
+        window.addEventListener('scroll', updateHeader);
+
+        // Fonction pour mettre à jour les liens actifs basée sur l'URL actuelle
+        function updateActiveLinks() {
+            const currentUrl = window.location.href;
+            const navLinks = document.querySelectorAll('.nav-link');
+            const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+            
+            // Retirer active de tous les liens
+            navLinks.forEach(link => link.classList.remove('active'));
+            dropdownToggles.forEach(toggle => toggle.classList.remove('active'));
+            
+            // Vérifier chaque lien
+            navLinks.forEach(link => {
+                if (link.href === currentUrl) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Gestion spéciale pour les dropdowns
+            if (currentUrl.includes('contact')) {
+                document.querySelector('.contact-toggle').classList.add('active');
+            } else if (currentUrl.includes('faq')) {
+                document.querySelector('.contact-toggle').classList.add('active');
+            }
+            
+            // Gestion des ancres pour la page d'accueil
+            if (currentUrl.includes('#evenements') || currentUrl.includes('#dernierEvenement') || 
+                currentUrl.includes('#equipeDirigeante') || currentUrl.includes('#temoingnage') || 
+                currentUrl.includes('#faireDon')) {
+                document.querySelector('.explorer-toggle').classList.add('active');
+            }
+        }
+
+        // Mettre à jour les liens actifs au chargement
+        updateActiveLinks();
+
+        // Gestion des liens actifs au clic
+        const allNavLinks = document.querySelectorAll('.nav-link, .dropdown-item');
+        
+        allNavLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                // Petit délai pour laisser le temps à la navigation de se faire
+                setTimeout(updateActiveLinks, 100);
+            });
+        });
+
+        // Écouter les changements d'URL (pour les ancres)
+        window.addEventListener('hashchange', updateActiveLinks);
+    });
+</script>

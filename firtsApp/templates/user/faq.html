@@ -1,0 +1,294 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block body %}
+<!-- Hero FAQ -->
+<section class="hero-faq">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold text-white mb-4">Foire Aux Questions</h1>
+                <p class="lead text-white mb-4">Trouvez rapidement des réponses à vos questions sur CommuLink</p>
+                <div class="search-box">
+                    <input type="text" class="form-control form-control-lg" placeholder="Rechercher une question..." id="faqSearch">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Categories -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <button class="btn btn-category active w-100" data-category="all">
+                    <i class="fas fa-globe me-2"></i>Toutes les questions
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-category w-100" data-category="inscription">
+                    <i class="fas fa-user-plus me-2"></i>Inscription
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-category w-100" data-category="utilisation">
+                    <i class="fas fa-cogs me-2"></i>Utilisation
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-category w-100" data-category="securite">
+                    <i class="fas fa-shield-alt me-2"></i>Sécurité
+                </button>
+            </div>
+        </div>
+
+        <!-- FAQ Content -->
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <!-- Inscription Category -->
+                    <div class="faq-category" data-category="inscription">
+                        <h3 class="category-title mb-4">Inscription et Compte</h3>
+                        
+                        <div class="accordion-item border-0 mb-3">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Comment puis-je m'inscrire sur CommuLink ?
+                                </button>
+                            </h4>
+                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>L'inscription sur CommuLink est simple et rapide :</p>
+                                    <ol>
+                                        <li>Cliquez sur le bouton "Inscription" en haut de la page</li>
+                                        <li>Remplissez le formulaire avec vos informations personnelles</li>
+                                        <li>Validez votre inscription</li>
+                                        <li>Votre compte sera activé après vérification par l'administrateur</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 mb-3">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Qui peut utiliser CommuLink ?
+                                </button>
+                            </h4>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>CommuLink est destiné à tous les membres de la communauté tchadienne résidant au Togo. Que vous soyez :</p>
+                                    <ul>
+                                        <li>Nouvellement arrivé au Togo</li>
+                                        <li>Résident de longue date</li>
+                                        <li>Étudiant ou professionnel</li>
+                                    </ul>
+                                    <p>Vous pouvez vous inscrire et profiter de tous les services offerts par la plateforme.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Utilisation Category -->
+                    <div class="faq-category" data-category="utilisation">
+                        <h3 class="category-title mb-4">Utilisation de la Plateforme</h3>
+
+                        <div class="accordion-item border-0 mb-3">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Comment mettre à jour mes informations personnelles ?
+                                </button>
+                            </h4>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Plusieurs méthodes sont disponibles :</p>
+                                    <ul>
+                                        <li><strong>Notification annuelle :</strong> Vous recevrez une notification pour mettre à jour vos informations</li>
+                                        <li><strong>Lien WhatsApp :</strong> Les administrateurs partageront un lien via le groupe WhatsApp</li>
+                                        <li><strong>Accès direct :</strong> Vous pouvez accéder à votre profil à tout moment pour modifier vos données</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 mb-3">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Comment créer et partager du contenu ?
+                                </button>
+                            </h4>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p>Pour créer et partager du contenu :</p>
+                                    <ol>
+                                        <li>Connectez-vous à votre compte</li>
+                                        <li>Accédez à la section "Publications"</li>
+                                        <li>Cliquez sur "Ajouter une publication"</li>
+                                        <li>Rédigez votre message et ajoutez des images si nécessaire</li>
+                                        <li>Cliquez sur "Publier" pour partager avec la communauté</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sécurité Category -->
+                    <div class="faq-category" data-category="securite">
+                        <h3 class="category-title mb-4">Sécurité et Confidentialité</h3>
+
+                        <div class="accordion-item border-0 mb-3">
+                            <h4 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    Mes données personnelles sont-elles sécurisées ?
+                                </button>
+                            </h4>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Absolument.</strong> La sécurité de vos données est notre priorité :</p>
+                                    <ul>
+                                        <li>Protocoles de sécurité avancés</li>
+                                        <li>Authentification requise pour les informations sensibles</li>
+                                        <li>Données partagées uniquement avec les membres autorisés</li>
+                                        <li>Respect des normes de confidentialité</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Support -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="section-title mb-4">Vous ne trouvez pas de réponse ?</h2>
+        <p class="lead mb-4">Notre équipe de support est là pour vous aider</p>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                        <h5>Email</h5>
+                        <p class="mb-0">support@commulink.tg</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                        <h5>Téléphone</h5>
+                        <p class="mb-0">+228 XX XX XX XX</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <i class="fab fa-whatsapp fa-2x text-primary mb-3"></i>
+                        <h5>WhatsApp</h5>
+                        <p class="mb-0">+228 XX XX XX XX</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero-faq {
+    background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%);
+    padding: 100px 0;
+    color: white;
+}
+
+.search-box {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.btn-category {
+    border: 2px solid #FF6B00;
+    color: #FF6B00;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.btn-category.active,
+.btn-category:hover {
+    background: #FF6B00;
+    color: white;
+}
+
+.category-title {
+    color: #FF6B00;
+    font-weight: 600;
+    border-bottom: 2px solid #FF6B00;
+    padding-bottom: 10px;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #FF6B00;
+    color: white;
+}
+
+.faq-category {
+    margin-bottom: 3rem;
+}
+</style>
+
+<script>
+// FAQ Search Functionality
+document.getElementById('faqSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const questions = document.querySelectorAll('.accordion-button');
+    
+    questions.forEach(question => {
+        const questionText = question.textContent.toLowerCase();
+        const accordionItem = question.closest('.accordion-item');
+        
+        if (questionText.includes(searchTerm)) {
+            accordionItem.style.display = 'block';
+        } else {
+            accordionItem.style.display = 'none';
+        }
+    });
+});
+
+// FAQ Category Filter
+document.querySelectorAll('.btn-category').forEach(button => {
+    button.addEventListener('click', function() {
+        // Update active button
+        document.querySelectorAll('.btn-category').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        const category = this.getAttribute('data-category');
+        const categories = document.querySelectorAll('.faq-category');
+        
+        categories.forEach(cat => {
+            if (category === 'all' || cat.getAttribute('data-category') === category) {
+                cat.style.display = 'block';
+            } else {
+                cat.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

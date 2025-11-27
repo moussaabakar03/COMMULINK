@@ -1,0 +1,224 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-about">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold text-white mb-4">À Propos de CommuLink</h1>
+                <p class="lead text-white mb-4">Plateforme numérique pour renforcer les liens au sein de la communauté tchadienne au Togo</p>
+                <a href="#mission" class="btn btn-primary btn-lg">Découvrir notre mission</a>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'user/img/about.jpg' %}" alt="Communauté" class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section id="mission" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title mb-4">Notre Mission</h2>
+                <p class="lead mb-5">
+                    CommuLink vise à moderniser la gestion des activités de la communauté tchadienne 
+                    résidant au Togo grâce à une plateforme numérique innovante.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box bg-primary mb-3">
+                            <i class="fas fa-users fa-2x text-white"></i>
+                        </div>
+                        <h5>Renforcer les liens</h5>
+                        <p class="mb-0">Faciliter l'intégration et la coordination entre les membres de la communauté.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box bg-primary mb-3">
+                            <i class="fas fa-digital-tachograph fa-2x text-white"></i>
+                        </div>
+                        <h5>Digitaliser la gestion</h5>
+                        <p class="mb-0">Automatiser l'enregistrement des membres et la gestion des événements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Objectifs Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Nos Objectifs</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="objective-icon mb-3">
+                        <i class="fas fa-user-plus fa-2x text-primary"></i>
+                    </div>
+                    <h6>Gestion des membres</h6>
+                    <small>Enregistrement et mise à jour des informations</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="objective-icon mb-3">
+                        <i class="fas fa-bullhorn fa-2x text-primary"></i>
+                    </div>
+                    <h6>Communication interne</h6>
+                    <small>Messagerie et notifications en temps réel</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="objective-icon mb-3">
+                        <i class="fas fa-calendar-alt fa-2x text-primary"></i>
+                    </div>
+                    <h6>Événements</h6>
+                    <small>Publication et gestion des activités</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="objective-icon mb-3">
+                        <i class="fas fa-archive fa-2x text-primary"></i>
+                    </div>
+                    <h6>Mémoire collective</h6>
+                    <small>Archivage des documents importants</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mini FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="section-title text-center mb-5">Questions Fréquentes</h2>
+                
+                <div class="accordion" id="miniFaqAccordion">
+                    <!-- Question 1 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                Comment m'inscrire sur CommuLink ?
+                            </button>
+                        </h3>
+                        <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#miniFaqAccordion">
+                            <div class="accordion-body">
+                                Cliquez sur "Inscription", remplissez le formulaire avec vos informations, 
+                                et validez. Votre compte sera activé après vérification.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 2 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Qui peut utiliser la plateforme ?
+                            </button>
+                        </h3>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#miniFaqAccordion">
+                            <div class="accordion-body">
+                                Tous les membres de la communauté tchadienne résidant au Togo, 
+                                nouveaux arrivants comme résidents de longue date.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question 3 -->
+                    <div class="accordion-item border-0 mb-3">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Comment mettre à jour mes informations ?
+                            </button>
+                        </h3>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#miniFaqAccordion">
+                            <div class="accordion-body">
+                                Vous recevrez une notification annuelle ou pourrez accéder à votre 
+                                profil à tout moment pour modifier vos données.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'faq' %}" class="btn btn-outline-primary">Voir toutes les questions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Prêt à rejoindre notre communauté ?</h2>
+        <p class="lead mb-4">Inscrivez-vous dès maintenant et renforcez les liens avec la communauté tchadienne au Togo.</p>
+        <a href="{% url 'inscription' %}" class="btn btn-light btn-lg">S'inscrire maintenant</a>
+    </div>
+</section>
+
+<style>
+.hero-about {
+    background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%);
+    padding: 100px 0;
+    color: white;
+}
+
+.section-title {
+    color: #FF6B00;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.icon-box {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.objective-icon {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #FF6B00;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.objective-icon:hover {
+    background-color: #FF6B00;
+    color: white !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #FF6B00;
+    color: white;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 0, 0.25);
+}
+</style>
+{% endblock %}

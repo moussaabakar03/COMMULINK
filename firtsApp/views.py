@@ -45,3 +45,23 @@ def detailEvenement(request, id):
     return render(request, 'user/detailEvenement.html', {'evenement': evenement, 'evenementImage': evenementImage})
 
 
+
+from django.views.generic import TemplateView
+
+class AboutView(TemplateView):
+    template_name = 'user/apropos.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'À Propos - CommuLink'
+        return context
+
+class FAQView(TemplateView):
+    template_name = 'user/faq.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'FAQ - CommuLink'
+        return context
+
+
