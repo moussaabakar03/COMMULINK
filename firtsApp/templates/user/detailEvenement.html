@@ -141,7 +141,7 @@
     {% for image in evenementImage %}
       <div class="gallery-item">
         {% if image.image %}
-          <a href="{{ image.image.url }}">
+          <a href="{{ image.image.url }}" target="_blank">
             <img src="{{ image.image.url }}" alt="image">
             <div class="overlay">Voir la photo</div>
           </a>

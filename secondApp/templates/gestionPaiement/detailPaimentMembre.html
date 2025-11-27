@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% load static %} 
+
+{% block title %}Détails Paiement - {{ paiement.membre_Reinscris.membre.nom_complet }}{% endblock %}
+
+{% block style %}
+
+    <link rel="stylesheet" href="{% static 'assets/css/paiements/detailPaiementMembre.css' %}" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container-custom text-center">
+        <h1 class="page-title text-white">💳 Détails du Paiement</h1>
+        <p class="page-subtitle">Informations complètes sur le paiement de {{ paiement.membre_Reinscris.membre.nom_complet }}</p>
+    </div>
+</header>
+
+<div class="page-inner">
+    <div class="container-custom">
+        <!-- Carte du paiement -->
+        <div class="payment-card">
+            <!-- En-tête -->
+            <div class="payment-header">
+                <div class="header-content">
+                    <h1 class="payment-title">
+                        <i class="fas fa-user-circle"></i>
+                        {{ paiement.membre_Reinscris.membre.nom_complet }}
+                    </h1>
+                    <div class="payment-event">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ paiement.evenement.titre }}
+                    </div>
+                </div>
+                <div class="payment-status-badge">
+                    <span class="status-badge-large 
+                        {% if paiement.statut == 'payé' %}status-paid
+                        {% elif paiement.statut == 'non_payé' %}status-unpaid
+                        {% elif paiement.statut == 'moitié_payé' %}status-pending
+                        {% else %}status-advance{% endif %}">
+                        <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% elif paiement.statut == 'moitié_payé' %}adjust{% else %}arrow-up{% endif %}"></i>
+                        {{ paiement.get_statut_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Corps -->
+            <div class="payment-body">
+                <!-- Informations du membre -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Informations du Membre
+                    </h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-signature"></i>
+                                Nom complet
+                            </div>
+                            <div class="info-value">{{ paiement.membre_Reinscris.membre.nom_complet }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </div>
+                            <div class="info-value">{{ paiement.membre_Reinscris.membre.email }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-phone"></i>
+                                Téléphone
+                            </div>
+                            <div class="info-value {% if not paiement.membre_Reinscris.membre.telephone %}empty{% endif %}">
+                                {{ paiement.membre_Reinscris.membre.telephone|default:"Non renseigné" }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-id-card"></i>
+                                NER
+                            </div>
+                            <div class="info-value">{{ paiement.membre_Reinscris.membre.ner }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Détails de l'événement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        Détails de l'Événement
+                    </h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-tag"></i>
+                                Titre de l'événement
+                            </div>
+                            <div class="info-value">{{ paiement.evenement.titre }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-coins"></i>
+                                Prix de l'événement
+                            </div>
+                            <div class="info-value">
+                                <span class="amount-highlight">{{ paiement.evenement.prix }} FCFA</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-calendar"></i>
+                                Date de l'événement
+                            </div>
+                            <div class="info-value">
+                                {{ paiement.evenement.date_evenement|date:"d/m/Y"|default:"Non définie" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informations du paiement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Informations du Paiement
+                    </h2>
+                    
+                    <div class="payment-summary">
+                        <div class="summary-item summary-main">
+                            <div class="summary-label">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                Montant payé
+                            </div>
+                            <div class="summary-value amount-paid">
+                                {{ paiement.montant }} FCFA
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="fas fa-clock"></i>
+                                Date de paiement
+                            </div>
+                            <div class="summary-value">
+                                {{ paiement.date_paiement|date:"d/m/Y à H:i"|default:"Non renseignée" }}
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="fas fa-info-circle"></i>
+                                Statut
+                            </div>
+                            <div class="summary-value">
+                                <span class="status-badge 
+                                    {% if paiement.statut == 'payé' %}status-paid
+                                    {% elif paiement.statut == 'non_payé' %}status-unpaid
+                                    {% elif paiement.statut == 'moitié_payé' %}status-pending
+                                    {% else %}status-advance{% endif %}">
+                                    <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% elif paiement.statut == 'moitié_payé' %}adjust{% else %}arrow-up{% endif %}"></i>
+                                    {{ paiement.get_statut_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {% if paiement.reste_a_payer > 0 %}
+                        <div class="summary-item summary-warning">
+                            <div class="summary-label">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Reste à payer
+                            </div>
+                            <div class="summary-value amount-remaining">
+                                {{ paiement.reste_a_payer }} FCFA
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Preuve de paiement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        Preuve de Paiement
+                    </h2>
+                    
+                    <div class="proof-container">
+                        {% if paiement.preuve_paiement %}
+                        <div class="proof-item">
+                            <div class="proof-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="proof-info">
+                                <div class="proof-name">Document de preuve</div>
+                                <a href="{{ paiement.preuve_paiement.url }}" target="_blank" class="btn-download">
+                                    <i class="fas fa-download"></i> Télécharger
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="proof-empty">
+                            <i class="fas fa-inbox"></i>
+                            <p>Aucune preuve de paiement disponible</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Pied de page -->
+            <div class="payment-footer">
+                <a href="{% url 'paiementParEvenement' paiement.evenement.id %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+
+                <div class="action-buttons">
+                    <a href="{% url 'modifierPaiement' paiement.id %}" class="btn-action btn-edit">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <a href="{% url 'supprimer_paiement' paiement.id paiement.evenement.id %}"
+                        class="btn-action btn-red"
+                        title="Supprimer"
+                        onclick="return confirm('Voulez-vous vraiment supprimer ce paiement ? Cette action est irréversible.');">
+                        <i class="fas fa-trash-alt"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+{% endblock %}

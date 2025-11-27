@@ -1,10 +1,11 @@
 from django import forms
 from django.core.validators import MinLengthValidator, EmailValidator
 from django.utils import timezone
-from .models import Annee, Membre
+from .models import Annee, Membre, Annonce, Paiement, Utilisateur
+
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import Utilisateur
+
 from django.contrib.auth import authenticate
 
 
@@ -74,6 +75,12 @@ class MembreForm(forms.Form):
     )
     
     niveauEtude = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    filiere = forms.CharField(
         max_length=20,
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -185,7 +192,6 @@ class MembreForm(forms.Form):
 
 
 #--------------------------------ANNONCES----------------------------------
-from .models import Annonce, Paiement
 
 class AnnonceForm(forms.ModelForm):
     class Meta:
@@ -205,7 +211,7 @@ class PaiementForm(forms.ModelForm):
         widgets = {
             'montant': forms.NumberInput(attrs={'min': '0', 'step': '25'}),
         }
-        exclude = ['evenement', 'statut'] 
+        # exclude = ['evenement', 'statut'] 
 
 
 class AnneeForm(forms.Form):
@@ -224,3 +230,5 @@ class ReinscriptionForm(forms.Form):
     niveauEtude = forms.CharField(max_length=120, required=False)  
     filiere = forms.CharField(max_length=150, required=False)
     photo_annuelle = forms.ImageField(required=False)
+
+

@@ -57,7 +57,7 @@ urlpatterns = [
     #-----------------------------URLS Annees------------------------------------
     path('liste-annee/', views.listeAnnee, name='listeAnnee'),
     path('ajout-annee/', views.ajoutAnnee, name='ajoutAnnee'),
-    
+    path('<int:pk>/modifier-annee/', views.modifierAnnee, name='modifierAnnee'),
     
     
     #-----------------------------URLS PAIEMENTS------------------------------------
@@ -67,6 +67,8 @@ urlpatterns = [
     path('<int:pk>/modifierPaiement/', views.modifierPaiement, name='modifierPaiement'),
     path('<int:pk>/paiementParEvenement/', views.paiementParEvenement, name='paiementParEvenement'),
     path('<int:pk>/ajout-Paiement-Evenement/', views.ajoutPaiementEvenement, name='ajoutPaiementEvenement'),
+    path('<int:pk>/detail-paiment-membre/', views.detailPaimentMembre, name='detailPaimentMembre'),
+    path('<int:pk_membre>/<int:pk_evenement>/supprimer-paiement/', views.supprimer_paiement, name='supprimer_paiement'),
     
     
     

@@ -39,6 +39,9 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="{% url 'index' %}" class="nav-item nav-link active">Accueil</a>
+                {% if request.user.role == "membreEquipe" %}
+                    <a href="{% url 'admin_dashboard' %}" class="nav-item nav-link">Dashbord</a>
+                {% endif %}
                 <a href="" class="nav-item nav-link">A propos</a>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto p-4 p-lg-0">

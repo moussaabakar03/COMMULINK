@@ -308,6 +308,7 @@ def liste_membres(request):
             Q(nom__icontains=search_query) |
             Q(prenom__icontains=search_query) |
             Q(email__icontains=search_query) |
+            Q(telephone__icontains=search_query) |
             Q(adresse__icontains=search_query) |
             Q(profession__icontains=search_query) |
             Q(niveauEtude__icontains=search_query) |
@@ -940,7 +941,7 @@ def supprimer_annonce(request, id):
 @login_required
 @admin_required
 def listeAnnee(request):
-    annees = Annee.objects.all()
+    annees = Annee.objects.all().order_by("id")
 
     context = {
         'annees': annees,
@@ -973,6 +974,26 @@ def ajoutAnnee(request):
         'form': form,
     })
 
+@login_required
+@admin_required
+def modifierAnnee(request, pk):
+    annee = get_object_or_404(Annee, pk=pk)
+    form = AnneeForm()
+    if request.method == "POST":
+        form = AnneeForm(request.POST)
+        
+        if form.is_valid():
+            annee.debutAnnee = form.cleaned_data['debutAnnee']
+            annee.finAnnee = form.cleaned_data['finAnnee']
+            
+            annee.save()
+            
+            messages.success(request, "Année modifiée avec succès!")
+            return redirect("listeAnnee")
+    else:
+        form = AnneeForm(initial = {"debutAnnee": annee.debutAnnee, "finAnnee": annee.finAnnee})
+    context = {"form": form, "annee": annee}
+    return render(request, "gestionAnnee/modifierAnnee.html", context)
 
 #---------------------------------GESTION DES PAIEMENTS------------------------------------------
 
@@ -1396,6 +1417,38 @@ def paiementParEvenement(request, pk):
         }
     return render(request, "gestionPaiement/paiementParEvenement.html", contexte)
 
+
+
+@login_required
+def detailPaimentMembre(request, pk):
+    """
+    Vue pour afficher les détails d'un paiement
+    """
+    paiement = get_object_or_404(Paiement, pk=pk)
+    
+    context = {
+        'paiement': paiement,
+    }
+    
+    return render(request, 'gestionPaiement/detailPaimentMembre.html', context)
+
+
+@login_required
+def supprimer_paiement(request, pk_membre, pk_evenement):
+    """
+    Vue pour supprimer un paiement
+    """
+    paiement = get_object_or_404(Paiement, pk=pk_membre)
+    evenement = get_object_or_404(Evenement, pk=pk_evenement)
+    
+    try:
+        membre_nom = paiement.membre_Reinscris.membre.nom_complet
+        paiement.delete()
+        messages.success(request, f'Paiement de {membre_nom} supprimé avec succès!')
+        return redirect('paiementParEvenement', pk=pk_evenement)
+    except Exception as e:
+        messages.error(request, f'Erreur lors de la suppression: {str(e)}')
+        return redirect('paiementParEvenement', pk=pk_evenement)
 
 
 @login_required

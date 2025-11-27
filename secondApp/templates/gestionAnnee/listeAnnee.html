@@ -96,12 +96,10 @@
                                     <td>{{ annee.finAnnee|date:"d/m/Y" }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="{% url 'modifierPaiement' annee.pk %}" class="btn-action btn-edit" title="Modifier">
+                                            <a href="{% url 'modifierAnnee' annee.pk %}" class="btn-action btn-edit" title="Modifier">
                                                 <i class="fas fa-sync-alt"></i>
                                             </a>
-                                            <a href="#" class="btn-action btn-info" title="Voir preuve">
-                                                <i class="fas fa-file-alt"></i>
-                                            </a>
+                                           
                                         </div>
                                     </td>
                                 </tr>

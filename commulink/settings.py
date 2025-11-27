@@ -53,6 +53,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'commulink.urls'
+LOGIN_URL = 'connexion'
 
 TEMPLATES = [
     {

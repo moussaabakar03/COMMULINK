@@ -17,13 +17,20 @@ from django.contrib.auth import authenticate, login, logout
 
 
 def connexion(request):
+    next_url = request.GET.get("next")  #  on récupère le paramètre next
+
     if request.method == "POST":
-        form = ConnexionForm(request.POST, request=request)  
+        form = ConnexionForm(request.POST, request=request)
 
         if form.is_valid():
             utilisateur = form.get_user()
             login(request, utilisateur)
 
+            # Si next existe, redirection prioritaire
+            if next_url:
+                return redirect(next_url)
+
+            # 3️Sinon, ton comportement normal
             if utilisateur.is_superuser or utilisateur.role == "membreEquipe":
                 messages.success(request, f"Bienvenue {utilisateur}")
                 return redirect(reverse('admin_dashboard'))
@@ -32,12 +39,13 @@ def connexion(request):
                 membre = get_object_or_404(Membre, utilisateur=utilisateur)
                 messages.success(request, f"Bienvenue {membre.nom} {membre.prenom}")
                 return redirect("index")
+
         else:
             messages.error(request, "Identifiant ou mot de passe incorrect")
 
     else:
         form = ConnexionForm()
-    
+
     return render(request, 'user/connexion.html', {"form": form})
 
 
@@ -75,8 +83,8 @@ def affichageEvenement(request, id):
     return render(request, 'dynamiquePart/affichageEvenement.html', {'evenement': evenement, 'evenementsFiltrer': evenementsFiltrer})
 
 @login_required
-@membre_required
 @admin_required
+@membre_required
 def detailEvenement(request, id):
     evenement = Evenement.objects.get(id=id)
     evenementImage = EvenementImage.objects.filter(evenement=evenement)
