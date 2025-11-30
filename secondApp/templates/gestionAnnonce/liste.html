@@ -415,6 +415,10 @@
                                     <a href="{% url 'publier_annonce' annonce.id %}" class="btn-action btn-publish">
                                         <i class="fas fa-paper-plane"></i> Publier
                                     </a>
+                                {% else %}
+                                    <a href="{% url 'depublier_annonce' annonce.id %}" class="btn-action btn-delete">
+                                        <i class="fas fa-paper-plane"></i> dépublier
+                                    </a>
                                 {% endif %}
                             </div>
                         </td>

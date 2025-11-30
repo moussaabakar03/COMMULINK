@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMMULINK - Inscription</title>
+    <title>Formulaire COMMULINK - Inscription</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
         :root {
-             {% comment %} --primary-color:rgb(226, 205, 118); {% endcomment %}
-             --primary-light: #6ea1e1;
-             --primary-dark: #2c5ba8;
-             {% comment %} --secondary-color:rgb(177, 188, 93); {% endcomment %}
+            --primary-color: #FF6F0F;
+            --primary-dark: #ffffff;
+            --secondary-color: #073841;
             --text-color: #333;
             --light-gray: #f8f9fa;
             --medium-gray: #e9ecef;
@@ -33,66 +33,171 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            background-color: rgb(202, 200, 200);
             color: var(--text-color);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
         
-        /*.auth-container {
+        .container {
             max-width: 900px;
             width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        */
-        .auth-card {
+            margin: 0 auto;
             background-color: white;
+            padding: 40px;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 40px;
-            width: 400px;
-            max-width: 100%;
             position: relative;
             overflow: hidden;
-            transition: var(--transition);
-            border: 0.5px solid black;
         }
         
-        .auth-card::before {
+        .container::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
         }
         
-        .auth-header {
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        /* Alerts/Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error, .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            line-height: 1;
+        }
+        
+        .alert-close:hover {
+            opacity: 1;
+        }
+        
+        .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
         }
         
-        .auth-header h2 {
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
             color: var(--primary-color);
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
-        .auth-header p {
+        .header p {
             color: var(--dark-gray);
-            font-size: 14px;
+            font-size: 16px;
+            font-weight: 300;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .header p::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 3px;
+        }
+        
+        .form-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--secondary-color);
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             position: relative;
         }
         
@@ -101,321 +206,795 @@
             font-weight: 500;
             margin-bottom: 8px;
             color: var(--dark-gray);
-            font-size: 14px;
+            transition: var(--transition);
         }
         
-        .form-control {
-            position: relative;
+        .required::after {
+            content: " *";
+            color: var(--danger);
+            font-weight: bold;
         }
         
-        .form-icon {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: var(--dark-gray);
-            font-size: 18px;
-        }
-        
+        /* Form controls - Style pour les champs Django */
+        .form-control,
         input[type="text"],
-        input[type="password"],
-        input[type="email"] {
+        input[type="email"],
+        input[type="tel"],
+        input[type="file"],
+        select,
+        textarea {
             width: 100%;
-            padding: 12px 15px 12px 45px;
+            padding: 12px 15px;
             border: 2px solid var(--medium-gray);
             border-radius: var(--border-radius);
             font-size: 16px;
             transition: var(--transition);
             font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            background-color: white;
         }
         
-        input:focus {
+        .form-control:focus,
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.2);
         }
         
-        .password-toggle {
-            position: absolute;
-            top: 50%;
-            right: 15px;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--dark-gray);
-            font-size: 18px;
-            user-select: none;
+        .form-control::placeholder,
+        input::placeholder,
+        textarea::placeholder {
+            color: #adb5bd;
         }
         
-        .password-toggle:hover {
-            color: var(--primary-color);
+        /* Select styling */
+        .form-select,
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 45px;
         }
         
-        .password-requirements {
-            font-size: 12px;
-            color: var(--dark-gray);
-            margin-top: 8px;
-            padding-left: 15px;
+        /* Error states */
+        .form-control.is-invalid,
+        input.is-invalid,
+        select.is-invalid,
+        textarea.is-invalid {
+            border-color: var(--danger);
         }
         
-        .requirement {
-            margin-bottom: 3px;
+        .invalid-feedback,
+        .error-message {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        /* Radio buttons custom */
+        .radio-group {
+            display: flex;
+            gap: 30px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-option {
             display: flex;
             align-items: center;
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
         }
         
-        .requirement span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
+        .radio-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 111, 15, 0.05);
+        }
+        
+        .radio-option input[type="radio"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .radio-option label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+        
+        .radio-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 111, 15, 0.1);
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .three-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-section {
+            padding: 25px;
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .type-form {
+            background-color: #fff8f3;
+            border-left: 4px solid var(--primary-color);
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+        
+        .type-form .section-title {
+            color: var(--primary-color);
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 15px;
+        }
+        
+        /* Photo upload */
+        .photo-upload-container {
+            border: 2px dashed var(--medium-gray);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: white;
+        }
+        
+        .photo-upload-container:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 111, 15, 0.05);
+        }
+        
+        .photo-upload-container.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 111, 15, 0.1);
+        }
+        
+        .photo-preview {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background-color: var(--medium-gray);
-            margin-right: 8px;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid var(--primary-color);
+            display: none;
         }
         
-        .requirement.valid span {
-            background-color: var(--success);
+        .photo-preview.show {
+            display: inline-block;
         }
         
-        .btn, .inscrit{
-            {% comment %} background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%); {% endcomment %}
-            color: black;
+        .photo-upload-icon {
+            font-size: 3rem;
+            color: #bdc3c7;
+            margin-bottom: 10px;
+        }
+        
+        .photo-upload-text {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Checkbox */
+        .form-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--medium-gray);
+        }
+        
+        .form-check-input {
+            width: 20px !important;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .form-check-label {
+            cursor: pointer;
+            margin-bottom: 0 !important;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .form-check-label a {
+            color: var(--primary-color);
+            text-decoration: underline;
+            background: none;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+            display: inline;
+            font-size: inherit;
+            font-weight: inherit;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        
+        .form-check-label a:hover {
+            color: var(--secondary-color);
+            transform: none;
+        }
+        
+        /* Buttons */
+        .btn-submit {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
             border: none;
-            padding: 14px 20px;
+            padding: 15px 30px;
             font-size: 16px;
             font-weight: 600;
             border-radius: 50px;
             cursor: pointer;
+            display: block;
             width: 100%;
+            margin-top: 30px;
             transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(255, 111, 15, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        .btn:hover, .btn:focus {
-            box-shadow: 0 5px 15px rgba(58, 87, 127, 0.4);
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
+        .btn-submit:hover {
+            box-shadow: 0 8px 25px rgba(255, 111, 15, 0.5);
+            transform: translateY(-2px);
         }
         
-        .btn:active::after {
-            width: 300px;
-            height: 300px;
+        .btn-submit:active {
+            transform: translateY(0);
         }
         
-        .switch-form {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: var(--dark-gray);
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
         
-        .switch-form a {
-            color: var(--primary-color);
+        .btn-cancel {
+            background: var(--medium-gray);
+            color: var(--text-color);
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            transition: var(--transition);
             text-decoration: none;
-            font-weight: 600;
-            margin-left: 5px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: none;
         }
         
-        .switch-form a:hover {
-            text-decoration: underline;
+        .btn-cancel:hover {
+            background: #d6d8db;
+            transform: translateY(-2px);
         }
         
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 30px 0;
-            color: var(--dark-gray);
-            font-size: 14px;
-        }
-        
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background-color: var(--medium-gray);
-        }
-        
-        .divider::before {
+        /* Loading spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             margin-right: 10px;
         }
         
-        .divider::after {
-            margin-left: 10px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .social-login {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--medium-gray);
-            background-color: white;
-            cursor: pointer;
+        .btn-submit.loading {
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         
-        .social-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        .btn-submit.loading .spinner {
+            display: inline-block;
         }
         
-        .social-btn i {
-            font-size: 18px;
-        }
-        
-        .social-btn.facebook {
-            color: #3b5998;
-        }
-        
-        .social-btn.google {
-            color: #dd4b39;
-        }
-        
-        .error-message {
-            color: var(--danger);
-            font-size: 14px;
-            margin-top: 5px;
+        .btn-submit.loading .btn-text {
             display: none;
         }
         
-        .success-message {
-            color: var(--success);
-            font-size: 14px;
+        /* Info text */
+        .info-text {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
             margin-top: 5px;
-            display: none;
         }
         
-        input.error {
-            border-color: var(--danger);
-        }
-        
-        .shake {
-            animation: shake 0.5s;
-        }
-        
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
-            100% { transform: translateX(0); }
-        }
-        
-        .progress-bar {
-            height: 4px;
-            width: 100%;
-            background-color: var(--medium-gray);
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%);
-            transition: width 0.3s;
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Mobile Responsiveness */
+        /* Responsive */
         @media (max-width: 768px) {
-            .auth-container {
-                flex-direction: column;
-                align-items: center;
+            .two-columns,
+            .three-columns {
+                grid-template-columns: 1fr;
+                gap: 0;
             }
             
-            .auth-card {
-                width: 100%;
-                max-width: 400px;
+            .container {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <!-- Formulaire d'inscription -->
-        <div class="auth-card fade-in">
-            <div class="auth-header">
-                <h2>Inscription</h2>
-                <p>Créez votre compte COMMULINK</p>
+    <div class="container">
+        <!-- Messages Flash -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <button class="alert-close" onclick="this.parentElement.remove()" type="button">&times;</button>
             </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Erreurs de formulaire globales -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>
+                    {% for error in form.non_field_errors %}
+                        {{ error }}{% if not forloop.last %}<br>{% endif %}
+                    {% endfor %}
+                </span>
+                <button class="alert-close" onclick="this.parentElement.remove()" type="button">&times;</button>
+            </div>
+        {% endif %}
             
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="username">Nom d'utilisateur</label>
-                    <div class="form-control">
-                        <span class="form-icon">👤</span>
-                        <input type="text" id="username" name="username" placeholder="Votre nom d'utilisateur" required>
-                    </div>
-                    <div class="error-message" id="username-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Mot de passe</label>
-                    <div class="form-control">
-                        <span class="form-icon">🔒</span>
-                        <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
-                        <span class="password-toggle" id="password-toggle">👁️</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="password-strength"></div>
-                    </div>
-                    <div class="error-message" id="password-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirm-password">Confirmer le mot de passe</label>
-                    <div class="form-control">
-                        <span class="form-icon">🔒</span>
-                        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirmez votre mot de passe" required>
-                    </div>
-                    <div class="error-message" id="confirm-password-error"></div>
-                </div>
-                
-                <a  href = "{% url 'formulaireInformation' %}" type="submit button" class="btn inscrit" id="signup-btn">S'inscrire</a>
-                
-                <div class="switch-form">
-                    Déjà inscrit ? <a href="{% url 'connexion' %}" id="switch-to-login" style="color: red;" >Se connecter</a>
-                </div>
-                <div class="switch-form">
-                    <a href="{% url 'index' %}" style="color: red; font-weight: bold; font-size: 20px;" id="switch-to-signup">Annuler</a>
-                </div>
-            </form>
+        <div class="header">
+            <h1>COMMULINK</h1>
+            <p>{{ titre|default:"Formulaire d'inscription" }}</p>
         </div>
-    
+        
+        <form method="post" enctype="multipart/form-data" id="inscription-form">
+            {% csrf_token %}
+            
+            <div class="form-content">
+                
+                <!-- Section Type/Identité culturelle -->
+                <div class="type-form">
+                    <h3 class="section-title">
+                        <i class="fas fa-globe-africa"></i>
+                        Votre Identité Culturelle
+                    </h3>
+                    <p class="info-text" style="margin-bottom: 20px;">
+                        <i class="fas fa-info-circle"></i>
+                        Ces informations nous aident à mieux vous connaître
+                    </p>
+                    
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="id_ner">Ner</label>
+                            {{ form.ner }}
+                            {% if form.ner.errors %}
+                                <span class="invalid-feedback">{{ form.ner.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_keri">Keri</label>
+                            {{ form.keri }}
+                            {% if form.keri.errors %}
+                                <span class="invalid-feedback">{{ form.keri.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="three-columns">
+                        <div class="form-group">
+                            <label for="id_keribour">Keribour</label>
+                            {{ form.keribour }}
+                            {% if form.keribour.errors %}
+                                <span class="invalid-feedback">{{ form.keribour.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_keriBa">Keri Bâ</label>
+                            {{ form.keriBa }}
+                            {% if form.keriBa.errors %}
+                                <span class="invalid-feedback">{{ form.keriBa.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_keribourBa">Keribour Bâ</label>
+                            {{ form.keribourBa }}
+                            {% if form.keribourBa.errors %}
+                                <span class="invalid-feedback">{{ form.keribourBa.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Section Informations Personnelles -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Informations Personnelles
+                    </h3>
+                    
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="id_nom" class="required">Nom</label>
+                            {{ form.nom }}
+                            {% if form.nom.errors %}
+                                <span class="invalid-feedback">{{ form.nom.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_prenom" class="required">Prénom</label>
+                            {{ form.prenom }}
+                            {% if form.prenom.errors %}
+                                <span class="invalid-feedback">{{ form.prenom.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Sexe avec radio buttons stylisés -->
+                    <div class="form-group">
+                        <label class="required">Sexe</label>
+                        <div class="radio-group">
+                            <label class="radio-option" id="radio-homme">
+                                <input type="radio" name="sexe" value="M" {% if form.sexe.value == 'M' %}checked{% endif %}>
+                                <i class="fas fa-mars" style="margin-right: 8px; color: #3498db;"></i>
+                                Homme
+                            </label>
+                            <label class="radio-option" id="radio-femme">
+                                <input type="radio" name="sexe" value="F" {% if form.sexe.value == 'F' %}checked{% endif %}>
+                                <i class="fas fa-venus" style="margin-right: 8px; color: #e91e63;"></i>
+                                Femme
+                            </label>
+                            <label class="radio-option" id="radio-autre">
+                                <input type="radio" name="sexe" value="A" {% if form.sexe.value == 'A' %}checked{% endif %}>
+                                <i class="fas fa-genderless" style="margin-right: 8px; color: #9c27b0;"></i>
+                                Autre
+                            </label>
+                        </div>
+                        {% if form.sexe.errors %}
+                            <span class="invalid-feedback">{{ form.sexe.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_profession" class="required">Profession</label>
+                        {{ form.profession }}
+                        {% if form.profession.errors %}
+                            <span class="invalid-feedback">{{ form.profession.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Section Coordonnées -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-address-card"></i>
+                        Coordonnées
+                    </h3>
+                    
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="id_email" class="required">Adresse email</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <span class="invalid-feedback">{{ form.email.errors.0 }}</span>
+                            {% endif %}
+                            <span class="info-text">
+                                <i class="fas fa-info-circle"></i>
+                                Vous recevrez une confirmation à cette adresse
+                            </span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_telephone">Téléphone</label>
+                            {{ form.telephone }}
+                            {% if form.telephone.errors %}
+                                <span class="invalid-feedback">{{ form.telephone.errors.0 }}</span>
+                            {% endif %}
+                            <span class="info-text">
+                                <i class="fas fa-key"></i>
+                                Sera utilisé comme mot de passe initial
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_adresse">Adresse / Quartier</label>
+                        {{ form.adresse }}
+                        {% if form.adresse.errors %}
+                            <span class="invalid-feedback">{{ form.adresse.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_numeroUrgence">Numéro en cas d'urgence</label>
+                        {{ form.numeroUrgence }}
+                        {% if form.numeroUrgence.errors %}
+                            <span class="invalid-feedback">{{ form.numeroUrgence.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Section Formation -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Formation & Études
+                    </h3>
+                    
+                    <div class="two-columns">
+                        <div class="form-group">
+                            <label for="id_niveauEtude">Niveau d'étude</label>
+                            {{ form.niveauEtude }}
+                            {% if form.niveauEtude.errors %}
+                                <span class="invalid-feedback">{{ form.niveauEtude.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="id_ecole">Université / École</label>
+                            {{ form.ecole }}
+                            {% if form.ecole.errors %}
+                                <span class="invalid-feedback">{{ form.ecole.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_filiere">Filière</label>
+                        {{ form.filiere }}
+                        {% if form.filiere.errors %}
+                            <span class="invalid-feedback">{{ form.filiere.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Section Photo et Notes -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-camera"></i>
+                        Photo & Informations Complémentaires
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="id_photo">Photo de profil</label>
+                        <div class="photo-upload-container" id="photoUploadContainer">
+                            <img src="" alt="Aperçu" class="photo-preview" id="photoPreview">
+                            <div id="uploadPlaceholder">
+                                <i class="fas fa-cloud-upload-alt photo-upload-icon"></i>
+                                <p class="photo-upload-text">
+                                    Cliquez pour sélectionner une photo<br>
+                                    <small>JPG, PNG (max 5 Mo)</small>
+                                </p>
+                            </div>
+                            {{ form.photo }}
+                        </div>
+                        {% if form.photo.errors %}
+                            <span class="invalid-feedback">{{ form.photo.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_notes">Autres renseignements</label>
+                        {{ form.notes }}
+                        {% if form.notes.errors %}
+                            <span class="invalid-feedback">{{ form.notes.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Conditions d'utilisation -->
+                    <div class="form-group" style="margin-top: 25px;">
+                        <div class="form-check">
+                            {{ form.accepte_conditions }}
+                            <label class="form-check-label" for="id_accepte_conditions">
+                                J'accepte les <a href="#" target="_blank">conditions d'utilisation</a> 
+                                et la <a href="#" target="_blank">politique de confidentialité</a>
+                                <span style="color: var(--danger);"> *</span>
+                            </label>
+                        </div>
+                        {% if form.accepte_conditions.errors %}
+                            <span class="invalid-feedback">{{ form.accepte_conditions.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Boutons -->
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span class="spinner"></span>
+                    <span class="btn-text">
+                        <i class="fas fa-paper-plane"></i> Soumettre ma demande
+                    </span>
+                </button>
+                
+                <a href="{% url 'index' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+            </div>
+        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion des radio buttons
+            const radioOptions = document.querySelectorAll('.radio-option');
+            radioOptions.forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+                
+                // Marquer comme sélectionné si déjà coché
+                if (radio.checked) {
+                    option.classList.add('selected');
+                }
+                
+                option.addEventListener('click', function() {
+                    // Retirer la classe selected de tous
+                    radioOptions.forEach(opt => opt.classList.remove('selected'));
+                    // Ajouter la classe selected à celui cliqué
+                    this.classList.add('selected');
+                    // Cocher le radio
+                    radio.checked = true;
+                });
+            });
+            
+            // Gestion de l'upload de photo
+            const photoInput = document.getElementById('id_photo');
+            const photoPreview = document.getElementById('photoPreview');
+            const uploadContainer = document.getElementById('photoUploadContainer');
+            const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+            
+            if (photoInput) {
+                // Cacher l'input file original
+                photoInput.style.display = 'none';
+                
+                // Click sur le container ouvre le sélecteur de fichier
+                uploadContainer.addEventListener('click', function(e) {
+                    if (e.target !== photoInput) {
+                        photoInput.click();
+                    }
+                });
+                
+                // Aperçu de l'image sélectionnée
+                photoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Vérifier la taille
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('La photo ne doit pas dépasser 5 Mo');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // Afficher l'aperçu
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            photoPreview.src = e.target.result;
+                            photoPreview.classList.add('show');
+                            uploadPlaceholder.style.display = 'none';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                // Drag and drop
+                uploadContainer.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                
+                uploadContainer.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+                
+                uploadContainer.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        photoInput.files = files;
+                        const event = new Event('change');
+                        photoInput.dispatchEvent(event);
+                    }
+                });
+            }
+            
+            // Soumission du formulaire avec loading
+            const form = document.getElementById('inscription-form');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            form.addEventListener('submit', function(e) {
+                // Vérification basique côté client
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+                
+                // Vérifier les conditions
+                const accepteConditions = document.getElementById('id_accepte_conditions');
+                if (accepteConditions && !accepteConditions.checked) {
+                    isValid = false;
+                    accepteConditions.closest('.form-check').style.borderColor = 'var(--danger)';
+                }
+                
+                if (isValid) {
+                    // Afficher le loading
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+                }
+            });
+            
+            // Retirer le style d'erreur quand on commence à taper
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+            
+            // Auto-hide des alertes après 5 secondes
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
 </body>
 </html>

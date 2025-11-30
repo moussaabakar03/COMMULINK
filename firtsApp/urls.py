@@ -6,8 +6,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('contact/', views.contact, name='contact'),
     path('feteIs/', views.feteIs, name='feteIs'),
-    path('formulaireInformation/', views.formulaireInformation, name='formulaireInformation'),
-    path('inscription/', views.inscription, name='inscription'),
+    path('inscription/confirmation/<int:pk>/', views.inscription_confirmation, name='inscription_confirmation'),
+    path('inscription/', views.inscription_membre, name='inscription'),
     path('connexion/', views.connexion, name='connexion'),
     
     

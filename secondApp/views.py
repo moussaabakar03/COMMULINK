@@ -1,28 +1,30 @@
-from django.shortcuts import redirect, render
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
-from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm, ReinscriptionForm
+from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm, ReinscriptionForm, MembreInscriptionForm, MembreModificationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mass_mail
-from time import timezone
+from django.views.decorators.http import require_POST
+# from time import timezone
+from django.db import transaction
 import datetime
 from django.db.models import Count
-# from firtsApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
-
-
+from django.http import JsonResponse
+from django.template.loader import get_template
+from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 
 
 # DASHBOARD VIEW
-
+@login_required
 def admin_dashboard(request):
     return render(request, "index.html")
 
@@ -250,276 +252,943 @@ def supprimerTemoingne(request, id):
 
 # --------------------------------GESTION DES MEMBRES----------------------------------------
 
-def liste_membres(request):
-    # Récupérer la requête de recherche
-    search_query = request.GET.get('search', '').strip()
-    
-    nombreMembre = 0
-    # Filtrer les membres selon la recherche
-    if search_query:
-        membres = Membre.objects.filter(
-            Q(nom__icontains=search_query) |
-            Q(prenom__icontains=search_query) |
-            Q(email__icontains=search_query) |
-            Q(adresse__icontains=search_query) |
-            Q(profession__icontains=search_query) |
-            Q(niveauEtude__icontains=search_query) |
-            Q(ecole__icontains=search_query) |
-            Q(date_inscription__icontains=search_query) |
-            Q(ner__icontains=search_query) |
-            Q(keri__icontains=search_query) |
-            Q(keribour__icontains=search_query) |
-            Q(keriBa__icontains=search_query) |
-            Q(keribourBa__icontains=search_query)
-        ).order_by('nom', 'prenom')
-        nombreMembre = membres.count()
-    else:
-        membres = Membre.objects.all().order_by('nom', 'prenom')
-        nombreMembre = membres.count()
-    
-    # Pagination (10 membres par page)
-    paginator = Paginator(membres, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    return render(request, 'gestionMembre/liste.html', {
-        'page_obj': page_obj,
-        'search_query': search_query,
-        'nombreMembre': nombreMembre
-    })
+# ============================================
+# INSCRIPTION PUBLIQUE (Demande en attente)
+# ============================================
 
-def detail_membre(request, pk):
+
+def inscription_confirmation(request, pk):
+    """Page de confirmation après inscription"""
     membre = get_object_or_404(Membre, pk=pk)
-    
-    reinscriptionMembres = membre.reinscriptions.all()
-
-    return render(request, 'gestionMembre/detail.html', {
-        'membre': membre,
-        "reinscriptionMembres": reinscriptionMembres
+    return render(request, 'gestionMembre/inscription_confirmation.html', {
+        'membre': membre
     })
 
-# def creer_membre(request):
-#     if request.method == 'POST':
-#         form = MembreForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('liste_membres')
-#     else:
-#         form = MembreForm()
-     
-#     return render(request, 'gestionMembre/creer.html', {'form': form})
 
+# ============================================
+# CRÉATION DIRECTE (Admin - Validé directement)
+# ============================================
+
+@login_required
 def creer_membre(request):
+    """
+    Création directe par un admin - Crée membre + utilisateur + réinscription
+    Le membre est directement validé
+    """
+    # Vérifier les droits
+    if not request.user.est_membre_equipe():
+        messages.error(request, "Vous n'avez pas les droits pour créer un membre.")
+        return redirect('liste_membres')
+    
     if request.method == 'POST':
         form = MembreForm(request.POST, request.FILES)
+        
         if form.is_valid():
+            try:
+                with transaction.atomic():
+                    nom = form.cleaned_data['nom']
+                    prenom = form.cleaned_data['prenom']
+                    email = form.cleaned_data['email']
+                    telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+                    
+                    # Vérification supplémentaire
+                    if Utilisateur.objects.filter(email=email).exists():
+                        messages.error(request, 'Un utilisateur avec cet email existe déjà.')
+                        return render(request, 'gestionMembre/creer.html', {'form': form})
+                    
+                    # 1. Créer l'utilisateur
+                    utilisateur = Utilisateur.objects.create(
+                        username=email,
+                        email=email,
+                        password=make_password(telephone),
+                        first_name=prenom,
+                        last_name=nom,
+                        role="membreLambda",
+                        is_active=True,
+                    )
+                    
+                    # 2. Créer le membre (validé directement)
+                    membre = Membre(
+                        utilisateur=utilisateur,
+                        nom=nom,
+                        prenom=prenom,
+                        sexe=form.cleaned_data['sexe'],
+                        email=email,
+                        telephone=telephone,
+                        adresse=form.cleaned_data.get('adresse', ''),
+                        profession=form.cleaned_data['profession'],
+                        numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
+                        niveauEtude=form.cleaned_data.get('niveauEtude', ''),
+                        ecole=form.cleaned_data.get('ecole', ''),
+                        ner=form.cleaned_data.get('ner', ''),
+                        keri=form.cleaned_data.get('keri', ''),
+                        keribour=form.cleaned_data.get('keribour', ''),
+                        keriBa=form.cleaned_data.get('keriBa', ''),
+                        keribourBa=form.cleaned_data.get('keribourBa', ''),
+                        notes=form.cleaned_data.get('notes', ''),
+                        statut='valide',  # Validé directement
+                        date_validation=timezone.now(),
+                        valide_par=request.user,
+                    )
+                    
+                    if form.cleaned_data.get('photo'):
+                        membre.photo = form.cleaned_data['photo']
+                    
+                    membre.save()
+                    
+                    # 3. Créer la réinscription pour l'année active
+                    annee_active = Annee.objects.order_by('-debutAnnee').first()
+                    if annee_active:
+                        Reinscription.objects.create(
+                            membre=membre,
+                            annee=annee_active,
+                            username=email,
+                            password=telephone,
+                            adresse=form.cleaned_data.get('adresse', ''),
+                            numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
+                            ecole=form.cleaned_data.get('ecole', ''),
+                            niveauEtude=form.cleaned_data.get('niveauEtude', ''),
+                            photo_annuelle=form.cleaned_data.get('photo'),
+                            filiere=form.cleaned_data.get('filiere', '')
+                        )
+                    
+                    messages.success(request, f'Le membre {nom} {prenom} a été créé avec succès.')
+                    return redirect('detail_membre', pk=membre.pk)
+                    
+            except Exception as e:
+                messages.error(request, f"Une erreur est survenue: {str(e)}")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        form = MembreForm()
+    
+    return render(request, 'gestionMembre/creer.html', {
+        'form': form,
+        'titre': "Créer un nouveau membre"
+    })
 
-            nom = form.cleaned_data['nom']
-            prenom = form.cleaned_data['prenom']
-            email = form.cleaned_data['email']
-            telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+
+# ============================================
+# VALIDATION DES DEMANDES
+# ============================================
+
+from io import BytesIO
+try:
+    from xhtml2pdf import pisa
+    PDF_ENABLED = True
+except ImportError:
+    PDF_ENABLED = False
+    print("xhtml2pdf non installé. L'export PDF sera désactivé.")
+
+
+def get_annee_active():
+    """Récupère l'année active ou la plus récente"""
+    today = timezone.now().date()
+    annee = Annee.objects.filter(
+        debutAnnee__lte=today,
+        finAnnee__gte=today
+    ).first()
+    
+    if not annee:
+        annee = Annee.objects.order_by('-debutAnnee').first()
+    
+    return annee
+
+@login_required
+def valider_membre(request, pk):
+    """
+    Valide une demande d'inscription
+    Crée l'utilisateur et la réinscription lors de la validation
+    """
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if not request.user.est_membre_equipe():
+        messages.error(request, "Vous n'avez pas les droits pour valider les inscriptions.")
+        return redirect('liste_membres')
+    
+    if membre.statut != 'en_attente':
+        messages.warning(request, f"Ce membre a déjà été traité (statut: {membre.get_statut_display()}).")
+        return redirect('liste_membres')
+    
+    try:
+        with transaction.atomic():
+            email = membre.email
+            telephone = membre.telephone or "defaultpass123"
             
+            # Vérifier si un utilisateur existe déjà avec cet email
             if Utilisateur.objects.filter(email=email).exists():
-                messages.error(request, 'Un utilisateur avec cet email existe déjà.')
-                return render(request, 'gestionMembre/creer.html', {'form': form})
+                messages.error(request, f"Un utilisateur avec l'email {email} existe déjà.")
+                return redirect('liste_membres')
             
-            
-            utilisateur = Utilisateur.objects.create(
+            # 1. Créer l'utilisateur avec create_user pour hasher le mot de passe
+            utilisateur = Utilisateur.objects.create_user(
                 username=email,
                 email=email,
-                password=make_password(telephone),
-                first_name=nom,
-                last_name=prenom,
-                role="membreLambda",
-                is_active=True,
+                password=telephone,
+                first_name=membre.prenom,
+                last_name=membre.nom,
             )
+            utilisateur.role = "membreLambda"
+            utilisateur.is_active = True
+            utilisateur.save()
             
-            # 2. Créer le membre
-            membre = Membre(
-                utilisateur=utilisateur,
-                nom=nom,
-                prenom=prenom,
-                sexe=form.cleaned_data['sexe'],
-                email=email,
-                telephone=telephone,
-                adresse=form.cleaned_data.get('adresse', ''),
-                profession=form.cleaned_data['profession'],
-                numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
-                niveauEtude=form.cleaned_data.get('niveauEtude', ''),
-                ecole=form.cleaned_data.get('ecole', ''),
-                ner=form.cleaned_data.get('ner', ''),
-                keri=form.cleaned_data.get('keri', ''),
-                keribour=form.cleaned_data.get('keribour', ''),
-                keriBa=form.cleaned_data.get('keriBa', ''),
-                keribourBa=form.cleaned_data.get('keribourBa', ''),
-                notes=form.cleaned_data.get('notes', ''),
-            )
-            
-            # Gestion de la photo
-            if form.cleaned_data.get('photo'):
-                membre.photo = form.cleaned_data['photo']
-            
+            # 2. Mettre à jour le membre
+            membre.utilisateur = utilisateur
+            membre.statut = 'valide'
+            membre.date_validation = timezone.now()
+            membre.valide_par = request.user
             membre.save()
-
+            
             # 3. Créer la réinscription pour l'année active
-            annee_active = Annee.objects.order_by('-id').first()
+            annee_active = get_annee_active()
             if annee_active:
+                # Extraire la filière des notes si présente
+                filiere = ''
+                if membre.notes and 'Filière:' in membre.notes:
+                    for line in membre.notes.split('\n'):
+                        if line.startswith('Filière:'):
+                            filiere = line.replace('Filière:', '').strip()
+                            break
+                
                 Reinscription.objects.create(
                     membre=membre,
                     annee=annee_active,
                     username=email,
                     password=telephone,
-                    adresse=form.cleaned_data.get('adresse', ''),
-                    numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
-                    ecole=form.cleaned_data.get('ecole', ''),
-                    niveauEtude=form.cleaned_data.get('niveauEtude', ''),
-                    photo_annuelle=form.cleaned_data.get('photo'),
-                    filiere=form.cleaned_data.get('filiere', '')
+                    adresse=membre.adresse or '',
+                    numeroUrgence=membre.numeroUrgence or '',
+                    ecole=membre.ecole or '',
+                    niveauEtude=membre.niveauEtude or '',
+                    photo_annuelle=membre.photo if membre.photo else None,
+                    filiere=filiere
                 )
-
-            messages.success(request, f'Le membre {nom} {prenom} a été créé avec succès.')
-            return redirect('liste_membres')
-    else:
-        form = MembreForm()
-
-    return render(request, 'gestionMembre/creer.html', {'form': form})
-
-
-def modifier_membre(request, pk):
-    membre = Membre.objects.get(pk=pk)
+            
+            messages.success(request, f"L'inscription de {membre.nom_complet} a été validée avec succès. Mot de passe: {telephone}")
+            
+    except Exception as e:
+        import traceback
+        print(f"Erreur validation: {e}")
+        print(traceback.format_exc())
+        messages.error(request, f"Erreur lors de la validation: {str(e)}")
     
-    if request.method == 'POST':
-        form = MembreForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.update(membre)
-            return redirect('liste_membres')
-    else:
-        # Initialiser le formulaire avec les données du membre
-        initial_data = {
-            'nom': membre.nom,
-            'prenom': membre.prenom,
-            'sexe': membre.sexe,
-            'email': membre.email,
-            'telephone': membre.telephone,
-            'adresse': membre.adresse,
-            'profession': membre.profession,
-            'numeroUrgence': membre.numeroUrgence,
-            'niveauEtude': membre.niveauEtude,
-            'ecole': membre.ecole,
-            'photo': membre.photo,
-            'notes': membre.notes,
-            'ner': membre.ner,
-            'keri': membre.keri,
-            'keribour': membre.keribour,
-            'keriBa': membre.keriBa,
-            'keribourBa': membre.keribourBa,
-        }
-
-        form = MembreForm(initial=initial_data)
-    
-    return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
-
-def supprimer_membre(request, pk):
-    membre = Membre.objects.get(pk=pk).delete()
-    messages.success(request, "Membre supprimé avec succès!")
     return redirect('liste_membres')
-    
-    
 
-def liste_EquipeDirigeante(request):
-    # Récupérer la requête de recherche
+
+@login_required
+def refuser_membre(request, pk):
+    """Refuse une demande d'inscription"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if not request.user.est_membre_equipe():
+        messages.error(request, "Vous n'avez pas les droits pour refuser les inscriptions.")
+        return redirect('liste_membres')
+    
+    if membre.statut != 'en_attente':
+        messages.warning(request, f"Ce membre a déjà été traité (statut: {membre.get_statut_display()}).")
+        return redirect('liste_membres')
+    
+    try:
+        membre.statut = 'refuse'
+        membre.date_validation = timezone.now()
+        membre.valide_par = request.user
+        membre.save()
+        
+        messages.info(request, f"L'inscription de {membre.nom_complet} a été refusée.")
+    except Exception as e:
+        messages.error(request, f"Erreur: {str(e)}")
+    
+    return redirect('liste_membres')
+
+
+@login_required
+@require_POST
+def valider_membre_ajax(request, pk):
+    """Valide une demande d'inscription via AJAX"""
+    
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if not request.user.est_membre_equipe():
+        return JsonResponse({
+            'success': False, 
+            'message': "Vous n'avez pas les droits pour cette action."
+        }, status=403)
+    
+    if membre.statut != 'en_attente':
+        return JsonResponse({
+            'success': False,
+            'message': "Ce membre a déjà été traité."
+        })
+    
+    try:
+        with transaction.atomic():
+            email = membre.email
+            telephone = membre.telephone or "defaultpass123"
+            
+            # Vérifier si un utilisateur existe déjà
+            if Utilisateur.objects.filter(email=email).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': f"Un utilisateur avec l'email {email} existe déjà."
+                })
+            
+            if Utilisateur.objects.filter(username=email).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': f"Un utilisateur avec ce nom d'utilisateur existe déjà."
+                })
+            
+            # 1. Créer l'utilisateur
+            utilisateur = Utilisateur.objects.create_user(
+                username=email,
+                email=email,
+                password=telephone,
+                first_name=membre.prenom,
+                last_name=membre.nom,
+            )
+            utilisateur.role = "membreLambda"
+            utilisateur.is_active = True
+            utilisateur.save()
+            
+            # 2. Mettre à jour le membre
+            membre.utilisateur = utilisateur
+            membre.statut = 'valide'
+            membre.date_validation = timezone.now()
+            membre.valide_par = request.user
+            membre.save()
+            
+            # 3. Créer la réinscription
+            annee_active = get_annee_active()
+            if annee_active:
+                filiere = ''
+                if membre.notes and 'Filière:' in membre.notes:
+                    for line in membre.notes.split('\n'):
+                        if line.startswith('Filière:'):
+                            filiere = line.replace('Filière:', '').strip()
+                            break
+                
+                Reinscription.objects.create(
+                    membre=membre,
+                    annee=annee_active,
+                    username=email,
+                    password=telephone,
+                    adresse=membre.adresse or '',
+                    numeroUrgence=membre.numeroUrgence or '',
+                    ecole=membre.ecole or '',
+                    niveauEtude=membre.niveauEtude or '',
+                    photo_annuelle=membre.photo if membre.photo else None,
+                    filiere=filiere
+                )
+            
+            return JsonResponse({
+                'success': True,
+                'message': f"L'inscription de {membre.nom_complet} a été validée.",
+                'nouveau_statut': 'valide',
+                'nouveau_statut_display': 'Validé'
+            })
+            
+    except Exception as e:
+        import traceback
+        print(f"Erreur AJAX validation: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({
+            'success': False,
+            'message': f"Erreur: {str(e)}"
+        })
+
+
+@login_required
+@require_POST
+def refuser_membre_ajax(request, pk):
+    """Refuse une demande d'inscription via AJAX"""
+    
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if not request.user.est_membre_equipe():
+        return JsonResponse({
+            'success': False, 
+            'message': "Vous n'avez pas les droits pour cette action."
+        }, status=403)
+    
+    if membre.statut != 'en_attente':
+        return JsonResponse({
+            'success': False,
+            'message': "Ce membre a déjà été traité."
+        })
+    
+    try:
+        membre.statut = 'refuse'
+        membre.date_validation = timezone.now()
+        membre.valide_par = request.user
+        membre.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f"L'inscription de {membre.nom_complet} a été refusée.",
+            'nouveau_statut': 'refuse',
+            'nouveau_statut_display': 'Refusé'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f"Erreur: {str(e)}"
+        })
+
+
+@login_required
+@require_POST
+def valider_tous_en_attente(request):
+    """Valide toutes les demandes en attente"""
+    
+    if not request.user.est_membre_equipe():
+        messages.error(request, "Vous n'avez pas les droits pour cette action.")
+        return redirect('liste_membres')
+    
+    membres_en_attente = Membre.objects.filter(statut='en_attente')
+    count_success = 0
+    count_error = 0
+    errors = []
+    
+    annee_active = get_annee_active()
+    
+    for membre in membres_en_attente:
+        try:
+            with transaction.atomic():
+                email = membre.email
+                telephone = membre.telephone or "defaultpass123"
+                
+                # Vérifier si l'utilisateur existe déjà
+                if Utilisateur.objects.filter(email=email).exists():
+                    count_error += 1
+                    errors.append(f"{membre.nom_complet}: email déjà utilisé")
+                    continue
+                
+                if Utilisateur.objects.filter(username=email).exists():
+                    count_error += 1
+                    errors.append(f"{membre.nom_complet}: username déjà utilisé")
+                    continue
+                
+                # Créer l'utilisateur
+                utilisateur = Utilisateur.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=telephone,
+                    first_name=membre.prenom,
+                    last_name=membre.nom,
+                )
+                utilisateur.role = "membreLambda"
+                utilisateur.is_active = True
+                utilisateur.save()
+                
+                # Mettre à jour le membre
+                membre.utilisateur = utilisateur
+                membre.statut = 'valide'
+                membre.date_validation = timezone.now()
+                membre.valide_par = request.user
+                membre.save()
+                
+                # Créer la réinscription
+                if annee_active:
+                    filiere = ''
+                    if membre.notes and 'Filière:' in membre.notes:
+                        for line in membre.notes.split('\n'):
+                            if line.startswith('Filière:'):
+                                filiere = line.replace('Filière:', '').strip()
+                                break
+                    
+                    Reinscription.objects.create(
+                        membre=membre,
+                        annee=annee_active,
+                        username=email,
+                        password=telephone,
+                        adresse=membre.adresse or '',
+                        numeroUrgence=membre.numeroUrgence or '',
+                        ecole=membre.ecole or '',
+                        niveauEtude=membre.niveauEtude or '',
+                        photo_annuelle=membre.photo if membre.photo else None,
+                        filiere=filiere
+                    )
+                
+                count_success += 1
+                
+        except Exception as e:
+            count_error += 1
+            errors.append(f"{membre.nom_complet}: {str(e)}")
+            print(f"Erreur validation en masse {membre.email}: {e}")
+    
+    if count_success > 0:
+        messages.success(request, f"{count_success} inscription(s) validée(s) avec succès.")
+    
+    if count_error > 0:
+        error_msg = f"{count_error} inscription(s) n'ont pas pu être validées."
+        if errors:
+            error_msg += " Détails: " + "; ".join(errors[:3])  # Afficher max 3 erreurs
+            if len(errors) > 3:
+                error_msg += f" et {len(errors) - 3} autre(s)..."
+        messages.warning(request, error_msg)
+    
+    return redirect('liste_membres') 
+
+
+# ============================================
+# LISTE ET DÉTAILS
+# ============================================
+
+def liste_membres(request):
+    """Liste des membres avec filtres par statut et par année"""
+    
     search_query = request.GET.get('search', '').strip()
+    statut_filter = request.GET.get('statut', 'tous')
+    annee_filter = request.GET.get('annee', '')
     
-    # Filtrer les membres selon la recherche
+    # Récupérer toutes les années pour le filtre
+    annees = Annee.objects.all().order_by('-debutAnnee')
+    
+    # Base queryset
+    membres = Membre.objects.all()
+    
+    # Filtrer par année (via les réinscriptions)
+    if annee_filter:
+        try:
+            annee_id = int(annee_filter)
+            membres = membres.filter(reinscriptions__annee_id=annee_id).distinct()
+        except (ValueError, TypeError):
+            pass
+    
+    # Filtrer par statut
+    if statut_filter == 'en_attente':
+        membres = membres.filter(statut='en_attente')
+    elif statut_filter == 'valide':
+        membres = membres.filter(statut='valide')
+    elif statut_filter == 'refuse':
+        membres = membres.filter(statut='refuse')
+    
+    # Filtrer par recherche
     if search_query:
-        membres = EquipeDirigeante.objects.filter(
-            Q(nom__icontains=search_query) | 
-            Q(role__icontains=search_query) |
-            Q(lienFacebook__icontains=search_query) |
-            Q(lienTwitter__icontains=search_query) |
-            Q(lienInstagram__icontains=search_query)
-        ).order_by('nom')
-    else:
-        membres = EquipeDirigeante.objects.all().order_by('nom')
+        membres = membres.filter(
+            Q(nom__icontains=search_query) |
+            Q(prenom__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(telephone__icontains=search_query) |
+            Q(ner__icontains=search_query) |
+            Q(keri__icontains=search_query) |
+            Q(ecole__icontains=search_query)
+        )
     
-    # Pagination (10 membres par page)
-    paginator = Paginator(membres, 7)
+    membres = membres.order_by('-date_inscription', 'nom', 'prenom')
+    nombreMembre = membres.count()
+    
+    # Compteurs
+    if annee_filter:
+        try:
+            annee_id = int(annee_filter)
+            base_qs = Membre.objects.filter(reinscriptions__annee_id=annee_id).distinct()
+        except:
+            base_qs = Membre.objects.all()
+    else:
+        base_qs = Membre.objects.all()
+    
+    nombre_en_attente = base_qs.filter(statut='en_attente').count()
+    nombre_valide = base_qs.filter(statut='valide').count()
+    nombre_refuse = base_qs.filter(statut='refuse').count()
+    
+    # Pagination
+    paginator = Paginator(membres, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'gestionMembre/listeMembreEquipe.html', {
+    # Année sélectionnée pour l'affichage
+    annee_selectionnee = None
+    if annee_filter:
+        try:
+            annee_selectionnee = Annee.objects.get(pk=int(annee_filter))
+        except:
+            pass
+    
+    context = {
         'page_obj': page_obj,
         'search_query': search_query,
-    })
-
-def ajoutMembreEquipe(request):
-    if request.method == 'POST':
-        nom = request.POST.get('nom')
-        photo = request.FILES.get('photo')
-        role = request.POST.get('role')
-        facebook = request.POST.get('facebook')
-        instagram = request.POST.get('instagram')
-        twitter = request.POST.get('twitter')
-        
-        utilisateur = Utilisateur.objects.create(
-            username = role,
-            password = make_password(role),
-            role="membreEquipe",
-            is_active=True,
-            is_staff = True
-        )
-        
-        EquipeDirigeante.objects.create(
-            utilisateur = utilisateur, nom = nom, image = photo, role = role, lienFacebook = facebook, lienInstagram = instagram , lienTwitter = twitter
-        )
-        return redirect("liste_EquipeDirigeante")
-    return render(request, 'gestionMembre/ajoutMembreEquipe.html')
-
-def modification_MembreEquipeDirigeante(request, pk):
-    # Récupérer le membre à modifier ou retourner 404 si non trouvé
-    membre = get_object_or_404(EquipeDirigeante, pk=pk)
-    
-    if request.method == 'POST':
-        # Récupérer les données du formulaire
-        nom = request.POST.get('nom')
-        role = request.POST.get('role')
-        facebook = request.POST.get('facebook')
-        instagram = request.POST.get('instagram')
-        twitter = request.POST.get('twitter')
-        photo = request.FILES.get('photo')
-        
-        # Mettre à jour les champs
-        membre.nom = nom
-        membre.role = role
-        membre.lienFacebook = facebook
-        membre.lienInstagram = instagram
-        membre.lienTwitter = twitter
-        
-        # Mettre à jour la photo seulement si une nouvelle est fournie
-        if photo:
-            membre.image = photo
-        
-        # Sauvegarder les modifications
-        membre.save()
-        
-        # Message de succès (optionnel)
-        messages.success(request, 'Membre modifié avec succès!')
-        
-        # Rediriger vers la liste
-        return redirect("liste_EquipeDirigeante")
-    
-    # Passer le membre au template pour pré-remplir le formulaire
-    context = {
-        'membre': membre
+        'statut_filter': statut_filter,
+        'annee_filter': annee_filter,
+        'annees': annees,
+        'annee_selectionnee': annee_selectionnee,
+        'nombreMembre': nombreMembre,
+        'nombre_en_attente': nombre_en_attente,
+        'nombre_valide': nombre_valide,
+        'nombre_refuse': nombre_refuse,
+        'pdf_enabled': PDF_ENABLED,
     }
     
-    return render(request, 'gestionMembre/modifierMembreEquipe.html', context)
+    return render(request, 'gestionMembre/liste.html', context)
 
 
-def supprimer_MembreEquipe(request, pk):
-    membre = get_object_or_404(EquipeDirigeante, pk=pk).delete()
-    return redirect("liste_EquipeDirigeante")
+@login_required
+def exporter_membres_pdf(request):
+    """Exporte la liste des membres en PDF"""
+    
+    if not PDF_ENABLED:
+        messages.error(request, "L'export PDF n'est pas disponible. Installez xhtml2pdf.")
+        return redirect('liste_membres')
+    
+    # Récupérer les mêmes filtres que la liste
+    search_query = request.GET.get('search', '').strip()
+    statut_filter = request.GET.get('statut', 'tous')
+    annee_filter = request.GET.get('annee', '')
+    
+    # Base queryset
+    membres = Membre.objects.all()
+    
+    # Filtrer par année
+    if annee_filter:
+        try:
+            annee_id = int(annee_filter)
+            membres = membres.filter(reinscriptions__annee_id=annee_id).distinct()
+        except (ValueError, TypeError):
+            pass
+    
+    # Filtrer par statut
+    if statut_filter == 'en_attente':
+        membres = membres.filter(statut='en_attente')
+    elif statut_filter == 'valide':
+        membres = membres.filter(statut='valide')
+    elif statut_filter == 'refuse':
+        membres = membres.filter(statut='refuse')
+    
+    # Filtrer par recherche
+    if search_query:
+        membres = membres.filter(
+            Q(nom__icontains=search_query) |
+            Q(prenom__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(telephone__icontains=search_query) |
+            Q(ner__icontains=search_query) |
+            Q(keri__icontains=search_query)
+        )
+    
+    membres = membres.order_by('nom', 'prenom')
+    
+    # Année sélectionnée
+    annee_selectionnee = None
+    if annee_filter:
+        try:
+            annee_selectionnee = Annee.objects.get(pk=int(annee_filter))
+        except:
+            pass
+    
+    # Générer le PDF
+    context = {
+        'membres': membres,
+        'total': membres.count(),
+        'statut_filter': statut_filter,
+        'annee_selectionnee': annee_selectionnee,
+        'search_query': search_query,
+        'date_export': timezone.now(),
+        'exporteur': request.user if request.user.is_authenticated else None,
+    }
+    
+    template = get_template('gestionMembre/export_pdf.html')
+    html = template.render(context)
+    
+    # Créer le PDF
+    response = HttpResponse(content_type='application/pdf')
+    
+    # Nom du fichier
+    filename = f"liste_membres_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    # Générer le PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    
+    if pisa_status.err:
+        messages.error(request, "Erreur lors de la génération du PDF.")
+        return redirect('liste_membres')
+    
+    return response
 
+
+@login_required
+def exporter_membres_csv(request):
+    """Exporte la liste des membres en CSV"""
+    import csv
+    
+    # Récupérer les mêmes filtres
+    search_query = request.GET.get('search', '').strip()
+    statut_filter = request.GET.get('statut', 'tous')
+    annee_filter = request.GET.get('annee', '')
+    
+    # Base queryset
+    membres = Membre.objects.all()
+    
+    # Filtrer par année
+    if annee_filter:
+        try:
+            annee_id = int(annee_filter)
+            membres = membres.filter(reinscriptions__annee_id=annee_id).distinct()
+        except:
+            pass
+    
+    # Filtrer par statut
+    if statut_filter == 'en_attente':
+        membres = membres.filter(statut='en_attente')
+    elif statut_filter == 'valide':
+        membres = membres.filter(statut='valide')
+    elif statut_filter == 'refuse':
+        membres = membres.filter(statut='refuse')
+    
+    # Filtrer par recherche
+    if search_query:
+        membres = membres.filter(
+            Q(nom__icontains=search_query) |
+            Q(prenom__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    membres = membres.order_by('nom', 'prenom')
+    
+    # Créer la réponse CSV
+    response = HttpResponse(content_type='text/csv')
+    filename = f"liste_membres_{timezone.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response.write('\ufeff'.encode('utf8'))  # BOM pour Excel
+    
+    writer = csv.writer(response, delimiter=';')
+    
+    # En-têtes
+    writer.writerow([
+        'Nom', 'Prénom', 'Email', 'Téléphone', 'Sexe',
+        'Profession', 'École', 'Niveau d\'étude',
+        'Ner', 'Keri', 'Keribour',
+        'Adresse', 'Statut', 'Date inscription'
+    ])
+    
+    # Données
+    for membre in membres:
+        writer.writerow([
+            membre.nom,
+            membre.prenom,
+            membre.email,
+            membre.telephone or '',
+            membre.get_sexe_display() if hasattr(membre, 'get_sexe_display') else membre.sexe,
+            membre.profession,
+            membre.ecole or '',
+            membre.niveauEtude or '',
+            membre.ner or '',
+            membre.keri or '',
+            membre.keribour or '',
+            membre.adresse or '',
+            membre.get_statut_display() if hasattr(membre, 'get_statut_display') else membre.statut,
+            membre.date_inscription.strftime('%d/%m/%Y') if membre.date_inscription else '',
+        ])
+    
+    return response
+
+
+def detail_membre(request, pk):
+    """Détails d'un membre"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    peut_modifier = False
+    if request.user.is_authenticated:
+        if request.user.est_membre_equipe():
+            peut_modifier = True
+        elif hasattr(request.user, 'membre') and request.user.membre.pk == pk:
+            peut_modifier = True
+    
+    # Récupérer les réinscriptions
+    reinscriptions = []
+    if hasattr(membre, 'reinscriptions'):
+        reinscriptions = membre.reinscriptions.all().order_by('-annee__id')
+    
+    return render(request, 'gestionMembre/detail.html', {
+        'membre': membre,
+        'peut_modifier': peut_modifier,
+        'reinscriptions': reinscriptions,
+    })
+
+
+# ============================================
+# MODIFICATION ET SUPPRESSION
+# ============================================
+
+@login_required
+def modifier_membre(request, pk):
+    """Modifier un membre existant"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    # Vérifier les droits
+    if not request.user.est_membre_equipe():
+        if not hasattr(request.user, 'membre') or request.user.membre.pk != pk:
+            messages.error(request, "Vous n'avez pas les droits pour modifier ce profil.")
+            return redirect('liste_membres')
+    
+    if request.method == 'POST':
+        form = MembreModificationForm(request.POST, request.FILES, instance=membre)
+        
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    # Mettre à jour le membre
+                    membre.nom = form.cleaned_data['nom']
+                    membre.prenom = form.cleaned_data['prenom']
+                    membre.sexe = form.cleaned_data['sexe']
+                    membre.email = form.cleaned_data['email']
+                    membre.telephone = form.cleaned_data.get('telephone', '')
+                    membre.adresse = form.cleaned_data.get('adresse', '')
+                    membre.profession = form.cleaned_data['profession']
+                    membre.numeroUrgence = form.cleaned_data.get('numeroUrgence', '')
+                    membre.niveauEtude = form.cleaned_data.get('niveauEtude', '')
+                    membre.ecole = form.cleaned_data.get('ecole', '')
+                    membre.ner = form.cleaned_data.get('ner', '')
+                    membre.keri = form.cleaned_data.get('keri', '')
+                    membre.keribour = form.cleaned_data.get('keribour', '')
+                    membre.keriBa = form.cleaned_data.get('keriBa', '')
+                    membre.keribourBa = form.cleaned_data.get('keribourBa', '')
+                    membre.notes = form.cleaned_data.get('notes', '')
+                    
+                    if form.cleaned_data.get('photo'):
+                        membre.photo = form.cleaned_data['photo']
+                    
+                    membre.save()
+                    
+                    # Mettre à jour l'utilisateur associé si existe
+                    if membre.utilisateur:
+                        membre.utilisateur.email = form.cleaned_data['email']
+                        membre.utilisateur.username = form.cleaned_data['email']
+                        membre.utilisateur.first_name = form.cleaned_data['prenom']
+                        membre.utilisateur.last_name = form.cleaned_data['nom']
+                        membre.utilisateur.save()
+                    
+                    messages.success(request, f"Le profil de {membre.nom_complet} a été mis à jour.")
+                    return redirect('detail_membre', pk=membre.pk)
+                    
+            except Exception as e:
+                messages.error(request, f"Erreur lors de la modification: {str(e)}")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        form = MembreModificationForm(instance=membre)
+    
+    return render(request, 'gestionMembre/modifierMembre.html', {
+        'form': form,
+        'membre': membre,
+        'titre': f"Modifier le profil de {membre.nom_complet}"
+    })
+
+
+@login_required
+def supprimer_membre(request, pk):
+    """Supprimer un membre"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if not request.user.est_membre_equipe():
+        messages.error(request, "Vous n'avez pas les droits pour supprimer un membre.")
+        return redirect('liste_membres')
+    
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                nom_complet = membre.nom_complet
+                
+                # Supprimer l'utilisateur associé si existe
+                if membre.utilisateur:
+                    membre.utilisateur.delete()
+                
+                membre.delete()
+                messages.success(request, f"Le membre {nom_complet} a été supprimé avec succès.")
+                
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la suppression: {str(e)}")
+        
+        return redirect('liste_membres')
+    
+    # return render(request, 'gestionMembre/supprimer_membre.html', {
+    #     'membre': membre
+    # })
+
+
+# ============================================
+# API
+# ============================================
+
+def verifier_email_disponible(request):
+    """API pour vérifier si un email est disponible"""
+    email = request.GET.get('email', '')
+    membre_pk = request.GET.get('membre_pk')  # Pour exclure lors de la modification
+    
+    if not email:
+        return JsonResponse({'disponible': False, 'message': 'Email requis'})
+    
+    # Vérifier dans les membres
+    membre_qs = Membre.objects.filter(email=email)
+    if membre_pk:
+        membre_qs = membre_qs.exclude(pk=membre_pk)
+    
+    # Vérifier dans les utilisateurs
+    user_qs = Utilisateur.objects.filter(email=email)
+    
+    existe = membre_qs.exists() or user_qs.exists()
+    
+    return JsonResponse({
+        'disponible': not existe,
+        'message': 'Cet email est déjà utilisé' if existe else 'Email disponible'
+    })
+
+
+#======================================GESTION EQUIPE DIRRIGEANTE===============================
+def liste_equipe_dirigeante(request):
+    """Liste des membres de l'équipe dirigeante"""
+    search_query = request.GET.get('search', '').strip()
+    statut_filter = request.GET.get('statut', 'tous')
+    role_filter = request.GET.get('role', '')
+    
+    # Base queryset
+    membres = EquipeDirigeante.objects.all()
+    
+    # Filtrer par statut
+    if statut_filter == 'actif':
+        membres = membres.filter(actif=True)
+    elif statut_filter == 'inactif':
+        membres = membres.filter(actif=False)
+    
+    # Filtrer par rôle
+    if role_filter:
+        membres = membres.filter(role=role_filter)
+    
+    # Recherche
+    if search_query:
+        membres = membres.filter(
+            Q(nom__icontains=search_query) |
+            Q(role__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    membres = membres.order_by('ordre', 'nom')
+    total_membres = membres.count()
+    
+    # Compteurs
+    nombre_actifs = EquipeDirigeante.objects.filter(actif=True).count()
+    nombre_inactifs = EquipeDirigeante.objects.filter(actif=False).count()
+    
+    # Liste des rôles pour le filtre
+    roles_disponibles = EquipeDirigeante.ROLE_CHOICES
+    
+    # Pagination
+    paginator = Paginator(membres, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'statut_filter': statut_filter,
+        'role_filter': role_filter,
+        'total_membres': total_membres,
+        'nombre_actifs': nombre_actifs,
+        'nombre_inactifs': nombre_inactifs,
+        'roles_disponibles': roles_disponibles,
+    }
+    
+    return render(request, 'gestionMembre/listeMembreEquipe.html', context)
 
 
 #-----------------------------GESTION ANNONCES--------------------------------------------------
@@ -536,7 +1205,7 @@ def liste_annonces(request):
     return render(request, 'gestionAnnonce/liste.html', {'annonces': annonces})
 
 
-# @login_required
+@login_required
 def creer_annonce(request):
     if request.method == 'POST':
         form = AnnonceForm(request.POST, request.FILES)
@@ -550,7 +1219,7 @@ def creer_annonce(request):
         form = AnnonceForm()
     return render(request, 'gestionAnnonce/creer.html', {'form': form})
 
-# @login_required
+@login_required
 def publier_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)
     annonce.est_publie = True
@@ -558,6 +1227,16 @@ def publier_annonce(request, id):
     annonce.save()
     messages.success(request, "Annonce publiée avec succès")
     return redirect('liste_annonces')
+
+
+@login_required
+def depublier_annonce(request, id):
+    annonce = get_object_or_404(Annonce, id=id)
+    annonce.est_publie = False
+    annonce.save()
+    messages.success(request, "Annonce dépubliée avec succès")
+    return redirect('liste_annonces')
+
 
 def modifier_annonce(request, id):
     annonce = get_object_or_404(Annonce, id=id)

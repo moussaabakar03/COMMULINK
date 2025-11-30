@@ -5,61 +5,679 @@
 {% block title %}Liste membres{% endblock %}
 
 {% block style %}
-
-
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
-
-    <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Libraries Stylesheet -->
-    <link href="{% static 'user/lib//animate/animate.min.css" rel="stylesheet'%}">
-    <link href="{% static 'user/lib//owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="{% static 'user/css/bootstrap.min.css'%}" rel="stylesheet">
-
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-
-
-    {% comment %} css pour la page {% endcomment %}
+    <link href="{% static 'user/css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'assets/css/membres/listeMembre.css' %}" />
 
+    <style>
+        :root {
+            --primary-color: #FF6F0F;
+            --secondary-color: #073841;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+
+        /* Toolbar actions */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Sélecteur d'année */
+        .year-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .year-selector label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            white-space: nowrap;
+        }
+
+        .year-selector select {
+            padding: 10px 40px 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            background: white;
+            cursor: pointer;
+            min-width: 200px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .year-selector select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 111, 15, 0.15);
+        }
+
+        .year-selector select:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Boutons d'export */
+        .btn-export {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .btn-export-pdf {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-export-pdf:hover {
+            color: white;
+        }
+
+        .btn-export-csv {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+
+        .btn-export-csv:hover {
+            color: white;
+        }
+
+        .btn-export-print {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+        }
+
+        .btn-add-membre {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .btn-add-membre:hover {
+            color: white;
+        }
+
+        /* Badge année active */
+        .year-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .year-badge i {
+            font-size: 1rem;
+        }
+
+        /* Filtres */
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            background: white;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .filter-tab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .filter-tab.active {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .filter-tab.active.en-attente {
+            background: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #000;
+        }
+        
+        .filter-tab.active.valide {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .filter-tab.active.refuse {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .badge-count {
+            background: rgba(0,0,0,0.15);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+        
+        .filter-tab.active .badge-count {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-badge.en_attente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.valide {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.refuse {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-action {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-details { background: var(--info-color); color: white; }
+        .btn-valider { background: var(--success-color); color: white; }
+        .btn-refuser { background: var(--danger-color); color: white; }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: white;
+        }
+
+        /* Bulk actions */
+        .bulk-actions {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            padding: 18px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn-bulk {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--success-color);
+            color: white;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-warning { background: #fff3cd; color: #856404; }
+        .alert-error, .alert-danger { background: #f8d7da; color: #721c24; }
+        .alert-info { background: #d1ecf1; color: #0c5460; }
+        
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        /* Loading state */
+        .row-updating {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal-dialog {
+            background: white;
+            border-radius: 20px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: modalShow 0.3s ease;
+        }
+
+        @keyframes modalShow {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 30px 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .modal-header.valider { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); }
+        .modal-header.refuser { background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); }
+        
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2.5rem;
+            background: white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .modal-icon.success { color: var(--success-color); }
+        .modal-icon.danger { color: var(--danger-color); }
+        
+        .modal-title { margin: 0; font-size: 1.4rem; font-weight: 700; }
+        
+        .modal-body { padding: 25px 30px; text-align: center; }
+        .modal-message { color: #666; font-size: 1rem; line-height: 1.6; margin: 0; }
+        
+        .modal-footer {
+            padding: 20px 30px 30px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .modal-btn-cancel { background: #e9ecef; color: #495057; }
+        .modal-btn-confirm { background: var(--success-color); color: white; }
+        .modal-btn-danger { background: var(--danger-color); color: white; }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+        
+        .toast {
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.5s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .toast.success { background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%); }
+        .toast.error { background: linear-gradient(135deg, var(--danger-color) 0%, #e83e8c 100%); }
+        
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        /* Table */
+        .table-warning {
+            background-color: rgba(255, 193, 7, 0.1) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-left, .toolbar-right {
+                justify-content: center;
+            }
+
+            .year-selector {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .year-selector select {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-tabs {
+                justify-content: center;
+            }
+
+            .btn-export span {
+                display: none;
+            }
+
+            .toolbar-right {
+                justify-content: center;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .toolbar, .filter-tabs, .bulk-actions, .search-section,
+            .pagination, .btn-action, .modal-overlay, .toast-container,
+            .alert, .page-header {
+                display: none !important;
+            }
+
+            .page-inner {
+                padding: 0 !important;
+            }
+
+            .members-table {
+                box-shadow: none !important;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Page Header -->
     <header class="page-header">
         <div class="container-custom text-center">
             <h1 class="page-title text-white">📋 Liste des Membres</h1>
             <p class="page-subtitle">Gérez et consultez les informations de tous les membres</p>
-            <p>Total: <span style = "font-weight: bold; font-size: 20px; ">{{nombreMembre}}</span></p>
+            <p>Total: <span style="font-weight: bold; font-size: 20px;">{{ nombreMembre }}</span></p>
+            {% if annee_selectionnee %}
+                <span class="year-badge mt-2">
+                    <i class="fas fa-calendar-alt"></i>
+                    Année {{ annee_selectionnee }}
+                </span>
+            {% endif %}
         </div>
     </header>
 
     <div class="page-inner">
         <div class="container-custom">
-            <!-- Barre de recherche -->
+            
+            <!-- Messages Flash -->
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Toolbar: Année + Export + Ajouter -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <!-- Sélecteur d'année -->
+                    <div class="year-selector">
+                        <label for="anneeSelect">
+                            <i class="fas fa-calendar-alt"></i> Année:
+                        </label>
+                        <select id="anneeSelect" onchange="filterByYear(this.value)">
+                            <option value="">Toutes les années</option>
+                            {% for annee in annees %}
+                                <option value="{{ annee.pk }}" {% if annee_filter == annee.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ annee.debutAnnee|date:"Y" }} - {{ annee.finAnnee|date:"Y" }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="toolbar-right">
+                    <!-- Boutons d'export -->
+                    {% if pdf_enabled %}
+                    <a href="{% url 'exporter_membres_pdf' %}?statut={{ statut_filter }}&annee={{ annee_filter }}&search={{ search_query }}" 
+                       class="btn-export btn-export-pdf" title="Exporter en PDF">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>PDF</span>
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'exporter_membres_csv' %}?statut={{ statut_filter }}&annee={{ annee_filter }}&search={{ search_query }}" 
+                       class="btn-export btn-export-csv" title="Exporter en CSV/Excel">
+                        <i class="fas fa-file-excel"></i>
+                        <span>Excel</span>
+                    </a>
+                    
+                    <button onclick="window.print()" class="btn-export btn-export-print" title="Imprimer">
+                        <i class="fas fa-print"></i>
+                        <span>Imprimer</span>
+                    </button>
+
+                    {% if user.is_authenticated and user.est_membre_equipe %}
+                    <a href="{% url 'creer_membre' %}" class="btn-export">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Ajouter</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Filtres par statut -->
+            <div class="filter-tabs">
+                <a href="?statut=tous&search={{ search_query }}&annee={{ annee_filter }}" 
+                   class="filter-tab {% if statut_filter == 'tous' %}active{% endif %}">
+                    <i class="fas fa-users"></i> Tous
+                    <span class="badge-count">{{ nombre_en_attente|add:nombre_valide|add:nombre_refuse }}</span>
+                </a>
+                <a href="?statut=en_attente&search={{ search_query }}&annee={{ annee_filter }}" 
+                   class="filter-tab en-attente {% if statut_filter == 'en_attente' %}active{% endif %}">
+                    <i class="fas fa-clock"></i> En attente
+                    <span class="badge-count">{{ nombre_en_attente }}</span>
+                </a>
+                <a href="?statut=valide&search={{ search_query }}&annee={{ annee_filter }}" 
+                   class="filter-tab valide {% if statut_filter == 'valide' %}active{% endif %}">
+                    <i class="fas fa-check-circle"></i> Validés
+                    <span class="badge-count">{{ nombre_valide }}</span>
+                </a>
+                <a href="?statut=refuse&search={{ search_query }}&annee={{ annee_filter }}" 
+                   class="filter-tab refuse {% if statut_filter == 'refuse' %}active{% endif %}">
+                    <i class="fas fa-times-circle"></i> Refusés
+                    <span class="badge-count">{{ nombre_refuse }}</span>
+                </a>
+            </div>
+
+            <!-- Actions groupées -->
+            {% if nombre_en_attente > 0 and user.is_authenticated and user.est_membre_equipe %}
+            <div class="bulk-actions">
+                <div class="bulk-actions-info">
+                    <i class="fas fa-exclamation-circle" style="font-size: 1.5em; color: #856404;"></i>
+                    <span><strong>{{ nombre_en_attente }}</strong> demande(s) en attente</span>
+                </div>
+                <button type="button" class="btn-bulk" onclick="openBulkModal()">
+                    <i class="fas fa-check-double"></i> Tout valider
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- Recherche -->
             <div class="search-section">
                 <form method="get" class="search-bar">
-                    <input type="text" name="search" 
-                        placeholder="Rechercher un membre par nom, email ou téléphone..." 
-                        value="{{ search_query }}">
+                    <input type="hidden" name="statut" value="{{ statut_filter }}">
+                    <input type="hidden" name="annee" value="{{ annee_filter }}">
+                    <input type="text" name="search" placeholder="Rechercher par nom, email, téléphone, ner, keri..." value="{{ search_query }}">
                     <button type="submit" class="search-button">
                         <i class="fas fa-search"></i> Rechercher
                     </button>
+                    {% if search_query %}
+                    <a href="?statut={{ statut_filter }}&annee={{ annee_filter }}" class="btn-export" style="background: #6c757d; color: white; margin-left: 10px;">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
                 </form>
             </div>
 
-            <!-- Tableau des membres -->
+            <!-- Tableau -->
             <div class="table-responsive">
                 <table class="members-table">
                     <thead>
@@ -68,41 +686,66 @@
                             <th>Ner</th>
                             <th>Keri</th>
                             <th>Téléphone</th>
-                            <th>Ecole</th>
+                            <th>École</th>
+                            <th>Statut</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for membre in page_obj %}
-                        <tr>
+                        <tr id="membre-row-{{ membre.pk }}" class="{% if membre.statut == 'en_attente' %}table-warning{% endif %}">
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="member-avatar me-2">
-                                        <i class="fas fa-user-circle text-primary"></i>
+                                    {% if membre.photo %}
+                                        <img src="{{ membre.photo.url }}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 2px solid var(--primary-color);">
+                                    {% else %}
+                                        <i class="fas fa-user-circle" style="font-size: 2.2em; margin-right: 10px; color: #ccc;"></i>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ membre.nom_complet }}</strong>
+                                        <br><small class="text-muted">{{ membre.email }}</small>
                                     </div>
-                                    <strong>{{ membre.nom_complet }}</strong>
                                 </div>
                             </td>
-                            <td>{{ membre.ner }}</td>
-                            <td>{{ membre.keri }}</td>
+                            <td>{{ membre.ner|default:"-" }}</td>
+                            <td>{{ membre.keri|default:"-" }}</td>
                             <td>{{ membre.telephone|default:"-" }}</td>
-                            <td>{{ membre.ecole }}</td>
+                            <td>{{ membre.ecole|default:"-" }}</td>
                             <td>
-                                <div class="action-buttons">
-                                    <a href="{% url 'detail_membre' membre.pk %}" class="btn-details">
-                                        <i class="fas fa-eye"></i> Détails
+                                <span class="status-badge {{ membre.statut }}" id="status-{{ membre.pk }}">
+                                    {% if membre.statut == 'en_attente' %}
+                                        <i class="fas fa-clock"></i> En attente
+                                    {% elif membre.statut == 'valide' %}
+                                        <i class="fas fa-check"></i> Validé
+                                    {% else %}
+                                        <i class="fas fa-times"></i> Refusé
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons" id="actions-{{ membre.pk }}">
+                                    <a href="{% url 'detail_membre' membre.pk %}" class="btn-action btn-details" title="Voir détails">
+                                        <i class="fas fa-eye"></i>
                                     </a>
+                                    {% if user.is_authenticated and user.est_membre_equipe and membre.statut == 'en_attente' %}
+                                        <button type="button" class="btn-action btn-valider" title="Valider"
+                                                onclick="openModal('valider', {{ membre.pk }}, '{{ membre.nom_complet|escapejs }}')">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button type="button" class="btn-action btn-refuser" title="Refuser"
+                                                onclick="openModal('refuser', {{ membre.pk }}, '{{ membre.nom_complet|escapejs }}')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4">
-                                <div class="empty-state">
-                                    <i class="fas fa-users"></i>
-                                    <h3>Aucun membre trouvé</h3>
-                                    <p>Essayez d'ajuster votre recherche ou vos filtres</p>
-                                </div>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="fas fa-users" style="font-size: 4em; color: #ddd; margin-bottom: 15px;"></i>
+                                <h4>Aucun membre trouvé</h4>
+                                <p class="text-muted">Essayez de modifier vos filtres ou votre recherche</p>
                             </td>
                         </tr>
                         {% endfor %}
@@ -112,45 +755,252 @@
 
             <!-- Pagination -->
             {% if page_obj.has_other_pages %}
-            <div class="pagination-container">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1&search={{ search_query }}">
-                                <i class="fas fa-angle-double-left"></i>
-                            </a>
-                        </li>
-                        {% endif %}
-                        
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                            <li class="page-item active">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                            {% else %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&statut={{ statut_filter }}&annee={{ annee_filter }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                                <a class="page-link" href="?page={{ num }}&search={{ search_query }}&statut={{ statut_filter }}&annee={{ annee_filter }}">{{ num }}</a>
                             </li>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}">
-                                <i class="fas fa-angle-double-right"></i>
-                            </a>
-                        </li>
                         {% endif %}
-                    </ul>
-                </nav>
-            </div>
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&statut={{ statut_filter }}&annee={{ annee_filter }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% endif %}
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+    <!-- Modal confirmation individuelle -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-dialog">
+            <div class="modal-header" id="modalHeader">
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <div class="modal-icon" id="modalIcon"><i class="fas fa-question"></i></div>
+                <h3 class="modal-title" id="modalTitle">Confirmation</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message" id="modalMessage">Confirmer cette action ?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button class="modal-btn" id="modalConfirmBtn" onclick="confirmAction()">
+                    <i class="fas fa-check"></i> Confirmer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal validation en masse -->
+    <div class="modal-overlay" id="bulkModal">
+        <div class="modal-dialog">
+            <div class="modal-header valider">
+                <button class="modal-close" onclick="closeBulkModal()">&times;</button>
+                <div class="modal-icon success"><i class="fas fa-check-double"></i></div>
+                <h3 class="modal-title">Validation en masse</h3>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">
+                    Valider <strong>toutes les {{ nombre_en_attente }} demandes</strong> en attente ?
+                    <br><br>
+                    <small class="text-muted">Un compte sera créé pour chaque membre.</small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="closeBulkModal()">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <form method="post" action="{% url 'valider_tous_en_attente' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="modal-btn modal-btn-confirm">
+                        <i class="fas fa-check-double"></i> Tout valider
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentAction = null;
+        let currentMembreId = null;
+        let currentMembreNom = null;
+
+        // Filtrer par année
+        function filterByYear(anneeId) {
+            const url = new URL(window.location.href);
+            if (anneeId) {
+                url.searchParams.set('annee', anneeId);
+            } else {
+                url.searchParams.delete('annee');
+            }
+            url.searchParams.delete('page'); // Reset pagination
+            window.location.href = url.toString();
+        }
+
+        // Ouvrir modal individuel
+        function openModal(action, membreId, membreNom) {
+            currentAction = action;
+            currentMembreId = membreId;
+            currentMembreNom = membreNom;
+            
+            const modal = document.getElementById('confirmModal');
+            const header = document.getElementById('modalHeader');
+            const icon = document.getElementById('modalIcon');
+            const title = document.getElementById('modalTitle');
+            const message = document.getElementById('modalMessage');
+            const btn = document.getElementById('modalConfirmBtn');
+            
+            if (action === 'valider') {
+                header.className = 'modal-header valider';
+                icon.className = 'modal-icon success';
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                title.textContent = 'Valider l\'inscription';
+                message.innerHTML = `Valider l'inscription de <strong>${membreNom}</strong> ?<br><small class="text-muted">Un compte utilisateur sera créé.</small>`;
+                btn.className = 'modal-btn modal-btn-confirm';
+                btn.innerHTML = '<i class="fas fa-check"></i> Valider';
+            } else {
+                header.className = 'modal-header refuser';
+                icon.className = 'modal-icon danger';
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                title.textContent = 'Refuser l\'inscription';
+                message.innerHTML = `Refuser l'inscription de <strong>${membreNom}</strong> ?`;
+                btn.className = 'modal-btn modal-btn-danger';
+                btn.innerHTML = '<i class="fas fa-times"></i> Refuser';
+            }
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fermer modal individuel
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            document.body.style.overflow = '';
+            currentAction = null;
+            currentMembreId = null;
+            currentMembreNom = null;
+        }
+
+        // Ouvrir/Fermer modal bulk
+        function openBulkModal() {
+            document.getElementById('bulkModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeBulkModal() {
+            document.getElementById('bulkModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Confirmer action AJAX
+        function confirmAction() {
+            if (!currentAction || !currentMembreId) return;
+            
+            const row = document.getElementById(`membre-row-${currentMembreId}`);
+            row.classList.add('row-updating');
+            closeModal();
+            
+            const baseUrl = currentAction === 'valider' 
+                ? '{% url "valider_membre_ajax" pk=99999 %}'.replace('99999', currentMembreId)
+                : '{% url "refuser_membre_ajax" pk=99999 %}'.replace('99999', currentMembreId);
+            
+            fetch(baseUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                row.classList.remove('row-updating');
+                
+                if (data.success) {
+                    const statusBadge = document.getElementById(`status-${currentMembreId}`);
+                    statusBadge.className = `status-badge ${data.nouveau_statut}`;
+                    statusBadge.innerHTML = data.nouveau_statut === 'valide' 
+                        ? '<i class="fas fa-check"></i> Validé'
+                        : '<i class="fas fa-times"></i> Refusé';
+                    
+                    row.classList.remove('table-warning');
+                    
+                    const actionsDiv = document.getElementById(`actions-${currentMembreId}`);
+                    const detailBtn = actionsDiv.querySelector('.btn-details');
+                    actionsDiv.innerHTML = '';
+                    actionsDiv.appendChild(detailBtn);
+                    
+                    showToast(data.message, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showToast(data.message || 'Erreur', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                row.classList.remove('row-updating');
+                showToast('Erreur de connexion', 'error');
+            });
+        }
+
+        // Toast notification
+        function showToast(message, type) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 5000);
+        }
+
+        // Fermer modals
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeBulkModal();
+            }
+        });
+        
+        document.getElementById('confirmModal').addEventListener('click', e => {
+            if (e.target.id === 'confirmModal') closeModal();
+        });
+        
+        document.getElementById('bulkModal').addEventListener('click', e => {
+            if (e.target.id === 'bulkModal') closeBulkModal();
+        });
+
+        // Auto-hide alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.transition = 'all 0.3s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        });
+    </script>
 {% endblock %}

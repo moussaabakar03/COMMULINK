@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription confirmée - COMMULINK</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #FF6F0F;
+            --secondary-color: #073841;
+            --success: #28a745;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .confirmation-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 550px;
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .confirmation-header {
+            background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%);
+            padding: 50px 30px;
+            color: white;
+        }
+        
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: bounceIn 0.6s ease;
+        }
+        
+        .success-icon i {
+            font-size: 3rem;
+            color: var(--success);
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .confirmation-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .confirmation-body {
+            padding: 40px 30px;
+        }
+        
+        .confirmation-body p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .member-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .member-info h4 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .info-value {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .status-badge i {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .next-steps {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .next-steps h4 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .btn-home {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 111, 15, 0.3);
+            color: white;
+        }
+        
+        /* Confetti animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            animation: confetti-fall 3s linear forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-card">
+        <div class="confirmation-header">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1>Demande envoyée avec succès !</h1>
+        </div>
+        
+        <div class="confirmation-body">
+            <p>
+                Merci <strong>{{ membre.prenom }}</strong> ! Votre demande d'inscription 
+                a été enregistrée et sera examinée par notre équipe.
+            </p>
+
+            <div class="member-info">
+                <h4><i class="fas fa-user-circle"></i> Récapitulatif</h4>
+                <div class="info-item">
+                    <span class="info-label">Nom complet</span>
+                    <span class="info-value">{{ membre.nom }} {{ membre.prenom }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ membre.email }}</span>
+                </div>
+                {% if membre.telephone %}
+                <div class="info-item">
+                    <span class="info-label">Téléphone</span>
+                    <span class="info-value">{{ membre.telephone }}</span>
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <span class="info-label">Date d'inscription</span>
+                    <span class="info-value">{{ membre.date_inscription|date:"d/m/Y à H:i" }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Statut</span>
+                    <span class="status-badge">
+                        <i class="fas fa-clock"></i>
+                        En attente de validation
+                    </span>
+                </div>
+            </div>
+
+            <div class="next-steps">
+                <h4><i class="fas fa-list-ol"></i> Prochaines étapes</h4>
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        Notre équipe examine votre demande d'inscription
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        Vous recevrez un email de confirmation à l'adresse <strong>{{ membre.email }}</strong>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        Une fois validé, vous pourrez accéder à tous nos services
+                    </div>
+                </div>
+            </div>
+
+            <a href="{% url 'index' %}" class="btn-home">
+                <i class="fas fa-home"></i>
+                Retour à l'accueil
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Effet confetti
+        document.addEventListener('DOMContentLoaded', function() {
+            const colors = ['#FF6F0F', '#073841', '#28a745', '#ffc107', '#17a2b8', '#e91e63'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(function() {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = confetti.style.width;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(function() {
+                        confetti.remove();
+                    }, 4000);
+                }, i * 60);
+            }
+        });
+    </script>
+</body>
+</html>

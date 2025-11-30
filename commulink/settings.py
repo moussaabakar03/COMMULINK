@@ -87,7 +87,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -152,3 +151,8 @@ DEFAULT_FROM_EMAIL = 'shalomgbekou84@gmail.com'
 
 
 AUTH_USER_MODEL = 'secondApp.Utilisateur'
+
+# Configuration des URLs d'authentification
+LOGIN_URL = 'connexion' 
+LOGIN_REDIRECT_URL = 'liste_membres'  
+LOGOUT_REDIRECT_URL = 'index' 
