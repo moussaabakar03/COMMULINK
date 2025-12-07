@@ -132,8 +132,8 @@ def rediriger_selon_role(user):
     
     # Superuser ou membre de l'équipe → Dashboard
     if user.is_superuser or user.est_membre_equipe():
-        print("-> Redirection vers admin_dashboard")
-        return redirect('admin_dashboard')
+        print("-> Redirection vers dashboard_admin")
+        return redirect('dashboard_admin')
     
     # Membre lambda → Page d'accueil
     print("-> Redirection vers index")
