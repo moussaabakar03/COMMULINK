@@ -2,161 +2,622 @@
 
 {% block body %}
 {% load static %}
-<style>
-   
-    .fadeIn{
-        background-color: rgba(128, 12, 12, 0.07);
-    }
-   
-    .headerNav nav{
-      background-color: #001D23;
-    }
 
-    .headerNav .header, .headerNav .header div small, .headerNav .header div a i {
-        background-color: white;
+
+  <style>
+    
+      .fadeIn{
+          background-color: rgba(128, 12, 12, 0.07);
+      }
+    
+      .headerNav nav{
+        background-color: #001D23;
+      }
+
+      .headerNav .header, .headerNav .header div small, .headerNav .header div a i {
+          background-color: white;
+          color: #FF6F0F;
+      }
+
+
+      .a-propos-section {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 60px 20px;
+        {% comment %} background-color: #1d1d3f; {% endcomment %}
+        color:rgb(32, 26, 26);
+        text-align: center;
+        font-family: 'Segoe UI', sans-serif;
+        margin-top: 120px;
+      }
+      
+      .a-propos-section h2 {
+        font-size: 3rem;
         color: #FF6F0F;
-    }
+        margin-bottom: 20px;
+      }
+      
+      .a-propos-section p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 40px;
+      }
+      
+      .a-propos-section h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      
+      .a-propos-section ul {
+        list-style-type: disc;
+        text-align: left;
+        max-width: 400px;
+        margin: 0 auto 40px auto;
+        padding-left: 20px;
+      }
+      
+      .a-propos-section hr {
+        border: 0.5px solid #b3aaff33;
+        margin-bottom: 40px;
+      }
+      
+      .cta-button a {
+        background: #FF6F0F;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: bold;
+        transition: background 0.3s ease;
+      }
+      
+      .cta-button a:hover {
+        background: linear-gradient(to right, #8e7cc3, #e0a7d8);
+      }
+      
 
 
-    .a-propos-section {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 60px 20px;
-      {% comment %} background-color: #1d1d3f; {% endcomment %}
-      color:rgb(32, 26, 26);
-      text-align: center;
-      font-family: 'Segoe UI', sans-serif;
-      margin-top: 120px;
-    }
-    
-    .a-propos-section h2 {
-      font-size: 3rem;
-      color: #FF6F0F;
-      margin-bottom: 20px;
-    }
-    
-    .a-propos-section p {
-      font-size: 1.1rem;
-      line-height: 1.6;
-      margin-bottom: 40px;
-    }
-    
-    .a-propos-section h3 {
-      font-size: 1.5rem;
+
+      .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px; /* espacement entre les images */
+      justify-content: center;
+      width: 100%;
+      }
+
+      .gallery-item {
+      position: relative;
+      width: 300px; /* largeur fixe */
+      height: 200px; /* hauteur fixe */
+      overflow: hidden;
+      border-radius: 8px;
+      }
+
+      .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* remplissage sans déformation */
+      display: block;
+      }
+
+      .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+      font-size: 1.2rem;
       font-weight: bold;
-      margin-bottom: 10px;
-    }
-    
-    .a-propos-section ul {
-      list-style-type: disc;
-      text-align: left;
-      max-width: 400px;
-      margin: 0 auto 40px auto;
-      padding-left: 20px;
-    }
-    
-    .a-propos-section hr {
-      border: 0.5px solid #b3aaff33;
-      margin-bottom: 40px;
-    }
-    
-    .cta-button a {
-      background: #FF6F0F;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-    
-    .cta-button a:hover {
-      background: linear-gradient(to right, #8e7cc3, #e0a7d8);
-    }
-    
+      }
 
+      .gallery-item:hover .overlay {
+      opacity: 1;
+      }
 
+      
+      .divider {
+          height: 3px;
+          background: linear-gradient(to right, transparent, var(--secondary-color), transparent);
+          margin: 3rem 0;
+          opacity: 0.3;
+      }
 
-    .gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; /* espacement entre les images */
-    justify-content: center;
-    width: 100%;
+      
+     /* Section Vidéos - CORRECTIONS */
+    .video-section {
+        max-width: 1200px;
+        margin: 60px auto;
+        padding: 0 20px;
     }
 
-    .gallery-item {
-    position: relative;
-    width: 300px; /* largeur fixe */
-    height: 200px; /* hauteur fixe */
-    overflow: hidden;
-    border-radius: 8px;
+    .section-title {
+        text-align: center;
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 40px;
+        position: relative;
+        padding-bottom: 15px;
     }
 
-    .gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* remplissage sans déformation */
-    display: block;
+    .section-title:after {
+        content: '';
+        position: absolute;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, #FF6F0F, #e05b00);
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 2px;
     }
 
-    .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    font-size: 1.2rem;
-    font-weight: bold;
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
     }
 
-    .gallery-item:hover .overlay {
-    opacity: 1;
+    .video-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
+    .video-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* CONTAINER VIDÉO CORRIGÉ */
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        background: #000;
+        overflow: hidden;
+    }
+
+    /* ÉLÉMENTS DANS LE CONTAINER */
+    .video-thumbnail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+        transition: opacity 0.3s ease;
+    }
+
+    .video-thumbnail.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .video-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .video-thumbnail:hover img {
+        transform: scale(1.05);
+    }
+
+    .play-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 111, 15, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 3;
+    }
+
+    .play-btn i {
+        color: white;
+        font-size: 24px;
+        margin-left: 4px;
+    }
+
+    .video-thumbnail:hover .play-btn {
+        transform: translate(-50%, -50%) scale(1.1);
+        background: rgba(255, 111, 15, 1);
+    }
+
+    /* VIDÉO CORRECTEMENT STYLÉE */
+    .video-player {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* ou 'cover' selon préférence */
+        background: #000;
+        z-index: 1;
+        display: block; /* CHANGÉ : par défaut visible */
+    }
+
+    .video-player.hidden {
+        display: none; /* Masqué par classe */
+    }
+
+    .video-info {
+        padding: 20px;
+    }
+
+    .video-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+
+    .video-description {
+        font-size: 14px;
+        color: #718096;
+        line-height: 1.5;
+    }
+
+    .video-meta {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: #a0aec0;
+    }
+
+    .video-badge {
+        background: rgba(255, 111, 15, 0.1);
+        color: #FF6F0F;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .video-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
         
-</style>
-<div class="a-propos-section">
-  <h2>{{ evenement.titre }}</h2>
-  <img src="{{ evenement.photo.url }}" alt="Photo de couverture" style="width:300px; height:200px; object-fit:cover; border-radius:15px;">
-  <p>
-      {{evenement.description}}
-  </p>
+        .video-container {
+            height: 180px;
+        }
+    }
+      @media(max-width: 1000px){
+          .event-header{
+              margin-top: 40px;
+          }
+      }
+      
+      /* Responsive pour vidéos */
+      @media (max-width: 768px) {
+          .video-gallery {
+              grid-template-columns: 1fr;
+              gap: 1.5rem;
+          }
+          
+          .event-video {
+              max-height: 250px;
+          }
+          
+          .video-thumbnail img {
+              height: 200px;
+          }
+          
+          .play-button {
+              width: 60px;
+              height: 60px;
+          }
+          
+          .play-button i {
+              font-size: 1.5rem;
+          }
+      }
+      
+  </style>
 
-  <hr />
-
-  <div class="cta-button">
-    <a href="{% url 'index' %}#evenements">Voir d'autres Evenements</a>
-  </div>
-</div>
-<div class="gallery">
-  {% if evenementImage %}
-    {% for image in evenementImage %}
-      <div class="gallery-item">
-        {% if image.image %}
-          <a href="{{ image.image.url }}" target="_blank">
-            <img src="{{ image.image.url }}" alt="image">
-            <div class="overlay">Voir la photo</div>
-          </a>
-        {% else %}
-          <div class="no-image">
-            <i>📷</i>
-          </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <p>Il n'y a pas d'image pour cet événement.</p>
-  {% endif %}
-</div>
 
   
+  <div class="a-propos-section">
+    <h2>{{ evenement.titre }}</h2>
+    <img src="{{ evenement.photo.url }}" alt="Photo de couverture" style="width:300px; height:200px; object-fit:cover; border-radius:15px;">
+    <p>
+        {{evenement.description}}
+    </p>
+
+    <hr />
+
+    <div class="cta-button">
+      <a href="{% url 'index' %}#evenements">Voir d'autres Evenements</a>
+    </div>
+  </div>
+  <div class="gallery">
+    {% if evenementImage %}
+      {% for image in evenementImage %}
+        <div class="gallery-item">
+          {% if image.image %}
+            <a href="{{ image.image.url }}" target="_blank">
+              <img src="{{ image.image.url }}" alt="image">
+              <div class="overlay">Voir la photo</div>
+            </a>
+          {% else %}
+            <div class="no-image">
+              <i>📷</i>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Il n'y a pas d'image pour cet événement.</p>
+    {% endif %}
+  </div>
+
+
+
+  <div class="divider"></div>
+{% if evenementVideos %}
+<section class="video-section">
+    <h2 class="section-title">
+        <i class="fas fa-video" style="color: #FF6F0F; margin-right: 10px;"></i>
+        Vidéos des événements
+    </h2>
+    
+    <div class="video-grid">
+        {% for video in evenementVideos %}
+        <div class="video-card">
+            <!-- CONTAINER UNIQUE POUR THUMBNAIL ET VIDÉO -->
+            <div class="video-container">
+                {% if video.miniature %}
+                <!-- THUMBNAIL - visible par défaut -->
+                <div class="video-thumbnail" data-video-id="video-{{ video.id }}">
+                    <img src="{{ video.miniature.url }}" alt="{{ video.titre|default:'Vidéo' }}">
+                    <div class="play-btn">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- VIDÉO - cachée par défaut si miniature existe -->
+                <video id="video-{{ video.id }}" 
+                       class="video-player {% if video.miniature %}hidden{% endif %}" 
+                       controls 
+                       preload="metadata">
+                    <source src="{{ video.video.url }}" type="video/mp4">
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+            </div>
+            
+            <div class="video-info">
+                <h3 class="video-title">{{ video.titre|default:"Vidéo événement" }}</h3>
+                {% if video.description %}
+                <p class="video-description">{{ video.description|truncatechars:80 }}</p>
+                {% endif %}
+                <div class="video-meta">
+                    <span class="video-badge">
+                        <i class="fas fa-hdd"></i> {{ video.taille_fichier }}
+                    </span>
+                    <span class="video-badge">
+                        <i class="fas fa-calendar"></i> {{ video.evenement.titre|truncatechars:20 }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+<div class="divider"></div>
+{% endif %}
+
+
+  <hr/>
+
+  <!-- Témoignages -->
+  <div class="container py-5" id="temoingnages">
+      <h2 class="section-title text-center mb-5">Témoignages</h2>
+      <div class="row">
+          {% for temoingnage in temoingnages %}
+          <div class="col-md-6 mb-4">
+              <div class="card h-100 shadow">
+                  <div class="row g-0">
+                      {% if temoingnage.image %}
+                      <div class="col-md-4 d-flex align-items-center">
+                          <img src="{{ temoingnage.image.url }}" 
+                                class="img-fluid rounded-start m-2" 
+                                alt="{{ temoingnage.nom }}"
+                                style="max-height: 150px; object-fit: cover;">
+                      </div>
+                      {% endif %}
+                      
+                      <div class="col-md-8">
+                          <div class="card-body">
+                              <div class="d-flex justify-content-between align-items-start">
+                                  <div>
+                                      <h5 class="card-title">{{ temoingnage.nom }}</h5>
+                                      <p class="card-subtitle text-muted small">{{ temoingnage.role }}</p>
+                                  </div>
+                                  {% if temoingnage.evenement %}
+                                  <span class="badge bg-primary">
+                                      {{ temoingnage.evenement.typeEvenement.nom_type_evenement|truncatechars:20 }}
+                                  </span>
+                                  {% endif %}
+                              </div>
+                              
+                              <p class="card-text mt-3">{{ temoingnage.message }}</p>
+                              
+                              {% if temoingnage.video %}
+                              <div class="mt-3 ratio ratio-16x9">
+                                  <video controls class="rounded">
+                                      <source src="{{ temoingnage.video.url }}" type="video/mp4">
+                                      Votre navigateur ne supporte pas les vidéos.
+                                  </video>
+                              </div>
+                              {% endif %}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+
+
+
+    
+<script>
+    // Script pour gérer la lecture des vidéos avec miniatures
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbnails = document.querySelectorAll('.video-thumbnail');
+        
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                const videoId = this.getAttribute('data-video-id');
+                const video = document.getElementById(videoId);
+                
+                if (video) {
+                    this.style.display = 'none';
+                    video.style.display = 'block';
+                    video.play();
+                    
+                    video.style.opacity = '0';
+                    setTimeout(() => {
+                        video.style.transition = 'opacity 0.3s ease';
+                        video.style.opacity = '1';
+                    }, 10);
+                }
+            });
+        });
+        
+        // Animation d'entrée pour les vidéos
+        const videoItems = document.querySelectorAll('.video-item');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '0';
+                        entry.target.style.transform = 'translateY(20px)';
+                        entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        
+                        requestAnimationFrame(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        });
+                    }, index * 100);
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        videoItems.forEach(item => observer.observe(item));
+    });
+</script>
+
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initialisation du lecteur vidéo...');
+    
+    // Gestion des clics sur les miniatures
+    document.querySelectorAll('.video-thumbnail').forEach(function(thumbnail) {
+        thumbnail.addEventListener('click', function() {
+            const videoId = this.getAttribute('data-video-id');
+            console.log('Miniature cliquée, vidéo ID:', videoId);
+            
+            const videoElement = document.getElementById(videoId);
+            
+            if (videoElement) {
+                console.log('Élément vidéo trouvé, démarrage...');
+                
+                // 1. Masquer la miniature
+                this.classList.add('hidden');
+                
+                // 2. Afficher la vidéo
+                videoElement.classList.remove('hidden');
+                
+                // 3. Lancer la lecture
+                videoElement.play().then(() => {
+                    console.log('Vidéo en lecture');
+                }).catch(error => {
+                    console.error('Erreur de lecture:', error);
+                    // Si autoplay échoue, afficher un message
+                    if (error.name === 'NotAllowedError') {
+                        alert('Cliquez sur le bouton play pour démarrer la vidéo');
+                    }
+                });
+            } else {
+                console.error('Vidéo non trouvée avec ID:', videoId);
+            }
+        });
+    });
+    
+    // Gestion de la fin de lecture
+    document.querySelectorAll('.video-player').forEach(function(video) {
+        video.addEventListener('ended', function() {
+            console.log('Vidéo terminée');
+            // Optionnel: Revenir à la miniature après la fin
+            // const thumbnail = document.querySelector('[data-video-id="' + this.id + '"]');
+            // if (thumbnail) {
+            //     this.classList.add('hidden');
+            //     thumbnail.classList.remove('hidden');
+            // }
+        });
+    });
+    
+    // Animation au scroll pour les cartes vidéo
+    const videoCards = document.querySelectorAll('.video-card');
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 100);
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    
+    videoCards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        cardObserver.observe(card);
+    });
+});
+</script>
+
+
 {% endblock %}
 

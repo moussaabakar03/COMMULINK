@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from commulink.utils.decorators import admin_required
-from .models import Annee, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
+from .models import Annee, EvenementVideo, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
 from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm, ReinscriptionForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
@@ -95,39 +95,125 @@ def affichageEvenement(request):
     evenements = Evenement.objects.all().order_by('-id')
     return render(request, 'gestionEvenement/listeEvenement.html', {'evenements': evenements})
 
+
+
 @login_required
 @admin_required
 def ajoutEvenement(request):
     typeEvenem = TypeEvenement.objects.all()
     toutes_annees = Annee.objects.all().order_by("-id")
+    
     if request.method == "POST":
-        titre = request.POST.get('titre')
-        description = request.POST.get('description')
-        type_evenement = request.POST.get('type_evenement')
-        images = request.FILES.getlist('photos[]') 
-        prix = request.POST.get("montant")
-        annee_select = request.POST.get("annee")
-        
-        evenementType = TypeEvenement.objects.get(id=type_evenement)
-        annee = Annee.objects.get(id=annee_select)
-        
-        if images:
-            photoCouverture = images[0]
-            evenement = Evenement.objects.create(
-                typeEvenement= evenementType, photo=photoCouverture, description=description, prix = prix, titre = titre, annee = annee
-            )
+        try:
+            # Récupération des données du formulaire
+            titre = request.POST.get('titre')
+            description = request.POST.get('description')
+            type_evenement = request.POST.get('type_evenement')
+            prix = request.POST.get("montant")
+            annee_select = request.POST.get("annee")
             
-            for image in range(0, len(images)):
-                EvenementImage.objects.create(
-                    evenement = evenement,
-                    image = images[image]
+            # Récupération des fichiers
+            images = request.FILES.getlist('photos[]')
+            videos = request.FILES.getlist('videos[]')
+            
+            # Validation
+            if not all([titre, description, type_evenement, annee_select]):
+                messages.error(request, 'Veuillez remplir tous les champs obligatoires.')
+                return redirect('ajoutEvenement')
+            
+            # Récupération des objets
+            evenementType = TypeEvenement.objects.get(id=type_evenement)
+            annee = Annee.objects.get(id=annee_select)
+            
+            # Création de l'événement
+            if images:
+                photoCouverture = images[0]
+                evenement = Evenement.objects.create(
+                    typeEvenement=evenementType,
+                    photo=photoCouverture,
+                    description=description,
+                    prix=prix if prix else 0.0,
+                    titre=titre,
+                    annee=annee
                 )
-        else:
-            evenement = Evenement.objects.create(
-                typeEvenement= evenementType, photo= None, description=description, prix = prix, titre = titre
-            )
+                
+                # Ajout de toutes les images
+                for image in images:
+                    EvenementImage.objects.create(
+                        evenement=evenement,
+                        image=image
+                    )
+            else:
+                evenement = Evenement.objects.create(
+                    typeEvenement=evenementType,
+                    photo=None,
+                    description=description,
+                    prix=prix if prix else 0.0,
+                    titre=titre,
+                    annee=annee
+                )
+            
+            # Ajout des vidéos
+            if videos:
+                for video in videos:
+                    # Vérifier la taille du fichier (par exemple, max 100MB)
+                    if video.size > 100 * 1024 * 1024:  # 100MB
+                        messages.warning(
+                            request, 
+                            f'La vidéo {video.name} est trop volumineuse (max 100MB).'
+                        )
+                        continue
+                    
+                    EvenementVideo.objects.create(
+                        evenement=evenement,
+                        video=video,
+                        titre=video.name  # Utiliser le nom du fichier comme titre par défaut
+                    )
+                
+                messages.success(
+                    request, 
+                    f'Événement "{titre}" créé avec succès ! {len(images)} image(s) et {len(videos)} vidéo(s) ajoutée(s).'
+                )
+            else:
+                messages.success(
+                    request, 
+                    f'Événement "{titre}" créé avec succès ! {len(images)} image(s) ajoutée(s).'
+                )
+            
+            return redirect('affichageEvenement')
+            
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la création de l\'événement: {str(e)}')
+            return redirect('ajoutEvenement')
+    
+    context = {
+        'typeEvenem': typeEvenem,
+        'toutes_annees': toutes_annees
+    }
+    
+    return render(request, 'gestionEvenement/ajoutEvenement.html', context)
+
+
+@login_required
+@admin_required
+def supprimer_video_evenement(request, video_id):
+    """
+    Vue pour supprimer une vidéo d'événement
+    """
+    try:
+        video = EvenementVideo.objects.get(id=video_id)
+        evenement_id = video.evenement.id
+        video.video.delete()  # Supprimer le fichier physique
+        video.delete()  # Supprimer l'enregistrement de la base
+        messages.success(request, 'Vidéo supprimée avec succès.')
+        return redirect('detail_evenement', pk=evenement_id)
+    except EvenementVideo.DoesNotExist:
+        messages.error(request, 'Vidéo introuvable.')
         return redirect('affichageEvenement')
-    return render(request, 'gestionEvenement/ajoutEvenement.html', {'typeEvenem': typeEvenem, 'toutes_annees': toutes_annees})
+    except Exception as e:
+        messages.error(request, f'Erreur lors de la suppression: {str(e)}')
+        return redirect('affichageEvenement')
+
 
 @login_required
 @admin_required
@@ -136,19 +222,51 @@ def evenementFiltrer(request, id):
     evenements = Evenement.objects.filter(typeEvenement__id=id)
     return render(request, "gestionEvenement/evenementFiltrer.html", {"evenements": evenements,"categorieEvenemnt": categorieEvenemnt})
 
+
 @login_required
 @admin_required
 def detailEvenements(request, id):
-    evenement = Evenement.objects.get(id=id)
+    """
+    Vue pour afficher les détails d'un événement avec photos, vidéos et témoignages
+    """
+    # Récupérer l'événement
+    evenement = get_object_or_404(Evenement, id=id)
     
-    temoingnages = Temoingnage.objects.filter(evenement = evenement)
+    # Récupérer les témoignages liés à l'événement
+    temoingnages = Temoingnage.objects.filter(evenement=evenement).order_by('-id')
     
-    evenementImage = EvenementImage.objects.filter(evenement=evenement).order_by('id')[3:]
-    nosPremiersPhotos = EvenementImage.objects.filter(evenement=evenement).order_by('-id')[:3]
-    return render(request, 'gestionEvenement/detailEvenement.html', 
-                  {'evenement': evenement, 'evenementImage': evenementImage, 'nosPremiersPhotos':nosPremiersPhotos, 
-                   'temoingnages': temoingnages})
-
+    # Récupérer les images (toutes sauf les 3 premières)
+    evenementImage = EvenementImage.objects.filter(
+        evenement=evenement
+    ).order_by('id')[3:]
+    
+    # Récupérer les 3 premières photos pour la section "à la une"
+    nosPremiersPhotos = EvenementImage.objects.filter(
+        evenement=evenement
+    ).order_by('-id')[:3]
+    
+    # Récupérer toutes les vidéos de l'événement
+    evenementVideos = EvenementVideo.objects.filter(
+        evenement=evenement 
+    ).order_by('-date_ajout')
+    
+    # Statistiques (optionnel)
+    stats = {
+        'total_photos': EvenementImage.objects.filter(evenement=evenement).count(),
+        'total_videos': evenementVideos.count(),
+        'total_temoingnages': temoingnages.count(),
+    }
+    
+    context = {
+        'evenement': evenement,
+        'evenementImage': evenementImage,
+        'nosPremiersPhotos': nosPremiersPhotos,
+        'evenementVideos': evenementVideos,
+        'temoingnages': temoingnages,
+        'stats': stats,
+    }
+    
+    return render(request, 'gestionEvenement/detailEvenement.html', context)
 
 
 @login_required
@@ -158,12 +276,14 @@ def modifierEvenement(request, id):
     typeEvenement = TypeEvenement.objects.all()
     toutes_annees = Annee.objects.all()
     imageEvenement = EvenementImage.objects.filter(evenement=evenement)
+    videoEvements = EvenementVideo.objects.filter(evenement=evenement)
     if request.method == "POST":
         titre = request.POST.get('titre')
         description = request.POST.get('description')
         type_evenement = request.POST.get('type_evenement')
         anneeSelect = request.POST.get('annee')
         images = request.FILES.getlist('photos[]')
+        videos = request.FILES.getlist('videos[]')
         prix = request.POST.get("prix")
         
         evenementType = TypeEvenement.objects.get(pk=int(type_evenement))
@@ -177,6 +297,8 @@ def modifierEvenement(request, id):
         evenement.save()
         
         if images:
+            # imageEvenement.delete()
+            
             photoCouverture = images[0]      
             evenement.photo = photoCouverture
                   
@@ -190,7 +312,7 @@ def modifierEvenement(request, id):
                 return redirect('affichageEvenement')
         return redirect('affichageEvenement')
         
-    return render(request, 'gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "toutes_annees": toutes_annees})
+    return render(request, 'gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "videoEvements": videoEvements, "toutes_annees": toutes_annees})
 
 
 @login_required
@@ -743,6 +865,99 @@ def liste_reinscriptions(request):
     }
 
     return render(request, 'gestionMembre/listeReinscription.html', context)
+
+
+
+
+@login_required
+def ajouter_reinscription(request):
+    """
+    Vue pour ajouter une nouvelle réinscription
+    """
+    if request.method == 'POST':
+        try:
+            # Récupération des données du formulaire
+            membre_id = request.POST.get('membre')
+            annee_id = request.POST.get('annee')
+            numeroUrgence = request.POST.get('numeroUrgence')
+            adresse = request.POST.get('adresse')
+            ecole = request.POST.get('ecole')
+            niveauEtude = request.POST.get('niveauEtude')
+            filiere = request.POST.get('filiere')
+            photo_annuelle = request.FILES.get('photo_annuelle')
+            
+            # Validation des champs obligatoires
+            if not all([membre_id, annee_id]):
+                messages.error(request, 'Veuillez sélectionner un membre et une année académique.')
+                return redirect('ajouter_reinscription')
+            
+            # Récupération des objets
+            membre = get_object_or_404(Membre, pk=membre_id)
+            annee = get_object_or_404(Annee, pk=annee_id)
+            
+            # Vérifier si le membre est déjà réinscrit pour cette année
+            if Reinscription.objects.filter(membre=membre, annee=annee).exists():
+                messages.warning(
+                    request, 
+                    f'{membre.nom_complet} est déjà réinscrit pour l\'année {annee}.'
+                )
+                return redirect('ajouter_reinscription')
+            
+            # Création de la réinscription
+            reinscription = Reinscription.objects.create(
+                membre=membre,
+                annee=annee,
+                numeroUrgence=numeroUrgence,
+                adresse=adresse,
+                ecole=ecole,
+                niveauEtude=niveauEtude,
+                filiere=filiere,
+                photo_annuelle=photo_annuelle
+            )
+            
+            messages.success(
+                request, 
+                f'Réinscription de {membre.nom_complet} enregistrée avec succès pour l\'année {annee}!'
+            )
+            return redirect('detail_membre', pk=reinscription.membre.pk)
+            
+        except Exception as e:
+            messages.error(request, f'Erreur lors de l\'enregistrement: {str(e)}')
+            return redirect('ajouter_reinscription')
+    
+    # GET request
+    membres = Membre.objects.all().order_by('nom', 'prenom')
+    annees = Annee.objects.all().order_by('-id')
+    
+    context = {
+        'membres': membres,
+        'annees': annees,
+    }
+    
+    return render(request, 'gestionMembre/ajouter_reinscription.html', context)
+
+
+
+@login_required
+def supprimer_reinscription(request, pk):
+    """
+    Vue pour supprimer une réinscription
+    """
+    reinscription = get_object_or_404(Reinscription, pk=pk)
+    
+    try:
+        reinscription.delete()
+        messages.success(
+            request, 
+            f'Réinscription supprimée avec succès!'
+        )
+        return redirect('listeReinscription')
+
+    except Exception as e:
+        messages.error(request, f'Erreur lors de la suppression: {str(e)}')
+        return redirect('listeReinscription')
+    
+
 
 
 

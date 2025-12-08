@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from commulink.utils.decorators import admin_required, membre_required
 from firtsApp.forms import ConnexionForm
-from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, Membre, Temoingnage, TypeEvenement
+from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Temoingnage, TypeEvenement
 from django.contrib.auth.decorators import login_required
 
 
@@ -82,12 +82,19 @@ def affichageEvenement(request, id):
     evenementsFiltrer = Evenement.objects.filter(typeEvenement__id = id)
     return render(request, 'dynamiquePart/affichageEvenement.html', {'evenement': evenement, 'evenementsFiltrer': evenementsFiltrer})
 
+
 @login_required
-@admin_required
-@membre_required
 def detailEvenement(request, id):
     evenement = Evenement.objects.get(id=id)
     evenementImage = EvenementImage.objects.filter(evenement=evenement)
-    return render(request, 'user/detailEvenement.html', {'evenement': evenement, 'evenementImage': evenementImage})
+    
+    # Récupérer toutes les vidéos de l'événement
+    evenementVideos = EvenementVideo.objects.filter(
+        evenement=evenement
+    ).order_by('-date_ajout')
+    
+    temoingnages = Temoingnage.objects.filter(evenement=evenement).order_by('-id')
+    
+    return render(request, 'user/detailEvenement.html', {'evenement': evenement, 'evenementImage': evenementImage, 'evenementVideos': evenementVideos, 'temoingnages': temoingnages,})
 
 

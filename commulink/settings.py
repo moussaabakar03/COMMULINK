@@ -155,3 +155,31 @@ DEFAULT_FROM_EMAIL = 'shalomgbekou84@gmail.com'
 AUTH_USER_MODEL = 'secondApp.Utilisateur'
 
 
+
+
+
+# Configuration pour les uploads de fichiers
+
+# Taille maximale des fichiers uploadés (en bytes)
+# 100 MB = 100 * 1024 * 1024 bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100 MB
+
+# Taille maximale des requêtes POST (en bytes)
+# Augmenter si vous uploadez plusieurs vidéos à la fois
+DATA_UPLOAD_MAX_MEMORY_SIZE = 200 * 1024 * 1024  # 200 MB
+
+# Nombre maximum de fichiers uploadés dans une seule requête
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+# Configuration des médias
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Formats de fichiers autorisés (optionnel - pour validation côté serveur)
+ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm']
+
+# Tailles maximales par type de fichier
+MAX_IMAGE_SIZE = 5 * 1024 * 1024   # 5 MB pour les images
+MAX_VIDEO_SIZE = 100 * 1024 * 1024  # 100 MB pour les vidéos
+

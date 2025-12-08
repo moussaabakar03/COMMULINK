@@ -160,7 +160,16 @@
           font-size: 1.1rem;
       }
       
-      #fileInput {
+      .upload-area.video-upload i {
+          color: #e63946;
+      }
+      
+      .upload-area.video-upload:hover {
+          border-color: #e63946;
+      }
+      
+      #fileInput,
+      #videoInput {
           display: none;
       }
       
@@ -187,6 +196,12 @@
           object-fit: cover;
       }
       
+      .preview-item video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+      }
+      
       .preview-item .remove-btn {
           position: absolute;
           top: 5px;
@@ -203,10 +218,37 @@
           justify-content: center;
           opacity: 0;
           transition: opacity 0.2s;
+          z-index: 10;
       }
       
       .preview-item:hover .remove-btn {
           opacity: 1;
+      }
+      
+      .preview-item .video-badge {
+          position: absolute;
+          bottom: 5px;
+          left: 5px;
+          background-color: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+      }
+      
+      .file-info {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 0.5rem;
+          font-size: 0.75rem;
+          text-align: center;
       }
       
       /* Buttons */
@@ -253,6 +295,19 @@
           background-color: #e05b00;
       }
       
+      /* Alert Messages */
+      .alert {
+          padding: 1rem;
+          border-radius: 6px;
+          margin-bottom: 1rem;
+      }
+      
+      .alert-warning {
+          background-color: #fff3cd;
+          color: #856404;
+          border-left: 4px solid #ffc107;
+      }
+      
       /* Responsive */
       @media(max-width: 768px) {
           .page-title {
@@ -293,12 +348,21 @@
 <header class="page-header">
     <div class="container-custom text-center">
         <h1 class="page-title text-white">➕ Ajouter un Événement</h1>
-        <p class="page-subtitle">Créez un nouvel événement avec photos</p>
+        <p class="page-subtitle">Créez un nouvel événement avec photos et vidéos</p>
     </div>
 </header>
 
 <div class="page-inner">
     <div class="container-custom">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
         <!-- Carte du formulaire -->
         <div class="form-card">
             <!-- En-tête -->
@@ -311,7 +375,7 @@
             
             <!-- Corps -->
             <div class="card-body-custom">
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="eventForm">
                     {% csrf_token %}
                     
                     <!-- Section Informations -->
@@ -336,19 +400,19 @@
                             <select name="annee" id="annee" required>
                                 <option value="">Choisir une année</option>
                                 {% for toutes_annee in toutes_annees %}
-                                    <option value="{{ toutes_annee.id }}">{{ toutes_annee.debutAnnee|date:"Y" }}- {{ toutes_annee.finAnnee|date:"Y" }}</option>
+                                    <option value="{{ toutes_annee.id }}">{{ toutes_annee.debutAnnee|date:"Y" }} - {{ toutes_annee.finAnnee|date:"Y" }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label for="titre">Titre de l'evenement</label>
-                            <input type="text" id="titre" name="titre" placeholder="Entrez le titre de l'evenement" step = "25" min ="0">
+                            <label for="titre">Titre de l'événement*</label>
+                            <input type="text" id="titre" name="titre" placeholder="Entrez le titre de l'événement" required>
                         </div>
 
                         <div class="form-group">
                             <label for="montant">Prix (FCFA)</label>
-                            <input type="number" id="montant" name="montant" placeholder="Entrez le montant (optionnel)" step = "25" min ="0">
+                            <input type="number" id="montant" name="montant" placeholder="Entrez le montant (optionnel)" step="25" min="0">
                         </div>
                         
                         <div class="form-group">
@@ -374,6 +438,28 @@
                         <div class="preview-container" id="previewContainer"></div>
                     </div>
                     
+                    <!-- Section Vidéos -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-video"></i>
+                            Vidéos de l'événement
+                        </h4>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> Taille maximale par vidéo: 100 MB. Formats acceptés: MP4, AVI, MOV, WMV, FLV, MKV, WEBM
+                        </div>
+                        
+                        <div class="upload-area video-upload" id="videoUploadArea">
+                            <i class="fas fa-video"></i>
+                            <p>Glissez-déposez vos vidéos ici</p>
+                            <p>ou cliquez pour sélectionner des vidéos</p>
+                            <input type="file" id="videoInput" accept="video/*" name="videos[]" multiple>
+                        </div>
+                        
+                        <div class="preview-container" id="videoPreviewContainer"></div>
+                    </div>
+                    
                     <!-- Boutons -->
                     <div class="form-actions">
                         <a href="{% url 'affichageEvenement' %}" class="btn-cancel">
@@ -396,10 +482,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileInput');
     const previewContainer = document.getElementById('previewContainer');
     
-    // Clic sur la zone d'upload
+    const videoUploadArea = document.getElementById('videoUploadArea');
+    const videoInput = document.getElementById('videoInput');
+    const videoPreviewContainer = document.getElementById('videoPreviewContainer');
+    
+    // === GESTION DES IMAGES ===
+    
+    // Clic sur la zone d'upload d'images
     uploadArea.addEventListener('click', () => fileInput.click());
     
-    // Drag and drop
+    // Drag and drop pour images
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         uploadArea.addEventListener(eventName, preventDefaults, false);
     });
@@ -421,18 +513,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Gestion des fichiers déposés
+    // Gestion des images déposées
     uploadArea.addEventListener('drop', function(e) {
         const files = e.dataTransfer.files;
         handleFiles(files);
     });
     
-    // Gestion des fichiers sélectionnés
+    // Gestion des images sélectionnées
     fileInput.addEventListener('change', function() {
         handleFiles(this.files);
     });
     
-    // Affichage des prévisualisations
+    // Affichage des prévisualisations d'images
     function handleFiles(files) {
         [...files].forEach(file => {
             if (!file.type.match('image.*')) return;
@@ -462,6 +554,101 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         });
     }
+    
+    // === GESTION DES VIDÉOS ===
+    
+    // Clic sur la zone d'upload de vidéos
+    videoUploadArea.addEventListener('click', () => videoInput.click());
+    
+    // Drag and drop pour vidéos
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        videoUploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        videoUploadArea.addEventListener(eventName, () => {
+            videoUploadArea.style.borderColor = '#e63946';
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        videoUploadArea.addEventListener(eventName, () => {
+            videoUploadArea.style.borderColor = 'var(--border)';
+        });
+    });
+    
+    // Gestion des vidéos déposées
+    videoUploadArea.addEventListener('drop', function(e) {
+        const files = e.dataTransfer.files;
+        handleVideoFiles(files);
+    });
+    
+    // Gestion des vidéos sélectionnées
+    videoInput.addEventListener('change', function() {
+        handleVideoFiles(this.files);
+    });
+    
+    // Affichage des prévisualisations de vidéos
+    function handleVideoFiles(files) {
+        [...files].forEach(file => {
+            if (!file.type.match('video.*')) return;
+            
+            // Vérifier la taille (100 MB max)
+            const maxSize = 100 * 1024 * 1024; // 100 MB
+            if (file.size > maxSize) {
+                alert(`La vidéo "${file.name}" est trop volumineuse (max 100 MB). Taille: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                const video = document.createElement('video');
+                video.src = e.target.result;
+                video.controls = false;
+                video.muted = true;
+                
+                const videoBadge = document.createElement('div');
+                videoBadge.className = 'video-badge';
+                videoBadge.innerHTML = '<i class="fas fa-play"></i> Vidéo';
+                
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+                fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.type = 'button';
+                removeBtn.addEventListener('click', () => {
+                    previewItem.remove();
+                });
+                
+                previewItem.appendChild(video);
+                previewItem.appendChild(videoBadge);
+                previewItem.appendChild(fileInfo);
+                previewItem.appendChild(removeBtn);
+                videoPreviewContainer.appendChild(previewItem);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    // Validation du formulaire avant soumission
+    document.getElementById('eventForm').addEventListener('submit', function(e) {
+        const titre = document.getElementById('titre').value;
+        const description = document.getElementById('description').value;
+        
+        if (!titre || !description) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires.');
+            return false;
+        }
+    });
 });
 </script>
 {% endblock %}

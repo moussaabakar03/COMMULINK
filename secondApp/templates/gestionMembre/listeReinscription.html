@@ -85,18 +85,57 @@
             background-color: #e65a00;
         }
         
+        /* Table responsive container */
         .table-responsive {
-            background-color: white;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Scroll fluide sur iOS */
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        
-        .members-table {
+
+        /* Fixer la largeur minimale du tableau pour forcer le scroll */
+        .reinscriptions-table {
+            min-width: 1000px; /* Ajustez selon vos besoins */
             width: 100%;
             border-collapse: collapse;
+            background: #ffffff;
         }
-        
+
+        /* Sticky première colonne (optionnel) */
+        .reinscriptions-table td:first-child,
+        .reinscriptions-table th:first-child {
+            position: sticky;
+            left: 0;
+            background: #ffffff;
+            z-index: 1;
+        }
+
+        .reinscriptions-table th:first-child {
+            background: #1a2035;
+        }
+
+        /* Style de la scrollbar (optionnel) */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #FF6F0F;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #e05b00;
+        }bers-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                
         .members-table th {
             background-color: var(--secondary-color);
             color: white;
@@ -358,29 +397,33 @@
                 </form>
 
             <!-- Tableau des réinscriptions -->
-            <div class="table-responsive">
-                <table class="members-table">
+            
+            <!-- Envelopper le tableau dans une div avec overflow -->
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="reinscriptions-table">
                     <thead>
                         <tr>
-                            <th>Nom</th>
-                            <th>Ner</th>
-                            <th>Keri</th>
+                            <th class="text-white">Membre</th>
+                            <th>NER</th>
+                            <th>KERI</th>
                             <th>École</th>
-                            <th>Niveau d'étude</th>
+                            <th>Niveau</th>
                             <th>Filière</th>
                             <th>Année</th>
-                            <th>Date de réinscription</th>
+                            <th>Date</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody style="overflow-x: auto; overflow: hidden;">
+                    <tbody>
                         {% for reinscription in page_obj %}
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="member-avatar me-2">
                                         {% if reinscription.photo_annuelle %}
-                                            <img src="{{ reinscription.photo_annuelle.url }}" alt="{{ reinscription.membre.nom_complet }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                            <img src="{{ reinscription.photo_annuelle.url }}" 
+                                                alt="{{ reinscription.membre.nom_complet }}" 
+                                                style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                                         {% else %}
                                             <i class="fas fa-user-circle"></i>
                                         {% endif %}
@@ -390,22 +433,28 @@
                             </td>
                             <td>{{ reinscription.membre.ner }}</td>
                             <td>{{ reinscription.membre.keri }}</td>
-                            <td>{{ reinscription.ecole|default:"-" }}</td>
+                            <td>{{ reinscription.ecole|truncatechars:15|default:"-" }}</td>
                             <td>{{ reinscription.niveauEtude|default:"-" }}</td>
-                            <td>{{ reinscription.filiere|default:"-" }}</td>
-                            <td>{{ reinscription.annee.debutAnnee|date:"Y"|default:"-" }}- {{ reinscription.annee.finAnnee|date:"Y"|default:"-" }}</td>
+                            <td>{{ reinscription.filiere|truncatechars:15|default:"-" }}</td>
+                            <td>{{ reinscription.annee.debutAnnee|date:"Y"|default:"-" }}-{{ reinscription.annee.finAnnee|date:"Y"|default:"-" }}</td>
                             <td>{{ reinscription.date_reinscription|date:"d/m/Y H:i" }}</td>
                             <td>
-                                <div class="action-buttons">
+                                <div class="action-buttons" style="display: flex!important; justify-content: space-between!important;">
                                     <a href="{% url 'detail_membre' reinscription.membre.pk %}" class="btn-details">
-                                        <i class="fas fa-eye"></i> Détails
+                                        <i class="fas fa-eye"></i> 
+                                    </a>
+                                    <a href="{% url 'supprimer_reinscription' reinscription.pk %}"
+                                        class="btn-details"
+                                        title="Supprimer"
+                                        onclick="return confirm('Voulez-vous vraiment supprimer cette réinscription ?')">
+                                        <i class="fas fa-trash-alt"></i> 
                                     </a>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8">
+                            <td colspan="9">
                                 <div class="empty-state">
                                     <i class="fas fa-file-alt"></i>
                                     <h3>Aucune réinscription trouvée</h3>
@@ -471,6 +520,28 @@
                     this.form.submit();
                 });
             });
+        });
+        
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableContainer = document.querySelector('.table-responsive');
+            
+            if (tableContainer) {
+                // Ajouter un indicateur si le tableau peut scroller
+                if (tableContainer.scrollWidth > tableContainer.clientWidth) {
+                    tableContainer.classList.add('has-scroll');
+                    
+                    // Optionnel: Ajouter une ombre pour indiquer qu'on peut scroller
+                    tableContainer.addEventListener('scroll', function() {
+                        if (this.scrollLeft > 0) {
+                            this.classList.add('scrolled');
+                        } else {
+                            this.classList.remove('scrolled');
+                        }
+                    });
+                }
+            }
         });
     </script>
 {% endblock %}

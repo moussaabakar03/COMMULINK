@@ -58,8 +58,8 @@
 <div class="sidebar" data-background-color="dark">
     <div class="sidebar-logo">
       <!-- Logo Header -->
-      <div class="logo-header" data-background-color="dark">
-        <a href="{% url 'admin_dashboard' %}" class="logo">
+      <div class="logo-header" data-background-color="dark"> 
+        <a href="{% url 'index' %}" class="logo">
           <span style="color:#ff6600">COMMU</span><span style="color:white;">LINK</span>
         </a>
         <div class="nav-toggle">
@@ -158,6 +158,12 @@
                     <span class="sub-item">Liste Reinscription *</span>
                   </a>
                 </li>
+                <li>
+                  <a href="{% url 'ajouter_reinscription' %}">
+                    <span class="sub-item">ajout Reinscription *</span>
+                  </a>
+                </li>
+                
                 <li>
                   <a href="{% url 'liste_EquipeDirigeante' %}">
                     <span class="sub-item">Equipe Dirigeante *</span>

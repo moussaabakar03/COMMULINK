@@ -20,6 +20,9 @@ urlpatterns = [
     path('depublier-evenement/<int:id>', views.depublier_evenement, name='depublier_evenement'),
     path('publier-evenement/<int:id>', views.publier_evenement, name='publier_evenement'),
     
+    path('evenements/videos/<int:video_id>/supprimer/', 
+         views.supprimer_video_evenement, 
+         name='supprimer_video_evenement'),
     
     
     #----------------------URLS TEMOIGNAGES--------------------------------
@@ -35,7 +38,9 @@ urlpatterns = [
     path('membre/<int:pk>/modifier/', views.modifier_membre, name='modifier_membre'),
     path('<int:pk>/supprimer/', views.supprimer_membre, name='supprimer_membre'),
     path('liste-reinscription', views.liste_reinscriptions, name='listeReinscription'),
-    
+    path('reinscriptions/ajouter/', views.ajouter_reinscription, name='ajouter_reinscription'),
+    path('reinscriptions/<int:pk>/supprimer/', views.supprimer_reinscription, name='supprimer_reinscription'),
+
     
     
     path('ajoutMembreEquipe/', views.ajoutMembreEquipe, name='ajoutMembreEquipe'),

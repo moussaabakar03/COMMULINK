@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from django.contrib.auth.models import AbstractUser, Group, Permission
 
+from django.core.validators import FileExtensionValidator
 
 
 class Utilisateur(AbstractUser):
@@ -166,10 +167,59 @@ class Evenement(models.Model):
     def __str__(self):
         return self.titre
 
+
+
 class EvenementImage(models.Model):
     evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='evenements/images')
+    date_ajout = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date_ajout']
+    
+    def __str__(self):
+        return f"Image de {self.evenement.titre}"
 
+
+class EvenementVideo(models.Model):
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, related_name='videos')
+    video = models.FileField(
+        upload_to='evenements/videos',
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm']
+            )
+        ],
+        help_text="Formats acceptés: MP4, AVI, MOV, WMV, FLV, MKV, WEBM"
+    )
+    titre = models.CharField(max_length=200, blank=True, null=True, help_text="Titre de la vidéo (optionnel)")
+    description = models.TextField(blank=True, null=True, help_text="Description de la vidéo (optionnel)")
+    duree = models.DurationField(blank=True, null=True, help_text="Durée de la vidéo")
+    miniature = models.ImageField(
+        upload_to='evenements/videos/thumbnails', 
+        blank=True, 
+        null=True,
+        help_text="Miniature de la vidéo (optionnelle)"
+    )
+    date_ajout = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-date_ajout']
+        verbose_name = "Vidéo d'événement"
+        verbose_name_plural = "Vidéos d'événements"
+    
+    def __str__(self):
+        return f"Vidéo de {self.evenement.titre} - {self.titre if self.titre else 'Sans titre'}"
+    
+    @property
+    def taille_fichier(self):
+        """Retourne la taille du fichier en MB"""
+        if self.video:
+            size_mb = self.video.size / (1024 * 1024)
+            return f"{size_mb:.2f} MB"
+        return "0 MB"
+    
+    
 
 class EquipeDirigeante(models.Model):
     
