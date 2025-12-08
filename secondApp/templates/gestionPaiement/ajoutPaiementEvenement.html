@@ -20,7 +20,7 @@
     <header class="page-header">
         <div class="container-custom text-center">
             <h1 class="page-title text-white">💳 Ajouter un Paiement</h1>
-            <p class="page-subtitle">Enregistrez un nouveau paiement pour un membre</p>
+            <p class="page-subtitle">Evenement: {{evenement}} </p>
         </div>
     </header>
 
@@ -69,7 +69,7 @@
                                             <i class="fas fa-calendar-alt"></i>
                                             Événement
                                         </label>
-                                        {{ form.evenement }}
+                                        <input text = "text" name = "evenement" value="{{ evenement }}" {% if form.evenement.value == evenement.id %}selected{% endif %} Readonly/>
                                         <div class="invalid-feedback">
                                             <i class="fas fa-exclamation-circle"></i>
                                             Veuillez sélectionner un événement.
@@ -93,7 +93,7 @@
                                             <i class="fas fa-money-bill-wave"></i>
                                             Montant Attendu (FCFA)
                                         </label>
-                                        <input text = "text" name = "montantAttendu" Readonly/>
+                                        <input text = "text" name = "montantAttendu" value="{{ evenement.prix }}" Readonly/>
                                     </div>
                                 </div>
 
@@ -156,7 +156,7 @@
                         
                         <!-- Boutons de soumission -->
                         <div class="form-actions">
-                            <a href="{% url 'liste_paiements' %}" class="btn-cancel">
+                            <a href="{% url 'paiementParEvenement' evenement.id %}" class="btn-cancel">
                                 <i class="fas fa-arrow-left"></i> Annuler
                             </a>
                             <button type="submit" class="btn-submit">

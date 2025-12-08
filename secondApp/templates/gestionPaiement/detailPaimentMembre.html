@@ -1,0 +1,693 @@
+{% extends 'base.html' %}
+
+{% load static %} 
+
+{% block title %}Détails Paiement - {{ paiement.membre_Reinscris.membre.nom_complet }}{% endblock %}
+
+{% block style %}
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    {% comment %} <link rel="stylesheet" href="{% static 'assets/css/paiements/detailPaiementMembre.css' %}" /> {% endcomment %}
+
+    <style>
+        :root {
+            --primary: #FF6F0F;
+            --dark: #1a2035;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+
+        /* Header */
+        .page-header {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            opacity: 0.9;
+        }
+
+        .container-custom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Payment Card */
+        .payment-card {
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, var(--dark) 0%, #2a3650 100%);
+            color: var(--white);
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .payment-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .payment-event {
+            font-size: 1rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .payment-status-badge {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-badge-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-body {
+            padding: 2rem;
+        }
+
+        /* Sections */
+        .info-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            background-color: var(--light);
+            padding: 1.25rem;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: var(--dark);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .info-value.empty {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .amount-highlight {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Payment Summary */
+        .payment-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .summary-item {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .summary-item.summary-main {
+            background: linear-gradient(135deg, rgba(255, 111, 15, 0.1) 0%, rgba(255, 111, 15, 0.05) 100%);
+            border-left: 4px solid var(--primary);
+        }
+
+        .summary-item.summary-warning {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+            border-left: 4px solid var(--danger);
+        }
+
+        .summary-label {
+            font-weight: 500;
+            color: #6c757d;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .summary-value {
+            color: var(--dark);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .amount-paid {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .amount-remaining {
+            color: var(--danger);
+            font-size: 1.5rem;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .status-paid {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #1e7e34;
+        }
+
+        .status-unpaid {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: #bd2130;
+        }
+
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #d39e00;
+        }
+
+        .status-advance {
+            background-color: rgba(23, 162, 184, 0.15);
+            color: #117a8b;
+        }
+
+        /* Preuve de paiement */
+        .proof-container {
+            background-color: var(--light);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .proof-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .proof-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 111, 15, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .proof-icon i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .proof-info {
+            flex: 1;
+        }
+
+        .proof-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-download {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: #e05b00;
+            color: var(--white);
+        }
+
+        .proof-empty {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+
+        .proof-empty i {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        .proof-empty p {
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Footer */
+        .payment-footer {
+            background-color: var(--light);
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-back {
+            background-color: var(--dark);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: #0f1420;
+            color: var(--white);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-action {
+            border-radius: 6px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+            border: none;
+        }
+
+        .btn-edit {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-edit:hover {
+            background-color: #e05b00;
+            color: var(--white);
+        }
+
+        .btn-red {
+            background-color: #e63946;
+            color: #fff;
+        }
+
+        .btn-red:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .payment-title {
+                font-size: 1.5rem;
+            }
+            
+            .payment-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .info-grid,
+            .payment-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn-back,
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .proof-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+
+    
+{% endblock %}
+
+{% block body %}
+<!-- Page Header -->
+<header class="page-header">
+    <div class="container-custom text-center">
+        <h1 class="page-title text-white">💳 Détails du Paiement</h1>
+        <p class="page-subtitle">Informations complètes sur le paiement de {{ paiement.membre_Reinscris.membre.nom_complet }}</p>
+    </div>
+</header>
+
+<div class="page-inner">
+    <div class="container-custom">
+        <!-- Carte du paiement -->
+        <div class="payment-card">
+            <!-- En-tête -->
+            <div class="payment-header">
+                <div class="header-content">
+                    <h1 class="payment-title">
+                        <i class="fas fa-user-circle"></i>
+                        {{ paiement.membre_Reinscris.membre.nom_complet }}
+                    </h1>
+                    <div class="payment-event">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ paiement.evenement.titre }}
+                    </div>
+                </div>
+                <div class="payment-status-badge">
+                    <span class="status-badge-large 
+                        {% if paiement.statut == 'payé' %}status-paid
+                        {% elif paiement.statut == 'non_payé' %}status-unpaid
+                        {% elif paiement.statut == 'moitié_payé' %}status-pending
+                        {% else %}status-advance{% endif %}">
+                        <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% elif paiement.statut == 'moitié_payé' %}adjust{% else %}arrow-up{% endif %}"></i>
+                        {{ paiement.get_statut_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Corps -->
+            <div class="payment-body">
+                <!-- Informations du membre -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Informations du Membre
+                    </h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-signature"></i>
+                                Nom complet
+                            </div>
+                            <div class="info-value">{{ paiement.membre_Reinscris.membre.nom_complet }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </div>
+                            <div class="info-value">{{ paiement.membre_Reinscris.membre.email }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-phone"></i>
+                                Téléphone
+                            </div>
+                            <div class="info-value {% if not paiement.membre_Reinscris.membre.telephone %}empty{% endif %}">
+                                {{ paiement.membre_Reinscris.membre.telephone|default:"Non renseigné" }}
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-id-card"></i>
+                                NER
+                            </div>
+                            <div class="info-value">{{ paiement.membre_Reinscris.membre.ner }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Détails de l'événement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-check"></i>
+                        Détails de l'Événement
+                    </h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-tag"></i>
+                                Titre de l'événement
+                            </div>
+                            <div class="info-value">{{ paiement.evenement.titre }}</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-coins"></i>
+                                Prix de l'événement
+                            </div>
+                            <div class="info-value">
+                                <span class="amount-highlight">{{ paiement.evenement.prix }} FCFA</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-label">
+                                <i class="fas fa-calendar"></i>
+                                Date de l'événement
+                            </div>
+                            <div class="info-value">
+                                {{ paiement.evenement.date_evenement|date:"d/m/Y"|default:"Non définie" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informations du paiement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Informations du Paiement
+                    </h2>
+                    
+                    <div class="payment-summary">
+                        <div class="summary-item summary-main">
+                            <div class="summary-label">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                Montant payé
+                            </div>
+                            <div class="summary-value amount-paid">
+                                {{ paiement.montant }} FCFA
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="fas fa-clock"></i>
+                                Date de paiement
+                            </div>
+                            <div class="summary-value">
+                                {{ paiement.date_paiement|date:"d/m/Y à H:i"|default:"Non renseignée" }}
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="summary-label">
+                                <i class="fas fa-info-circle"></i>
+                                Statut
+                            </div>
+                            <div class="summary-value">
+                                <span class="status-badge 
+                                    {% if paiement.statut == 'payé' %}status-paid
+                                    {% elif paiement.statut == 'non_payé' %}status-unpaid
+                                    {% elif paiement.statut == 'moitié_payé' %}status-pending
+                                    {% else %}status-advance{% endif %}">
+                                    <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% elif paiement.statut == 'moitié_payé' %}adjust{% else %}arrow-up{% endif %}"></i>
+                                    {{ paiement.get_statut_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {% if paiement.reste_a_payer > 0 %}
+                        <div class="summary-item summary-warning">
+                            <div class="summary-label">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Reste à payer
+                            </div>
+                            <div class="summary-value amount-remaining">
+                                {{ paiement.reste_a_payer }} FCFA
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Preuve de paiement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        Preuve de Paiement
+                    </h2>
+                    
+                    <div class="proof-container">
+                        {% if paiement.preuve_paiement %}
+                        <div class="proof-item">
+                            <div class="proof-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="proof-info">
+                                <div class="proof-name">Document de preuve</div>
+                                <a href="{{ paiement.preuve_paiement.url }}" target="_blank" class="btn-download">
+                                    <i class="fas fa-download"></i> Télécharger
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="proof-empty">
+                            <i class="fas fa-inbox"></i>
+                            <p>Aucune preuve de paiement disponible</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Pied de page -->
+            <div class="payment-footer">
+                <a href="{% url 'paiementParEvenement' paiement.evenement.id %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+
+                <div class="action-buttons">
+                    <a href="{% url 'modifierPaiement' paiement.id %}" class="btn-action btn-edit">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <a href="{% url 'supprimer_paiement' paiement.id paiement.evenement.id %}"
+                        class="btn-action btn-red"
+                        title="Supprimer"
+                        onclick="return confirm('Voulez-vous vraiment supprimer ce paiement ? Cette action est irréversible.');">
+                        <i class="fas fa-trash-alt"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<!-- Font Awesome -->
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+{% endblock %}

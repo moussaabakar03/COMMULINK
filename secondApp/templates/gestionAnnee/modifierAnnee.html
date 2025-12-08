@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Ajout année{% endblock %}
+{% block title %}modifer année{% endblock %}
 {% block style %}
 
     <!-- Inclure Flatpickr pour le champ datetime -->
@@ -19,8 +19,8 @@
     <!-- Page Header -->
     <header class="page-header">
         <div class="container-custom text-center">
-            <h1 class="page-title text-white">💳 Ajouter une année</h1>
-            <p class="page-subtitle">Enregistrez une nouvelle année</p>
+            <h1 class="page-title text-white">💳 Modifier année</h1>
+            <p class="page-subtitle">Modifier l'année</p>
         </div>
     </header>
 
@@ -32,7 +32,7 @@
                 <div class="card-header-custom">
                     <h3 class="card-title text-white">
                         <i class="fas fa-cash-register"></i>
-                        Nouvelle année
+                        Modifer l'année
                     </h3>
                 </div>
                 
@@ -40,7 +40,6 @@
                 <div class="card-body-custom">
                     <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
                         <div class="form-section">
                             <div class="row g-4">
                                 <div class="col-md-6">
@@ -75,7 +74,7 @@
                         
                         <!-- Boutons de soumission -->
                         <div class="form-actions">
-                            <a href="{% url 'liste_paiements' %}" class="btn-cancel">
+                            <a href="{% url 'listeAnnee' %}" class="btn-cancel">
                                 <i class="fas fa-arrow-left"></i> Annuler
                             </a>
                             <button type="submit" class="btn-submit">

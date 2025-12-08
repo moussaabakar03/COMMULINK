@@ -21,12 +21,6 @@
 <!-- Template Stylesheet -->
 <link href="{% static 'user/css/style.css' %}" rel="stylesheet">
 
-<!-- Swiper CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-
-<!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-
 <style>
     :root {
         --primary-color: #FF6F0F;
@@ -273,9 +267,165 @@
         opacity: 0.3;
     }
 
+    /* Section Vidéos */
+    .video-section {
+        margin: 3rem 0;
+        padding: 2rem 0;
+    }
+    
+    .video-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .video-item {
+        background-color: var(--bg-light);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .video-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+    }
+    
+    .video-wrapper {
+        position: relative;
+        width: 100%;
+        background-color: #000;
+    }
+    
+    .event-video {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        display: block;
+    }
+    
+    .video-thumbnail {
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    
+    .video-thumbnail img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .video-thumbnail:hover img {
+        transform: scale(1.05);
+    }
+    
+    .play-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        background-color: rgba(255, 111, 15, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 111, 15, 0.5);
+    }
+    
+    .play-button i {
+        color: white;
+        font-size: 1.8rem;
+        margin-left: 5px;
+    }
+    
+    .video-thumbnail:hover .play-button {
+        transform: translate(-50%, -50%) scale(1.1);
+        background-color: rgba(255, 111, 15, 1);
+        box-shadow: 0 6px 20px rgba(255, 111, 15, 0.7);
+    }
+    
+    .video-info {
+        padding: 1.5rem;
+    }
+    
+    .video-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+        font-family: 'Saira', sans-serif;
+    }
+    
+    .video-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .video-meta {
+        display: flex;
+        gap: 1.5rem;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .video-meta span {
+        display: flex;
+        align-items: center;
+    }
+    
+    .video-size,
+    .video-duration {
+        background-color: rgba(255, 111, 15, 0.1);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    .card {
+        transition: transform 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
     @media(max-width: 1000px){
         .event-header{
             margin-top: 40px;
+        }
+    }
+    
+    /* Responsive pour vidéos */
+    @media (max-width: 768px) {
+        .video-gallery {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .event-video {
+            max-height: 250px;
+        }
+        
+        .video-thumbnail img {
+            height: 200px;
+        }
+        
+        .play-button {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .play-button i {
+            font-size: 1.5rem;
         }
     }
 </style>
@@ -290,11 +440,12 @@
         </div>
     </div>
 </header>
-<div style = "margin-bottom: 25px;">
-    <div class="">
-        <div class="cta-button">
-            <a href="{% url 'paiementParEvenement' evenement.id %}"><span style ="font-size: 20px">💰</span>VOIR LES PAYEMENTS</a>
-        </div>
+
+<div style="margin-bottom: 25px;">
+    <div class="cta-button">
+        <a href="{% url 'paiementParEvenement' evenement.id %}">
+            <span style="font-size: 20px">💰</span>VOIR LES PAIEMENTS
+        </a>
     </div>
 </div>
 
@@ -307,13 +458,15 @@
             {% if evenement.photo %}
                 <img src="{{ evenement.photo.url }}" alt="{{ evenement.typeEvenement.nom_type_evenement }}">
             {% else %}
-                <img src="" alt="img">
+                <div class="no-image"><i class="fas fa-image"></i></div>
             {% endif %}
         </div> 
         <div class="event-description">
             <p>{{ evenement.description }}</p>
             <div class="cta-button">
-                <a href="{% url 'affichageEvenement' %}"><i class="fas fa-calendar-alt me-2"></i>Voir d'autres événements</a>
+                <a href="{% url 'affichageEvenement' %}">
+                    <i class="fas fa-calendar-alt me-2"></i>Voir d'autres événements
+                </a>
             </div>
         </div>
     </div>
@@ -326,16 +479,14 @@
             {% for image in nosPremiersPhotos %}
             <div class="gallery-item">
                 {% if image.image %}
-                <a href="{{ image.image.url }}">
+                <a href="{{ image.image.url }}" target="_blank">
                     <img src="{{ image.image.url }}" alt="Photo événement">
                     <div class="overlay">
                         <span class="overlay-text"><i class="fas fa-search-plus me-2"></i>Agrandir</span>
                     </div>
                 </a>
                 {% else %}
-                <div class="no-image">
-                    <i class="fas fa-camera"></i>
-                </div>
+                <div class="no-image"><i class="fas fa-camera"></i></div>
                 {% endif %}
             </div>
             {% endfor %}
@@ -353,16 +504,14 @@
             {% for image in evenementImage %}
             <div class="gallery-item">
                 {% if image.image %}
-                <a href="{{ image.image.url }}">
+                <a href="{{ image.image.url }}" target="_blank">
                     <img src="{{ image.image.url }}" alt="Photo événement">
                     <div class="overlay">
                         <span class="overlay-text"><i class="fas fa-search-plus me-2"></i>Agrandir</span>
                     </div>
                 </a>
                 {% else %}
-                <div class="no-image">
-                    <i class="fas fa-camera"></i>
-                </div>
+                <div class="no-image"><i class="fas fa-camera"></i></div>
                 {% endif %}
             </div>
             {% endfor %}
@@ -374,84 +523,178 @@
     </div>
     {% endif %}
 
-    <hr/>
+    <div class="divider"></div>
 
-    <div class="container py-5" id="temoingnages">
-    <h2 class="section-title text-center mb-5">Témoignages</h2>
-    <div class="row">
-        {% for temoingnage in temoingnages %}
-        <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow">
-                <div class="row g-0">
-                    <!-- Partie Image -->
-                    {% if temoingnage.image %}
-                    <div class="col-md-4 d-flex align-items-center">
-                        <img src="{{ temoingnage.image.url }}" 
-                             class="img-fluid rounded-start m-2" 
-                             alt="{{ temoingnage.nom }}"
-                             style="max-height: 150px; object-fit: cover;">
-                    </div>
+    <!-- Section Vidéos -->
+    {% if evenementVideos %}
+    <section class="video-section">
+        <h2 class="section-title">
+            <i class="fas fa-video me-2"></i>Vidéos de l'événement
+        </h2>
+        
+        <div class="video-gallery">
+            {% for video in evenementVideos %}
+            <div class="video-item">
+                <div class="video-wrapper">
+                    {% if video.miniature %}
+                        <div class="video-thumbnail" data-video-id="video-{{ video.id }}">
+                            <img src="{{ video.miniature.url }}" alt="{{ video.titre|default:'Vidéo événement' }}">
+                            <div class="play-button">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
                     {% endif %}
                     
-                    <!-- Partie Texte -->
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title">{{ temoingnage.nom }}</h5>
-                                    <p class="card-subtitle text-muted small">{{ temoingnage.role }}</p>
+                    <video id="video-{{ video.id }}" controls preload="metadata" class="event-video" {% if video.miniature %}style="display: none;"{% endif %}>
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture de vidéos.
+                    </video>
+                </div>
+                
+                {% if video.titre or video.description %}
+                <div class="video-info">
+                    {% if video.titre %}
+                    <h5 class="video-title">{{ video.titre }}</h5>
+                    {% endif %}
+                    
+                    {% if video.description %}
+                    <p class="video-description">{{ video.description|truncatechars:100 }}</p>
+                    {% endif %}
+                    
+                    <div class="video-meta">
+                        <span class="video-size">
+                            <i class="fas fa-hdd me-1"></i>{{ video.taille_fichier }}
+                        </span>
+                        {% if video.duree %}
+                        <span class="video-duration">
+                            <i class="fas fa-clock me-1"></i>{{ video.duree }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <hr/>
+
+    <!-- Témoignages -->
+    <div class="container py-5" id="temoingnages">
+        <h2 class="section-title text-center mb-5">Témoignages</h2>
+        <div class="row">
+            {% for temoingnage in temoingnages %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow">
+                    <div class="row g-0">
+                        {% if temoingnage.image %}
+                        <div class="col-md-4 d-flex align-items-center">
+                            <img src="{{ temoingnage.image.url }}" 
+                                 class="img-fluid rounded-start m-2" 
+                                 alt="{{ temoingnage.nom }}"
+                                 style="max-height: 150px; object-fit: cover;">
+                        </div>
+                        {% endif %}
+                        
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title">{{ temoingnage.nom }}</h5>
+                                        <p class="card-subtitle text-muted small">{{ temoingnage.role }}</p>
+                                    </div>
+                                    {% if temoingnage.evenement %}
+                                    <span class="badge bg-primary">
+                                        {{ temoingnage.evenement.typeEvenement.nom_type_evenement|truncatechars:20 }}
+                                    </span>
+                                    {% endif %}
                                 </div>
-                                {% if temoingnage.evenement %}
-                                <span class="badge bg-primary">
-                                    {{ temoingnage.evenement.typeEvenement.nom_type_evenement|truncatechars:20 }}
-                                </span>
+                                
+                                <p class="card-text mt-3">{{ temoingnage.message }}</p>
+                                
+                                {% if temoingnage.video %}
+                                <div class="mt-3 ratio ratio-16x9">
+                                    <video controls class="rounded">
+                                        <source src="{{ temoingnage.video.url }}" type="video/mp4">
+                                        Votre navigateur ne supporte pas les vidéos.
+                                    </video>
+                                </div>
                                 {% endif %}
                             </div>
-                            
-                            <p class="card-text mt-3">{{ temoingnage.message }}</p>
-                            
-                            <!-- Partie Vidéo -->
-                            {% if temoingnage.video %}
-                            <div class="mt-3 ratio ratio-16x9">
-                                <video controls class="rounded">
-                                    <source src="{{ temoingnage.video.url }}" type="video/mp4">
-                                    Votre navigateur ne supporte pas les vidéos.
-                                </video>
-                            </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
-
-<style>
-    .card {
-        transition: transform 0.3s;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-</style>
-
-
 </div>
 
 <!-- JavaScript Libraries -->
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-{% comment %} <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script> {% endcomment %}
 <script src="{% static 'user/lib/wow/wow.min.js' %}"></script>
 <script src="{% static 'user/lib/easing/easing.min.js' %}"></script>
 <script src="{% static 'user/lib/waypoints/waypoints.min.js' %}"></script>
 <script src="{% static 'user/lib/owlcarousel/owl.carousel.min.js' %}"></script>
 <script src="{% static 'user/lib/parallax/parallax.min.js' %}"></script>
-
-<!-- Template Javascript -->
 <script src="{% static 'user/js/main.js' %}"></script>
 
-
+<script>
+    // Script pour gérer la lecture des vidéos avec miniatures
+    document.addEventListener('DOMContentLoaded', function() {
+        const thumbnails = document.querySelectorAll('.video-thumbnail');
+        
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                const videoId = this.getAttribute('data-video-id');
+                const video = document.getElementById(videoId);
+                
+                if (video) {
+                    this.style.display = 'none';
+                    video.style.display = 'block';
+                    video.play();
+                    
+                    video.style.opacity = '0';
+                    setTimeout(() => {
+                        video.style.transition = 'opacity 0.3s ease';
+                        video.style.opacity = '1';
+                    }, 10);
+                }
+            });
+        });
+        
+        // Animation d'entrée pour les vidéos
+        const videoItems = document.querySelectorAll('.video-item');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '0';
+                        entry.target.style.transform = 'translateY(20px)';
+                        entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        
+                        requestAnimationFrame(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        });
+                    }, index * 100);
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        videoItems.forEach(item => observer.observe(item));
+    });
+</script>
 
 {% endblock %}
+
+

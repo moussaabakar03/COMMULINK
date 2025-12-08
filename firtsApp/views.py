@@ -1,9 +1,59 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
+from commulink.utils.decorators import admin_required, membre_required
+from firtsApp.forms import ConnexionForm
+from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Temoingnage, TypeEvenement
+from django.contrib.auth.decorators import login_required
 
+
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
 # Create your views here.
+
+
+from django.contrib.auth import authenticate, login, logout
+
+
+
+def connexion(request):
+    next_url = request.GET.get("next")  #  on récupère le paramètre next
+
+    if request.method == "POST":
+        form = ConnexionForm(request.POST, request=request)
+
+        if form.is_valid():
+            utilisateur = form.get_user()
+            login(request, utilisateur)
+
+            # Si next existe, redirection prioritaire
+            if next_url:
+                return redirect(next_url)
+
+            # 3️Sinon, ton comportement normal
+            if utilisateur.is_superuser or utilisateur.role == "membreEquipe":
+                messages.success(request, f"Bienvenue {utilisateur}")
+                return redirect(reverse('admin_dashboard'))
+            
+            elif utilisateur.role == "membreLambda":
+                membre = get_object_or_404(Membre, utilisateur=utilisateur)
+                messages.success(request, f"Bienvenue {membre.nom} {membre.prenom}")
+                return redirect("index")
+
+        else:
+            messages.error(request, "Identifiant ou mot de passe incorrect")
+
+    else:
+        form = ConnexionForm()
+
+    return render(request, 'user/connexion.html', {"form": form})
+
+
+def deconnexion(request):
+    logout(request)
+    messages.success(request, "Vous êtes déconnecté avec succès!")
+    return redirect("index")
+
 
 def index(request):
     evenements = Evenement.objects.all().order_by('id')[:5]
@@ -12,10 +62,8 @@ def index(request):
     temoingnages = Temoingnage.objects.all()
     return render(request, 'user/accueil.html', {'evenements': evenements, 'typeEvenement': typeEvenement, 'equipes': equipes, 'temoingnages': temoingnages})
 
-
 def contact(request):
     return render(request, 'user/contact.html')
-
 
 def feteIs(request):
     return render(request, 'user/feteIs.html')
@@ -26,17 +74,27 @@ def formulaireInformation(request):
 def inscription(request):
     return render(request, 'user/inscription.html')
 
-def connexion(request):
-    return render(request, 'user/connexion.html')
+# def connexion(request):
+#     return render(request, 'user/connexion.html')
 
 def affichageEvenement(request, id):  
     evenement = TypeEvenement.objects.get(id = id)
     evenementsFiltrer = Evenement.objects.filter(typeEvenement__id = id)
     return render(request, 'dynamiquePart/affichageEvenement.html', {'evenement': evenement, 'evenementsFiltrer': evenementsFiltrer})
 
+
+@login_required
 def detailEvenement(request, id):
     evenement = Evenement.objects.get(id=id)
     evenementImage = EvenementImage.objects.filter(evenement=evenement)
-    return render(request, 'user/detailEvenement.html', {'evenement': evenement, 'evenementImage': evenementImage})
+    
+    # Récupérer toutes les vidéos de l'événement
+    evenementVideos = EvenementVideo.objects.filter(
+        evenement=evenement
+    ).order_by('-date_ajout')
+    
+    temoingnages = Temoingnage.objects.filter(evenement=evenement).order_by('-id')
+    
+    return render(request, 'user/detailEvenement.html', {'evenement': evenement, 'evenementImage': evenementImage, 'evenementVideos': evenementVideos, 'temoingnages': temoingnages,})
 
 

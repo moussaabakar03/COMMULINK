@@ -50,21 +50,6 @@
 
     <div class="page-inner">
         <div class="container-custom">
-            <!-- Messages d'alerte -->
-            {% if messages %}
-            <div class="alert-container">
-                {% for message in messages %}
-                <div class="alert-custom alert-{{ message.tags }} alert-dismissible fade show">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
-                        <div>{{ message }}</div>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            
             <!-- Carte principale -->
             <div class="main-card">
                 <!-- En-tête -->
@@ -75,7 +60,7 @@
                             Gestion des annees
                         </h3>
                         <div class="header-actions">
-                            <a href="{% url 'ajouter_paiement' %}" class="btn-add">
+                            <a href="{% url 'ajoutAnnee' %}" class="btn-add">
                                 <i class="fas fa-plus"></i> Ajouter une Annee
                             </a>
                         </div>
@@ -111,12 +96,10 @@
                                     <td>{{ annee.finAnnee|date:"d/m/Y" }}</td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="{% url 'modifierPaiement' annee.pk %}" class="btn-action btn-edit" title="Modifier">
+                                            <a href="{% url 'modifierAnnee' annee.pk %}" class="btn-action btn-edit" title="Modifier">
                                                 <i class="fas fa-sync-alt"></i>
                                             </a>
-                                            <a href="#" class="btn-action btn-info" title="Voir preuve">
-                                                <i class="fas fa-file-alt"></i>
-                                            </a>
+                                           
                                         </div>
                                     </td>
                                 </tr>

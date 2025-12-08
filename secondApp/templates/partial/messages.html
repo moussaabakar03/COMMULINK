@@ -1,24 +1,33 @@
 {% load static %}
 {% if messages %}
+
+<div class="message-system">
 <!-- Chargement de Font Awesome pour les icônes -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<!-- Style Bootstrap minimal pour les alertes -->
 <style>
-    /* Styles Bootstrap minimalistes pour les alertes */
-    .alert {
+
+    /* --- Isolation complète des styles --- */
+    .message-system .alert {
         position: relative;
         padding: 1rem 1rem;
         margin-bottom: 1rem;
         border: 1px solid transparent;
         border-radius: 0.375rem;
+        animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        border: none;
+        border-left: 4px solid;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        border-radius: 8px !important;
+        background-color: white;
     }
-    
-    .alert-dismissible {
+
+    .message-system .alert-dismissible {
         padding-right: 3rem;
     }
-    
-    .btn-close {
+
+    .message-system .btn-close {
         box-sizing: content-box;
         width: 1em;
         height: 1em;
@@ -33,63 +42,70 @@
         right: 0;
         z-index: 2;
         padding: 1.25rem 1rem;
+        transition: opacity 0.3s ease;
     }
-    
-    .btn-close:hover {
+
+    .message-system .btn-close:hover {
         opacity: .75;
     }
-    
-    .fade {
+
+    .message-system .fade {
         transition: opacity .15s linear;
     }
-    
-    .fade:not(.show) {
+
+    .message-system .fade:not(.show) {
         opacity: 0;
     }
-    
-    /* Styles personnalisés pour les messages */
-    :root {
-        --teal-glacier: #2cb9a9;
-        --pink-swoosh: #ff6b8a;
-        --yellow-canaan: #ffc107;
-        --black-shadow: #333;
+
+    /* Couleurs de bordure */
+    .message-system .alert-success { border-left-color: #2cb9a9; }
+    .message-system .alert-error,
+    .message-system .alert-danger { border-left-color: #ff6b8a; }
+    .message-system .alert-warning { border-left-color: #ffc107; }
+    .message-system .alert-info { border-left-color: #2cb9a9; }
+
+    /* Icônes */
+    .message-system .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
-    
-    /* Animation d'entrée */
-    .message-container .alert {
-        animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        border: none;
-        border-left: 4px solid;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-        border-radius: 8px !important;
-        background-color: white;
+
+    /* Texte */
+    .message-system .alert p {
+        color: #333;
     }
-    
-    /* Couleurs de bordure personnalisées */
-    .message-container .alert-success {
-        border-left-color: var(--teal-glacier);
-    }
-    
-    .message-container .alert-error, 
-    .message-container .alert-danger {
-        border-left-color: var(--pink-swoosh);
-    }
-    
-    .message-container .alert-warning {
-        border-left-color: var(--yellow-canaan);
-    }
-    
-    .message-container .alert-info {
-        border-left-color: var(--teal-glacier);
-    }
-    
-    /* Couleur par défaut */
-    .message-container .alert {
-        border-left-color: var(--teal-glacier);
-    }
-    
-    /* Animation */
+
+    /* Utilities */
+    .message-system .position-fixed { position: fixed !important; }
+    .message-system .top-0 { top: 0 !important; }
+    .message-system .end-0 { right: 0 !important; }
+    .message-system .p-3 { padding: 1rem !important; }
+    .message-system .d-flex { display: flex !important; }
+    .message-system .align-items-center { align-items: center !important; }
+    .message-system .flex-grow-1 { flex-grow: 1 !important; }
+    .message-system .me-3 { margin-right: 1rem !important; }
+    .message-system .mb-0 { margin-bottom: 0 !important; }
+    .message-system .fw-medium { font-weight: 500 !important; }
+    .message-system .rounded-circle { border-radius: 50% !important; }
+
+    .message-system .bg-success { background-color: rgba(25, 135, 84, 0.1) !important; }
+    .message-system .bg-danger { background-color: rgba(220, 53, 69, 0.1) !important; }
+    .message-system .bg-warning { background-color: rgba(255, 193, 7, 0.1) !important; }
+    .message-system .bg-info { background-color: rgba(13, 202, 240, 0.1) !important; }
+    .message-system .bg-primary { background-color: rgba(13, 110, 253, 0.1) !important; }
+
+    .message-system .text-success { color: #198754 !important; }
+    .message-system .text-danger { color: #dc3545 !important; }
+    .message-system .text-warning { color: #ffc107 !important; }
+    .message-system .text-info { color: #0dcaf0 !important; }
+    .message-system .text-primary { color: #0d6efd !important; }
+
+    .message-system .fs-4 { font-size: 1.5rem !important; }
+
     @keyframes slideIn {
         from {
             opacity: 0;
@@ -100,200 +116,74 @@
             transform: translateX(0) translateY(0);
         }
     }
-    
-    /* Animation de fermeture */
-    .message-container .alert.fade {
-        transition: all 0.4s ease-in;
-    }
-    
-    /* Bouton de fermeture */
-    .message-container .btn-close {
-        opacity: 0.5;
-        transition: opacity 0.3s ease;
-    }
-    
-    .message-container .btn-close:hover {
-        opacity: 1;
-    }
-    
-    /* Icône dans un cercle */
-    .message-container .icon-wrapper {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    
-    /* Texte */
-    .message-container .alert p {
-        color: var(--black-shadow);
-    }
-    
-    /* Classes utilitaires minimales */
-    .position-fixed {
-        position: fixed !important;
-    }
-    
-    .top-0 {
-        top: 0 !important;
-    }
-    
-    .end-0 {
-        right: 0 !important;
-    }
-    
-    .p-3 {
-        padding: 1rem !important;
-    }
-    
-    .d-flex {
-        display: flex !important;
-    }
-    
-    .align-items-center {
-        align-items: center !important;
-    }
-    
-    .flex-grow-1 {
-        flex-grow: 1 !important;
-    }
-    
-    .me-3 {
-        margin-right: 1rem !important;
-    }
-    
-    .mb-0 {
-        margin-bottom: 0 !important;
-    }
-    
-    .fw-medium {
-        font-weight: 500 !important;
-    }
-    
-    .rounded-circle {
-        border-radius: 50% !important;
-    }
-    
-    .bg-success {
-        background-color: rgba(25, 135, 84, 0.1) !important;
-    }
-    
-    .bg-danger {
-        background-color: rgba(220, 53, 69, 0.1) !important;
-    }
-    
-    .bg-warning {
-        background-color: rgba(255, 193, 7, 0.1) !important;
-    }
-    
-    .bg-info {
-        background-color: rgba(13, 202, 240, 0.1) !important;
-    }
-    
-    .bg-primary {
-        background-color: rgba(13, 110, 253, 0.1) !important;
-    }
-    
-    .text-success {
-        color: #198754 !important;
-    }
-    
-    .text-danger {
-        color: #dc3545 !important;
-    }
-    
-    .text-warning {
-        color: #ffc107 !important;
-    }
-    
-    .text-info {
-        color: #0dcaf0 !important;
-    }
-    
-    .text-primary {
-        color: #0d6efd !important;
-    }
-    
-    .fs-4 {
-        font-size: 1.5rem !important;
-    }
 </style>
 
+<!-- Conteneur -->
 <div class="message-container position-fixed top-0 end-0 p-3" style="z-index: 1100; max-width: 400px;">
     {% for message in messages %}
-        <div class="alert alert-dismissible fade show {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
-            <div class="d-flex align-items-center">
-                <!-- Icône selon le type de message -->
-                {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-                    <div class="icon-wrapper bg-success bg-opacity-25 rounded-circle p-2 me-3">
-                        <i class="fa-solid fa-check-circle fs-4 text-success"></i>
-                    </div>
-                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                    <div class="icon-wrapper bg-danger bg-opacity-25 rounded-circle p-2 me-3">
-                        <i class="fa-solid fa-triangle-exclamation fs-4 text-danger"></i>
-                    </div>
-                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
-                    <div class="icon-wrapper bg-warning bg-opacity-25 rounded-circle p-2 me-3">
-                        <i class="fa-solid fa-circle-exclamation fs-4 text-warning"></i>
-                    </div>
-                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-                    <div class="icon-wrapper bg-info bg-opacity-25 rounded-circle p-2 me-3">
-                        <i class="fa-solid fa-circle-info fs-4 text-info"></i>
-                    </div>
-                    {% else %}
-                    <div class="icon-wrapper bg-primary bg-opacity-25 rounded-circle p-2 me-3">
-                        <i class="fa-solid fa-circle-info fs-4 text-primary"></i>
-                    </div>
-                {% endif %}
+    <div class="alert alert-dismissible fade show {% if message.tags %}{{ message.tags }}{% endif %}" role="alert">
+        <div class="d-flex align-items-center">
 
-                <div class="flex-grow-1">
-                    <p class="mb-0 fw-medium">{{ message }}</p>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                <div class="icon-wrapper bg-success rounded-circle p-2 me-3">
+                    <i class="fa-solid fa-check-circle fs-4 text-success"></i>
                 </div>
-                
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                <div class="icon-wrapper bg-danger rounded-circle p-2 me-3">
+                    <i class="fa-solid fa-triangle-exclamation fs-4 text-danger"></i>
+                </div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                <div class="icon-wrapper bg-warning rounded-circle p-2 me-3">
+                    <i class="fa-solid fa-circle-exclamation fs-4 text-warning"></i>
+                </div>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                <div class="icon-wrapper bg-info rounded-circle p-2 me-3">
+                    <i class="fa-solid fa-circle-info fs-4 text-info"></i>
+                </div>
+            {% else %}
+                <div class="icon-wrapper bg-primary rounded-circle p-2 me-3">
+                    <i class="fa-solid fa-circle-info fs-4 text-primary"></i>
+                </div>
+            {% endif %}
+
+            <div class="flex-grow-1">
+                <p class="mb-0 fw-medium">{{ message }}</p>
             </div>
+
+            <button type="button" class="btn-close" aria-label="Close"></button>
         </div>
+    </div>
     {% endfor %}
 </div>
 
-<!-- Script Bootstrap minimal pour la fermeture des alertes -->
+</div> <!-- FIN .message-system -->
+
 <script>
-    // Fermeture automatique après 7 secondes
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.message-container .alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                // Fermeture manuelle sans dépendance Bootstrap JS
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.message-system .alert');
+
+    alerts.forEach(alert => {
+
+        // Auto-hide
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            setTimeout(() => alert.style.display = 'none', 400);
+        }, 7000);
+
+        // Manual close
+        const closeButton = alert.querySelector('.btn-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
                 alert.style.opacity = '0';
-                setTimeout(() => {
-                    alert.style.display = 'none';
-                }, 400);
-            }, 7000);
-            
-            // Gestionnaire pour le bouton de fermeture
-            const closeButton = alert.querySelector('.btn-close');
-            if (closeButton) {
-                closeButton.addEventListener('click', function() {
-                    alert.style.opacity = '0';
-                    setTimeout(() => {
-                        alert.style.display = 'none';
-                    }, 400);
-                });
-            }
-            
-            // Animation au survol
-            alert.addEventListener('mouseenter', () => {
-                alert.style.transform = 'translateX(-5px)';
+                setTimeout(() => alert.style.display = 'none', 400);
             });
-            
-            alert.addEventListener('mouseleave', () => {
-                alert.style.transform = 'translateX(0)';
-            });
-        });
+        }
+
+        // Hover animation
+        alert.addEventListener('mouseenter', () => alert.style.transform = 'translateX(-5px)');
+        alert.addEventListener('mouseleave', () => alert.style.transform = 'translateX(0)');
     });
+});
 </script>
+
 {% endif %}
-
-

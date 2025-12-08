@@ -267,7 +267,7 @@
                 
                 <div class="event-overlay">
                     <div class="overlay-content">
-                        <h3 class="text-white mb-2">{{ evenement.titre|default:"Événement sans titre" }}</h3>
+                        <h3 class="text-white mb-2">Type: {{ evenement.typeEvenement.nom_type_evenement|default:"Événement sans titre" }}</h3>
                         <div class="event-date mb-3 text-white">
                             <i class="far fa-calendar-alt"></i>
                             {{ evenement.dateHeure|date:"d M Y"|default:"Date non spécifiée" }}
@@ -323,7 +323,7 @@
 
                 </div>
             </div>
-        </div>
+        </div> 
     {% empty %}
         <div class="col-12 text-center py-5">
             <i class="fas fa-calendar-times fa-3x mb-3" style="color: #cbd5e1;"></i>

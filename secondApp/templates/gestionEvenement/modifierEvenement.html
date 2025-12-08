@@ -283,6 +283,55 @@
                 height: 60px;
             }
         }
+
+
+
+        /* Upload Area */
+      .upload-area {
+          border: 2px dashed var(--border);
+          border-radius: 6px;
+          padding: 2rem;
+          text-align: center;
+          background-color: var(--light);
+          transition: border-color 0.2s;
+          cursor: pointer;
+      }
+      
+      .upload-area:hover {
+          border-color: var(--primary);
+      }
+      
+      .upload-area i {
+          font-size: 3rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          display: block;
+      }
+      
+      .upload-area p {
+          margin: 0.5rem 0;
+          color: #6c757d;
+      }
+      
+      .upload-area p:first-of-type {
+          font-weight: 500;
+          color: var(--dark);
+          font-size: 1.1rem;
+      }
+      
+      .upload-area.video-upload i {
+          color: #e63946;
+      }
+      
+      .upload-area.video-upload:hover {
+          border-color: #e63946;
+      }
+      
+      #fileInput,
+      #videoInput {
+          display: none;
+      }
+      
     </style>
        <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -361,7 +410,7 @@
                             <label for="prix">Prix (FCFA)*</label>
                             <input type="number" id="prix" name="prix" value="{{evenement.prix}}" 
                                    placeholder="Entrez le prix de l'événement" min= 0 step = "25" required>
-                        </div>
+                        </div> 
                         
                         <div class="form-group">
                             <label for="description">Description*</label>
@@ -412,6 +461,30 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <!-- Section Vidéos -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="fas fa-video"></i>
+                            Vidéos de l'événement
+                        </h4>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> Taille maximale par vidéo: 100 MB. Formats acceptés: MP4, AVI, MOV, WMV, FLV, MKV, WEBM
+                        </div>
+                        
+                        <div class="upload-area video-upload" id="videoUploadArea">
+                            <i class="fas fa-video"></i>
+                            <p>Glissez-déposez vos vidéos ici</p>
+                            <p>ou cliquez pour sélectionner des vidéos</p>
+                            <input type="file" id="videoInput" accept="video/*" name="videos[]" multiple>
+                        </div>
+                        
+                        <div class="preview-container" id="videoPreviewContainer"></div>
+                    </div>
+                    
                     
                     <!-- Boutons -->
                     <div class="form-actions">
@@ -446,5 +519,90 @@
             });
         }
     });
+
+
+
+    // === GESTION DES VIDÉOS ===
+    
+    // Clic sur la zone d'upload de vidéos
+    videoUploadArea.addEventListener('click', () => videoInput.click());
+    
+    // Drag and drop pour vidéos
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        videoUploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        videoUploadArea.addEventListener(eventName, () => {
+            videoUploadArea.style.borderColor = '#e63946';
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        videoUploadArea.addEventListener(eventName, () => {
+            videoUploadArea.style.borderColor = 'var(--border)';
+        });
+    });
+    
+    // Gestion des vidéos déposées
+    videoUploadArea.addEventListener('drop', function(e) {
+        const files = e.dataTransfer.files;
+        handleVideoFiles(files);
+    });
+    
+    // Gestion des vidéos sélectionnées
+    videoInput.addEventListener('change', function() {
+        handleVideoFiles(this.files);
+    });
+    
+    // Affichage des prévisualisations de vidéos
+    function handleVideoFiles(files) {
+        [...files].forEach(file => {
+            if (!file.type.match('video.*')) return;
+            
+            // Vérifier la taille (100 MB max)
+            const maxSize = 100 * 1024 * 1024; // 100 MB
+            if (file.size > maxSize) {
+                alert(`La vidéo "${file.name}" est trop volumineuse (max 100 MB). Taille: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                const video = document.createElement('video');
+                video.src = e.target.result;
+                video.controls = false;
+                video.muted = true;
+                
+                const videoBadge = document.createElement('div');
+                videoBadge.className = 'video-badge';
+                videoBadge.innerHTML = '<i class="fas fa-play"></i> Vidéo';
+                
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info';
+                fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.type = 'button';
+                removeBtn.addEventListener('click', () => {
+                    previewItem.remove();
+                });
+                
+                previewItem.appendChild(video);
+                previewItem.appendChild(videoBadge);
+                previewItem.appendChild(fileInfo);
+                previewItem.appendChild(removeBtn);
+                videoPreviewContainer.appendChild(previewItem);
+            }
+            
+            reader.readAsDataURL(file);
+        });
+    }
 </script>
 {% endblock %}

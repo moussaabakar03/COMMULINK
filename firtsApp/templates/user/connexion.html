@@ -374,12 +374,14 @@
                 <p>Accédez à votre compte COMMULINK</p>
             </div>
             
-            <form id="login-form">
+            <form id="login-form" method="POST">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="login-username">Nom d'utilisateur</label>
                     <div class="form-control">
                         <span class="form-icon">👤</span>
-                        <input type="text" id="login-username" name="login-username" placeholder="Votre nom d'utilisateur" required>
+                        {{ form.identifiant }}
+                        {% comment %} <input type="text" id="login-username" name="login-username" placeholder="Votre nom d'utilisateur" required> {% endcomment %}
                     </div>
                     <div class="error-message" id="login-username-error"></div>
                 </div>
@@ -388,7 +390,9 @@
                     <label for="login-password">Mot de passe</label>
                     <div class="form-control">
                         <span class="form-icon">🔒</span>
-                        <input type="password" id="login-password" name="login-password" placeholder="Votre mot de passe" required>
+                        {% comment %} <input type="password" id="login-password" name="login-password" placeholder="Votre mot de passe" required> {% endcomment %}
+                        {{ form.password }}
+
                         <span class="password-toggle" id="login-password-toggle">👁️</span>
                     </div>
                     <div class="error-message" id="login-password-error"></div>

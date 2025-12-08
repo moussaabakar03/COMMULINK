@@ -58,8 +58,8 @@
 <div class="sidebar" data-background-color="dark">
     <div class="sidebar-logo">
       <!-- Logo Header -->
-      <div class="logo-header" data-background-color="dark">
-        <a href="{% url 'admin_dashboard' %}" class="logo">
+      <div class="logo-header" data-background-color="dark"> 
+        <a href="{% url 'index' %}" class="logo">
           <span style="color:#ff6600">COMMU</span><span style="color:white;">LINK</span>
         </a>
         <div class="nav-toggle">
@@ -154,6 +154,17 @@
                   </a>
                 </li>
                 <li>
+                  <a href="{% url 'listeReinscription' %}">
+                    <span class="sub-item">Liste Reinscription *</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'ajouter_reinscription' %}">
+                    <span class="sub-item">ajout Reinscription *</span>
+                  </a>
+                </li>
+                
+                <li>
                   <a href="{% url 'liste_EquipeDirigeante' %}">
                     <span class="sub-item">Equipe Dirigeante *</span>
                   </a>
@@ -211,8 +222,6 @@
               </ul>
             </div>
           </li>
-
-          
           </li>
            <li class="nav-item">
             <a data-bs-toggle="collapse" href="#annee">
@@ -236,6 +245,26 @@
             </div>
           </li>
         </ul>
+
+        
+  <ul class="nav nav-secondary" style="margin-top: 150px;">
+            <li class="nav-section">
+                <button type="button" class="btn btn-warning" onclick="copyReinscriptionLink()" title="Copier le lien">
+                    Copier le lien Reinscription
+                </button>
+            </li>
+        </ul>
+
+        <script>
+        function copyReinscriptionLink() {
+            const url = "{% url 'reinscriptionUser' %}";
+            navigator.clipboard.writeText(url).then(function() {
+                alert("Lien de la page reinscription copié avec succès !");
+            });
+        }
+        </script>
       </div>
     </div>
   </div>
+
+
