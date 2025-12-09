@@ -13,9 +13,14 @@ urlpatterns = [
     path('connexion/', views.connexion, name='connexion'),
     
     
-    path('affichageEvenement/<int:id>/', views.affichageEvenement, name='affichageEvenement'),
+   path('evenements/<int:type_id>/', views.affichageEvenement, name='affichage_evenement'),
+
     path('detailEvenement/<int:id>/', views.detailEvenement, name='detailEvenement'),    
     path('a-propos/', views.AboutView.as_view(), name='about'),
     path('faq/', views.FAQView.as_view(), name='faq'),
+
+    path('evenements/', views.liste_evenements, name='liste_evenements'),
+    path('evenements/<int:type_id>/', views.affichageEvenement, name='affichageEvenement'),
+   
     
 ]

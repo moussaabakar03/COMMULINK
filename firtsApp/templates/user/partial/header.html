@@ -103,6 +103,7 @@
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="{% url 'index' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">Accueil</a>
                 <a href="{% url 'about' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">A propos</a>
+                <a href="{% url 'liste_evenements' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'liste_evenements' %}active{% endif %}">Liste Evenements</a>
                 
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle explorer-toggle" data-bs-toggle="dropdown">Explorer</a>

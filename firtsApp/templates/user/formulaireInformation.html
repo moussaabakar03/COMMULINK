@@ -3,25 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire COMMULINK</title>
+    <title>COMMULINK - Formulaire d'inscription</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         :root {
-            --primary-color: #FF6F0F;
-            --primary-dark: #ffffff;
-            --secondary-color: #073841;
-            --text-color: #333;
-            --light-gray: #f8f9fa;
-            --medium-gray: #e9ecef;
-            --dark-gray: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --border-radius: 8px;
-            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --primary-orange: #FF6B35;
+            --primary-orange-hover: #E55A2B;
+            --primary-orange-light: #FFF5F0;
+            --primary-orange-bg: #FFFAF7;
+            --white: #FFFFFF;
+            --white-alt: #FCFCFC;
+            --black: #1A1A1A;
+            --black-light: #333333;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F5;
+            --gray-200: #E5E5E5;
+            --gray-300: #D4D4D4;
+            --gray-400: #A3A3A3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --success: #10B981;
+            --error: #EF4444;
+            --warning: #F59E0B;
+            
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            --border-radius-xl: 16px;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         * {
@@ -31,514 +49,1061 @@
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--white-alt);
+            color: var(--black);
             min-height: 100vh;
-            padding: 40px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 32px 20px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
-        .container {
-            max-width: 850px;
+        .form-container {
+            max-width: 900px;
             width: 100%;
-            background-color: white;
-            padding: 40px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
+            margin: 0 auto;
+        }
+        
+        .form-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, #FF8B35 100%);
+            padding: 40px 48px;
+            color: var(--white);
             position: relative;
             overflow: hidden;
         }
         
-        .container::before {
+        .form-header::before {
             content: '';
             position: absolute;
-            top: -50px;
-            left: -50px;
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            opacity: 0.1;
-            z-index: 0;
+            transform: translate(30%, -30%);
         }
         
-        .container::after {
-            content: '';
-            position: absolute;
-            bottom: -50px;
-            right: -50px;
-            width: 180px;
-            height: 180px;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-            border-radius: 50%;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        .brand-section {
             position: relative;
             z-index: 1;
         }
         
-        .header h1 {
-            font-size: 36px;
+        .brand-logo {
+            font-size: 32px;
             font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
         
-        .header p {
-            color: var(--dark-gray);
-            font-size: 16px;
-            font-weight: 300;
+        .form-title {
+            font-size: 20px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        .form-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 32px;
+        }
+        
+        .progress-step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all var(--transition-base);
             position: relative;
-            display: inline-block;
         }
         
-        .header p::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
+        .progress-step.active {
+            background-color: var(--white);
+            color: var(--primary-orange);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-step.completed {
+            background-color: var(--white);
+            color: var(--primary-orange);
+        }
+        
+        .progress-step.completed::after {
+            content: '✓';
+            font-size: 16px;
+        }
+        
+        .progress-line {
+            flex: 1;
             height: 3px;
-            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-            border-radius: 3px;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-line.active {
+            background-color: var(--white);
+        }
+        
+        .progress-line.completed {
+            background-color: var(--white);
         }
         
         .form-content {
-            position: relative;
-            z-index: 1;
+            padding: 48px;
+        }
+        
+        .form-section {
+            margin-bottom: 48px;
+            animation: slideIn 0.5s ease-out;
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+        
+        .section-number {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-orange);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
         }
         
         .section-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
-            color: var(--primary-color);
+            color: var(--black);
+        }
+        
+        .section-description {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .type-section {
+            background-color: var(--primary-orange-bg);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .type-section .section-header {
+            border-bottom: none;
+            padding-bottom: 0;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--medium-gray);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
         }
         
         .form-group {
-            margin-bottom: 25px;
-            position: relative;
+            margin-bottom: 20px;
         }
         
-        label {
+        .form-label {
             display: block;
             font-weight: 500;
             margin-bottom: 8px;
-            color: var(--dark-gray);
-            transition: var(--transition);
+            color: var(--black-light);
+            font-size: 14px;
+            letter-spacing: 0.2px;
         }
         
-        .required::after {
-            content: " *";
-            color: var(--danger);
-            font-weight: bold;
+        .required {
+            color: var(--error);
         }
         
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        select {
+        .form-input,
+        .form-select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--medium-gray);
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: var(--transition);
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-color);
+            padding: 12px 16px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: 15px;
+            font-family: inherit;
+            background-color: var(--white);
+            color: var(--black);
+            transition: all var(--transition-fast);
         }
         
-        input:focus,
-        select:focus {
+        .form-input:focus,
+        .form-select:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px var(--primary-orange-light);
         }
         
-        input::placeholder {
-            color: #adb5bd;
+        .form-input::placeholder {
+            color: var(--gray-400);
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 44px;
         }
         
         .radio-group {
             display: flex;
-            gap: 30px;
-            margin-top: 5px;
+            gap: 24px;
+            margin-top: 4px;
         }
         
         .radio-option {
             display: flex;
             align-items: center;
+            gap: 8px;
             cursor: pointer;
         }
         
-        .custom-radio {
-            position: relative;
-            display: inline-block;
+        .radio-input {
+            display: none;
+        }
+        
+        .radio-custom {
             width: 20px;
             height: 20px;
-            margin-right: 10px;
+            border: 2px solid var(--gray-300);
             border-radius: 50%;
-            border: 2px solid var(--medium-gray);
-            transition: var(--transition);
+            position: relative;
+            transition: all var(--transition-fast);
         }
         
-        .radio-option input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
+        .radio-input:checked + .radio-custom {
+            border-color: var(--primary-orange);
+            background-color: var(--primary-orange);
         }
         
-        .radio-option input:checked + .custom-radio {
-            border-color: var(--primary-color);
-        }
-        
-        .radio-option input:checked + .custom-radio::after {
+        .radio-input:checked + .radio-custom::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
+            background-color: var(--white);
             border-radius: 50%;
-            background-color: var(--primary-color);
         }
         
-        .radio-option label {
+        .radio-label {
+            font-size: 15px;
+            color: var(--gray-600);
+            cursor: pointer;
             margin-bottom: 0;
-            cursor: pointer;
         }
         
-        .two-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .textarea-group {
+            margin-top: 20px;
         }
         
-        .type-selector {
-            margin-bottom: 10px;
-        }
-        
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px;
-        }
-        
-        .form-section {
-            padding: 20px;
-            background-color: var(--light-gray);
-            border-radius: var(--border-radius);
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .type-form {
-            background-color: #e8f4fd;
-            border-left: 4px solid var(--primary-color);
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: var(--border-radius);
-        }
-        
-        .type-form .section-title {
-            color: var(--primary-color);
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 15px;
-        }
-        
-        button, a {
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            display: block;
+        .form-textarea {
             width: 100%;
-            margin-top: 30px;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(58, 123, 213, 0.3);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            
+            min-height: 120px;
+            padding: 12px 16px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all var(--transition-fast);
         }
         
-        button:hover {
-            box-shadow: 0 8px 25px rgba(58, 123, 213, 0.5);
-            transform: translateY(-2px);
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px var(--primary-orange-light);
         }
         
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 3px 10px rgba(58, 123, 213, 0.3);
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--gray-200);
         }
         
-        button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120%;
-            height: 120%;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
+        .btn {
+            padding: 14px 32px;
+            border-radius: var(--border-radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-orange);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-orange-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--gray-600);
+            border: 1.5px solid var(--gray-300);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn-back {
+            margin-right: auto;
+        }
+        
+        .btn-next {
+            margin-left: auto;
+        }
+        
+        .form-feedback {
+            font-size: 13px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             opacity: 0;
-            transition: transform 0.6s, opacity 0.6s;
+            transform: translateY(-4px);
+            transition: all var(--transition-fast);
         }
         
-        button:active::after {
-            transform: translate(-50%, -50%) scale(1);
+        .form-feedback.show {
             opacity: 1;
+            transform: translateY(0);
         }
         
-        .input-group {
-            position: relative;
+        .form-feedback.error {
+            color: var(--error);
         }
         
-        .input-icon {
-            position: absolute;
-            top: 14px;
-            left: 15px;
-            color: var(--dark-gray);
+        .form-feedback.success {
+            color: var(--success);
         }
         
-        .icon-input {
-            padding-left: 45px;
+        .form-input.error {
+            border-color: var(--error);
         }
         
-        .tooltip {
-            position: absolute;
-            top: -10px;
-            right: 0;
-            font-size: 12px;
-            color: var(--info);
-            cursor: help;
+        .form-input.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
         }
         
-        .tooltip:hover::before {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            width: 200px;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            line-height: 1.4;
-            z-index: 10;
-        }
-        
-        .error-message {
-            display: none;
-            color: var(--danger);
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        
-        input.error, select.error {
-            border-color: var(--danger);
-        }
-        
+        /* Responsive */
         @media (max-width: 768px) {
-            .two-columns {
+            .form-grid {
                 grid-template-columns: 1fr;
-                gap: 0;
+                gap: 16px;
             }
             
-            .container {
-                padding: 30px 20px;
+            .form-header {
+                padding: 32px 24px;
+            }
+            
+            .form-content {
+                padding: 32px 24px;
             }
             
             .radio-group {
                 flex-direction: column;
-                gap: 15px;
+                gap: 16px;
             }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn-back,
+            .btn-next {
+                margin: 0;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 16px;
+            }
+            
+            .form-header {
+                padding: 24px 20px;
+            }
+            
+            .form-content {
+                padding: 24px 20px;
+            }
+            
+            .type-section {
+                padding: 20px;
+            }
+            
+            .form-section {
+                margin-bottom: 32px;
+            }
+            
+            .form-progress {
+                gap: 8px;
+            }
+            
+            .progress-step {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Animation de validation */
+        @keyframes validPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .valid-pulse {
+            animation: validPulse 0.3s ease;
+        }
+        
+        /* Animation du progress bar */
+        @keyframes progressPulse {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+        
+        .progress-line.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--white);
+            animation: progressPulse 0.5s ease-out;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>COMMULINK</h1>
-            <p>Formulaire d'inscription</p>
-        </div>
-        
-        <form id="commulink-form">
-            <div class="form-content">
-                <!-- Type Section - Now with independent fields -->
-                <div class="type-form">
-                    <h3 class="section-title">Votre Type</h3>
-                    <div class="form-group">
-                        <label class="required">Veuillez remplir les champs de type</label>
-                        <div class="two-columns">
-                            <div class="form-group">
-                                <label for="type_ner">Ner</label>
-                                <input type="text" id="type_ner" name="type_ner" placeholder="Valeur pour Ner">
-                            </div>
-                            <div class="form-group">
-                                <label for="type_keri">Keri</label>
-                                <input type="text" id="type_keri" name="type_keri" placeholder="Valeur pour Keri">
-                            </div>
-                        </div>
-                        <div class="two-columns">
-                            <div class="form-group">
-                                <label for="type_keribour">Keribour</label>
-                                <input type="text" id="type_keribour" name="type_keribour" placeholder="Valeur pour Keribour">
-                            </div>
-                            <div class="form-group">
-                                <label for="type_keri_ba">Keri Bâ</label>
-                                <input type="text" id="type_keri_ba" name="type_keri_ba" placeholder="Valeur pour Keri Bâ">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="type_keribour_ba">Keribour Bâ</label>
-                            <input type="text" id="type_keribour_ba" name="type_keribour_ba" placeholder="Valeur pour Keribour Bâ">
-                        </div>
-                        <div class="error-message" id="type-error">Veuillez remplir au moins un des champs de type</div>
-                    </div>
-                </div>
-                
-                <!-- Informations personnelles -->
-                <div class="form-section">
-                    <h3 class="section-title">Informations Personnelles</h3>
-                    <div class="two-columns">
-                        <div class="form-group">
-                            <label for="nom" class="required">Nom</label>
-                            <input type="text" id="nom" name="nom" placeholder="Votre nom" required>
-                            <div class="error-message" id="nom-error">Veuillez entrer votre nom</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="prenom" class="required">Prénom</label>
-                            <input type="text" id="prenom" name="prenom" placeholder="Votre prénom" required>
-                            <div class="error-message" id="prenom-error">Veuillez entrer votre prénom</div>
-                        </div>
-                    </div>
+    <div class="form-container">
+        <div class="form-card">
+            <!-- Header avec progression -->
+            <div class="form-header">
+                <div class="brand-section">
+                    <div class="brand-logo">COMMULINK</div>
+                    <div class="form-title">Formulaire d'inscription complet</div>
                     
-                    <!-- Sexe -->
-                    <div class="form-group">
-                        <label class="required">Sexe</label>
-                        <div class="radio-group">
-                            <div class="radio-option">
-                                <input type="radio" id="homme" name="sexe" value="homme" required>
-                                <span class="custom-radio"></span>
-                                <label for="homme">Homme</label>
-                            </div>
-                            <div class="radio-option">
-                                <input type="radio" id="femme" name="sexe" value="femme">
-                                <span class="custom-radio"></span>
-                                <label for="femme">Femme</label>
-                            </div>
-                        </div>
-                        <div class="error-message" id="sexe-error">Veuillez sélectionner votre sexe</div>
+                    <div class="form-progress">
+                        <div class="progress-step active" data-step="1">1</div>
+                        <div class="progress-line active"></div>
+                        <div class="progress-step" data-step="2">2</div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" data-step="3">3</div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" data-step="4">4</div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" data-step="5">5</div>
                     </div>
                 </div>
-                
-                <!-- Coordonnées -->
-                <div class="form-section">
-                    <h3 class="section-title">Coordonnées</h3>
-                    <div class="two-columns">
-                        <div class="form-group">
-                            <label for="quartier" class="required">Quartier</label>
-                            <input type="text" id="quartier" name="quartier" placeholder="Votre quartier" required>
-                            <div class="error-message" id="quartier-error">Veuillez entrer votre quartier</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="contact" class="required">Contact téléphonique</label>
-                            <input type="tel" id="contact" name="contact" placeholder="Votre numéro de téléphone" required>
-                            <div class="error-message" id="contact-error">Veuillez entrer un numéro de téléphone valide</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email" class="required">Adresse email</label>
-                        <input type="email" id="email" name="email" placeholder="votre.email@exemple.com" required>
-                        <div class="error-message" id="email-error">Veuillez entrer une adresse email valide</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="urgence" class="required">Numéro en cas d'urgence</label>
-                        <input type="tel" id="urgence" name="urgence" placeholder="Numéro d'une personne à contacter" required>
-                        <div class="error-message" id="urgence-error">Veuillez entrer un numéro en cas d'urgence</div>
-                    </div>
-                </div>
-                
-                <!-- Études et profession -->
-                <div class="form-section">
-                    <h3 class="section-title">Formation & Profession</h3>
-                    <div class="two-columns">
-                        <div class="form-group">
-                            <label for="niveau_etude" class="required">Niveau d'étude</label>
-                            <select id="niveau_etude" name="niveau_etude" required>
-                                <option value="" disabled selected>Sélectionnez votre niveau...</option>
-                                <option value="Primaire">Primaire</option>
-                                <option value="Collège">Collège</option>
-                                <option value="Lycée">Lycée</option>
-                                <option value="Bac">Bac</option>
-                                <option value="Bac+1">Bac+1</option>
-                                <option value="Bac+2">Bac+2</option>
-                                <option value="Bac+3">Bac+3</option>
-                                <option value="Bac+4">Bac+4</option>
-                                <option value="Bac+5">Bac+5</option>
-                                <option value="Doctorat">Doctorat</option>
-                            </select>
-                            <div class="error-message" id="niveau-error">Veuillez sélectionner votre niveau d'étude</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="universite">Université/École</label>
-                            <input type="text" id="universite" name="universite" placeholder="Nom de votre établissement">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="profession" class="required">Profession</label>
-                        <input type="text" id="profession" name="profession" placeholder="Votre profession actuelle" required>
-                        <div class="error-message" id="profession-error">Veuillez entrer votre profession</div>
-                    </div>
-                </div>
-                
-                <!-- Autres renseignements -->
-                <div class="form-section">
-                    <h3 class="section-title">Informations Complémentaires</h3>
-                    <div class="form-group">
-                        <label for="autres_renseignements">Autres renseignements</label>
-                        <textarea id="autres_renseignements" name="autres_renseignements" rows="5" placeholder="Ajoutez ici toute information complémentaire que vous souhaitez partager..." style="width: 100%; padding: 12px 15px; border: 2px solid var(--medium-gray); border-radius: var(--border-radius); font-size: 16px; transition: var(--transition); font-family: 'Poppins', sans-serif; resize: vertical;"></textarea>
-                    </div>
-                </div>
-                
-                <button type="submit">Soumettre le formulaire</button>
-                <a href="{% url 'index' %}" type="button" style = "text-decoration: none ; text-align: center;">Annuler/Ignorer</a>
             </div>
-        </form>
+            
+            <!-- Contenu du formulaire -->
+            <div class="form-content">
+                <form id="commulink-form">
+                    <!-- Section Type - Étape 1 -->
+                    <div class="form-section active" id="section-1" data-step="1">
+                        <div class="type-section">
+                            <div class="section-header">
+                                <div class="section-number">1</div>
+                                <div>
+                                    <h2 class="section-title">Informations de Type</h2>
+                                    <p class="section-description">Veuillez remplir au moins un des champs ci-dessous</p>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="type_ner" class="form-label">Ner</label>
+                                    <input type="text" id="type_ner" name="type_ner" class="form-input" placeholder="Entrez la valeur pour Ner">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="type_keri" class="form-label">Keri</label>
+                                    <input type="text" id="type_keri" name="type_keri" class="form-input" placeholder="Entrez la valeur pour Keri">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="type_keribour" class="form-label">Keribour</label>
+                                    <input type="text" id="type_keribour" name="type_keribour" class="form-input" placeholder="Entrez la valeur pour Keribour">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="type_keri_ba" class="form-label">Keri Bâ</label>
+                                    <input type="text" id="type_keri_ba" name="type_keri_ba" class="form-input" placeholder="Entrez la valeur pour Keri Bâ">
+                                </div>
+                                
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label for="type_keribour_ba" class="form-label">Keribour Bâ</label>
+                                    <input type="text" id="type_keribour_ba" name="type_keribour_ba" class="form-input" placeholder="Entrez la valeur pour Keribour Bâ">
+                                </div>
+                            </div>
+                            <div class="form-feedback" id="type-feedback"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informations personnelles - Étape 2 -->
+                    <div class="form-section" id="section-2" data-step="2">
+                        <div class="section-header">
+                            <div class="section-number">2</div>
+                            <div>
+                                <h2 class="section-title">Informations Personnelles</h2>
+                                <p class="section-description">Vos coordonnées de base</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nom" class="form-label">Nom <span class="required">*</span></label>
+                                <input type="text" id="nom" name="nom" class="form-input" placeholder="Votre nom" required>
+                                <div class="form-feedback" id="nom-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="prenom" class="form-label">Prénom <span class="required">*</span></label>
+                                <input type="text" id="prenom" name="prenom" class="form-input" placeholder="Votre prénom" required>
+                                <div class="form-feedback" id="prenom-feedback"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Sexe <span class="required">*</span></label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" id="homme" name="sexe" value="homme" class="radio-input" required>
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-label">Homme</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" id="femme" name="sexe" value="femme" class="radio-input">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-label">Femme</span>
+                                </label>
+                            </div>
+                            <div class="form-feedback" id="sexe-feedback"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coordonnées - Étape 3 -->
+                    <div class="form-section" id="section-3" data-step="3">
+                        <div class="section-header">
+                            <div class="section-number">3</div>
+                            <div>
+                                <h2 class="section-title">Coordonnées</h2>
+                                <p class="section-description">Comment pouvons-nous vous contacter ?</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="quartier" class="form-label">Quartier <span class="required">*</span></label>
+                                <input type="text" id="quartier" name="quartier" class="form-input" placeholder="Votre quartier" required>
+                                <div class="form-feedback" id="quartier-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contact" class="form-label">Contact téléphonique <span class="required">*</span></label>
+                                <input type="tel" id="contact" name="contact" class="form-input" placeholder="Votre numéro de téléphone" required>
+                                <div class="form-feedback" id="contact-feedback"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="email" class="form-label">Adresse email <span class="required">*</span></label>
+                                <input type="email" id="email" name="email" class="form-input" placeholder="votre.email@exemple.com" required>
+                                <div class="form-feedback" id="email-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="urgence" class="form-label">Numéro en cas d'urgence <span class="required">*</span></label>
+                                <input type="tel" id="urgence" name="urgence" class="form-input" placeholder="Numéro d'une personne à contacter" required>
+                                <div class="form-feedback" id="urgence-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formation et profession - Étape 4 -->
+                    <div class="form-section" id="section-4" data-step="4">
+                        <div class="section-header">
+                            <div class="section-number">4</div>
+                            <div>
+                                <h2 class="section-title">Formation & Profession</h2>
+                                <p class="section-description">Votre parcours académique et professionnel</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="niveau_etude" class="form-label">Niveau d'étude <span class="required">*</span></label>
+                                <select id="niveau_etude" name="niveau_etude" class="form-select" required>
+                                    <option value="" disabled selected>Sélectionnez votre niveau...</option>
+                                    <option value="Primaire">Primaire</option>
+                                    <option value="Collège">Collège</option>
+                                    <option value="Lycée">Lycée</option>
+                                    <option value="Bac">Bac</option>
+                                    <option value="Bac+1">Bac+1</option>
+                                    <option value="Bac+2">Bac+2</option>
+                                    <option value="Bac+3">Bac+3</option>
+                                    <option value="Bac+4">Bac+4</option>
+                                    <option value="Bac+5">Bac+5</option>
+                                    <option value="Doctorat">Doctorat</option>
+                                </select>
+                                <div class="form-feedback" id="niveau-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="universite" class="form-label">Université/École</label>
+                                <input type="text" id="universite" name="universite" class="form-input" placeholder="Nom de votre établissement">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profession" class="form-label">Profession <span class="required">*</span></label>
+                            <input type="text" id="profession" name="profession" class="form-input" placeholder="Votre profession actuelle" required>
+                            <div class="form-feedback" id="profession-feedback"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informations complémentaires - Étape 5 -->
+                    <div class="form-section" id="section-5" data-step="5">
+                        <div class="section-header">
+                            <div class="section-number">5</div>
+                            <div>
+                                <h2 class="section-title">Informations Complémentaires</h2>
+                                <p class="section-description">Partagez avec nous toute information utile</p>
+                            </div>
+                        </div>
+                        
+                        <div class="textarea-group">
+                            <label for="autres_renseignements" class="form-label">Autres renseignements</label>
+                            <textarea id="autres_renseignements" name="autres_renseignements" class="form-textarea" placeholder="Ajoutez ici toute information complémentaire que vous souhaitez partager..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions du formulaire -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary btn-back" id="back-btn" style="display: none;">
+                            <span>← Retour</span>
+                        </button>
+                        <button type="button" class="btn btn-primary btn-next" id="next-btn">
+                            <span>Suivant →</span>
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submit-btn" style="display: none;">
+                            <span>Soumettre le formulaire</span>
+                        </button>
+                        <a href="{% url 'index' %}" class="btn btn-secondary" id="cancel-btn">
+                            <span>Annuler</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-   
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('commulink-form');
+            const sections = document.querySelectorAll('.form-section');
+            const progressSteps = document.querySelectorAll('.progress-step');
+            const progressLines = document.querySelectorAll('.progress-line');
+            const backBtn = document.getElementById('back-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            
+            let currentStep = 1;
+            const totalSteps = sections.length;
+            
+            // Initialiser le formulaire
+            updateProgress();
+            updateButtons();
+            
+            // Écouter le bouton Suivant
+            nextBtn.addEventListener('click', function() {
+                if (validateCurrentSection()) {
+                    if (currentStep < totalSteps) {
+                        currentStep++;
+                        updateProgress();
+                        updateButtons();
+                        showSection(currentStep);
+                    }
+                }
+            });
+            
+            // Écouter le bouton Retour
+            backBtn.addEventListener('click', function() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateProgress();
+                    updateButtons();
+                    showSection(currentStep);
+                }
+            });
+            
+            // Écouter le bouton Annuler
+            cancelBtn.addEventListener('click', function(e) {
+                if (!confirm('Êtes-vous sûr de vouloir annuler ? Toutes les données saisies seront perdues.')) {
+                    e.preventDefault();
+                }
+            });
+            
+            // Écouter la soumission du formulaire
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateAllSections()) {
+                    // Simulation d'envoi
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span>Envoi en cours...</span>';
+                    
+                    setTimeout(() => {
+                        alert('Formulaire soumis avec succès !');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span>Soumettre le formulaire</span>';
+                        // Redirection vers la page d'accueil ou de confirmation
+                        // window.location.href = "{% url 'index' %}";
+                    }, 1500);
+                }
+            });
+            
+            // Fonction pour valider la section actuelle
+            function validateCurrentSection() {
+                const currentSection = document.getElementById(`section-${currentStep}`);
+                const requiredFields = currentSection.querySelectorAll('[required]');
+                let isValid = true;
+                
+                // Validation spécifique pour l'étape 1 (champs de type)
+                if (currentStep === 1) {
+                    const typeFields = [
+                        'type_ner', 'type_keri', 'type_keribour', 
+                        'type_keri_ba', 'type_keribour_ba'
+                    ];
+                    
+                    let hasTypeValue = false;
+                    typeFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (field && field.value.trim()) {
+                            hasTypeValue = true;
+                        }
+                    });
+                    
+                    if (!hasTypeValue) {
+                        showFeedback('type-feedback', '⚠️ Veuillez remplir au moins un des champs de type', 'error');
+                        isValid = false;
+                    } else {
+                        showFeedback('type-feedback', '✅ Informations de type validées', 'success');
+                    }
+                }
+                
+                // Validation des champs obligatoires
+                requiredFields.forEach(field => {
+                    if (!validateField(field)) {
+                        isValid = false;
+                    }
+                });
+                
+                return isValid;
+            }
+            
+            // Fonction pour valider toutes les sections
+            function validateAllSections() {
+                let allValid = true;
+                
+                for (let i = 1; i <= totalSteps; i++) {
+                    const section = document.getElementById(`section-${i}`);
+                    const requiredFields = section.querySelectorAll('[required]');
+                    
+                    // Validation spécifique pour l'étape 1
+                    if (i === 1) {
+                        const typeFields = [
+                            'type_ner', 'type_keri', 'type_keribour', 
+                            'type_keri_ba', 'type_keribour_ba'
+                        ];
+                        
+                        let hasTypeValue = false;
+                        typeFields.forEach(fieldId => {
+                            const field = document.getElementById(fieldId);
+                            if (field && field.value.trim()) {
+                                hasTypeValue = true;
+                            }
+                        });
+                        
+                        if (!hasTypeValue) {
+                            showFeedback('type-feedback', '⚠️ Veuillez remplir au moins un des champs de type', 'error');
+                            allValid = false;
+                        }
+                    }
+                    
+                    // Validation des champs obligatoires
+                    requiredFields.forEach(field => {
+                        if (!validateField(field)) {
+                            allValid = false;
+                        }
+                    });
+                }
+                
+                return allValid;
+            }
+            
+            // Fonction pour valider un champ
+            function validateField(field) {
+                const value = field.value.trim();
+                const fieldId = field.id;
+                const feedbackId = fieldId + '-feedback';
+                const feedback = document.getElementById(feedbackId);
+                
+                if (!field.hasAttribute('required')) {
+                    return true;
+                }
+                
+                if (!value) {
+                    showError(field, feedback, 'Ce champ est obligatoire');
+                    return false;
+                }
+                
+                // Validation spécifique par type de champ
+                switch(field.type) {
+                    case 'email':
+                        if (!isValidEmail(value)) {
+                            showError(field, feedback, 'Veuillez entrer une adresse email valide');
+                            return false;
+                        }
+                        break;
+                        
+                    case 'tel':
+                        if (!isValidPhone(value)) {
+                            showError(field, feedback, 'Veuillez entrer un numéro de téléphone valide');
+                            return false;
+                        }
+                        break;
+                }
+                
+                // Validation spécifique pour les select
+                if (field.tagName === 'SELECT') {
+                    if (!value) {
+                        showError(field, feedback, 'Veuillez sélectionner une option');
+                        return false;
+                    }
+                }
+                
+                showSuccess(field, feedback);
+                return true;
+            }
+            
+            // Fonction pour afficher une section
+            function showSection(step) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const currentSection = document.getElementById(`section-${step}`);
+                if (currentSection) {
+                    currentSection.classList.add('active');
+                }
+                
+                // Faire défiler vers le haut
+                window.scrollTo({
+                    top: document.querySelector('.form-content').offsetTop - 20,
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Fonction pour mettre à jour la progression
+            function updateProgress() {
+                progressSteps.forEach((step, index) => {
+                    const stepNumber = parseInt(step.dataset.step);
+                    
+                    step.classList.remove('active', 'completed');
+                    
+                    if (stepNumber < currentStep) {
+                        step.classList.add('completed');
+                    } else if (stepNumber === currentStep) {
+                        step.classList.add('active');
+                    }
+                });
+                
+                progressLines.forEach((line, index) => {
+                    line.classList.remove('active', 'completed');
+                    
+                    if (index + 1 < currentStep) {
+                        line.classList.add('completed');
+                    } else if (index + 1 === currentStep) {
+                        line.classList.add('active');
+                    }
+                });
+            }
+            
+            // Fonction pour mettre à jour les boutons
+            function updateButtons() {
+                backBtn.style.display = currentStep > 1 ? 'flex' : 'none';
+                
+                if (currentStep === totalSteps) {
+                    nextBtn.style.display = 'none';
+                    submitBtn.style.display = 'flex';
+                } else {
+                    nextBtn.style.display = 'flex';
+                    submitBtn.style.display = 'none';
+                }
+            }
+            
+            // Fonctions utilitaires
+            function showError(field, feedback, message) {
+                if (feedback) {
+                    feedback.textContent = message;
+                    feedback.className = 'form-feedback show error';
+                    field.classList.add('error');
+                    field.classList.remove('valid-pulse');
+                }
+            }
+            
+            function showSuccess(field, feedback) {
+                if (feedback) {
+                    feedback.textContent = '✓ Champ valide';
+                    feedback.className = 'form-feedback show success';
+                    field.classList.remove('error');
+                    field.classList.add('valid-pulse');
+                    
+                    setTimeout(() => {
+                        field.classList.remove('valid-pulse');
+                    }, 300);
+                }
+            }
+            
+            function showFeedback(elementId, message, type) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = message;
+                    element.className = 'form-feedback show ' + type;
+                }
+            }
+            
+            function isValidEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            function isValidPhone(phone) {
+                const re = /^[\d\s\-\+\(\)]{8,}$/;
+                return re.test(phone);
+            }
+            
+            // Écouter les changements sur les champs pour validation en temps réel
+            form.addEventListener('input', function(e) {
+                if (e.target.hasAttribute('required')) {
+                    validateField(e.target);
+                }
+            });
+            
+            // Écouter les changements sur les champs de type
+            const typeFields = [
+                'type_ner', 'type_keri', 'type_keribour', 
+                'type_keri_ba', 'type_keribour_ba'
+            ];
+            
+            typeFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        // Vérifier si au moins un champ de type est rempli
+                        let hasTypeValue = false;
+                        typeFields.forEach(id => {
+                            const f = document.getElementById(id);
+                            if (f && f.value.trim()) {
+                                hasTypeValue = true;
+                            }
+                        });
+                        
+                        if (hasTypeValue) {
+                            showFeedback('type-feedback', '✅ Informations de type validées', 'success');
+                        } else {
+                            showFeedback('type-feedback', '⚠️ Veuillez remplir au moins un des champs de type', 'error');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

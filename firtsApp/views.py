@@ -34,9 +34,9 @@ def inscription(request):
 def connexion(request):
     return render(request, 'user/connexion.html')
 
-def affichageEvenement(request, id):  
-    evenement = TypeEvenement.objects.get(id = id)
-    evenementsFiltrer = Evenement.objects.filter(typeEvenement__id = id)
+def affichageEvenement(request, type_id):  
+    evenement = TypeEvenement.objects.get(id = type_id)
+    evenementsFiltrer = Evenement.objects.filter(typeEvenement__id = type_id)
     return render(request, 'dynamiquePart/affichageEvenement.html', {'evenement': evenement, 'evenementsFiltrer': evenementsFiltrer})
 
 def detailEvenement(request, id):
@@ -64,4 +64,30 @@ class FAQView(TemplateView):
         context['title'] = 'FAQ - CommuLink'
         return context
 
+from django.shortcuts import render
+from datetime import datetime
+from .models import TypeEvenement, Evenement
 
+def liste_evenements(request):
+    """
+    Vue pour afficher la liste des types d'événements avec statistiques
+    ET les  événements
+    """
+    # Récupérer tous les types d'événements
+    type_evenements = TypeEvenement.objects.all().order_by('nom_type_evenement')
+    
+    # Récupérer les  événements 
+    derniers_evenements = Evenement.objects.all().order_by('-dateHeure')
+    
+    # Calculer les statistiques pour le hero
+    total_events = Evenement.objects.count()
+    now = datetime.now()
+    upcoming_events = Evenement.objects.filter(dateHeure__gte=now).count()
+    
+    context = {
+        'typeEvenement': type_evenements,      # Pour la boucle des types d'événements
+        'evenements': derniers_evenements,     # Pour la section "DERNIERS EVENEMENTS"
+        'total_events': total_events,          # Pour les statistiques
+        'upcoming_events': upcoming_events,    # Pour les statistiques
+    }
+    return render(request, 'user/listeEvenement.html', context)
