@@ -1,645 +1,1304 @@
 {% extends 'base.html' %}
-
-<!-- {% load static %} -->
+{% load static %}
 
 {% block title %}Dashboard Admin{% endblock %}
 
-{% block style %}{% endblock %}
+{% block style %}
+<style>
+    :root {
+        --primary: #1a2035;
+        --accent: #FF6F0F;
+        --primary-light: rgba(26, 32, 53, 0.08);
+        --accent-light: rgba(255, 111, 15, 0.14);
+        --text-muted: #777;
+    }
+
+    .card-stats {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-stats:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(26,32,53,0.2);
+    }
+
+    .icon-big {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #fff;
+        background-color: var(--primary);
+    }
+    .icon-primary { background-color: var(--primary); }
+    .icon-success { background-color: var(--accent); }
+    .icon-warning { background-color: var(--accent); }
+    .icon-info { background-color: var(--primary); }
+    .icon-danger { background-color: var(--primary); }
+    .icon-secondary { background-color: var(--primary); }
+
+    .bubble-shadow-small {
+        box-shadow: 0 5px 15px rgba(26,32,53,0.3);
+    }
+
+    .card-round {
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .chart-container {
+        position: relative;
+        min-height: 300px;
+    }
+    .chart-container-sm {
+        position: relative;
+        min-height: 200px;
+    }
+
+    .progress-sm {
+        height: 8px;
+        border-radius: 4px;
+    }
+
+    .item-list {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .item-list:last-child {
+        border-bottom: none;
+    }
+
+    .avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .avatar-title {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+    }
+
+    .info-user { flex: 1; }
+    .username { font-weight: 600; color: #333; }
+    .status { font-size: 12px; color: var(--text-muted); }
+
+    .stat-evolution {
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .stat-evolution.positive { color: var(--accent); }
+    .stat-evolution.negative { color: #c0392b; }
+
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px 0;
+        border-left: 3px solid var(--primary);
+        padding-left: 15px;
+        margin-left: 10px;
+        margin-bottom: 10px;
+    }
+    .activity-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-size: 14px;
+        background-color: var(--primary);
+        color: #fff;
+    }
+
+    /* Actions rapides */
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 12px 16px;
+
+        border-radius: 10px;
+        border: 1px solid var(--primary);
+        background-color: #fff;
+
+        color: var(--primary);
+        font-weight: 500;
+        text-decoration: none;
+
+        transition: background-color 0.25s ease, color 0.25s ease,
+                    box-shadow 0.25s ease, transform 0.25s ease;
+    }
+
+    .quick-action-btn:hover {
+        background-color: var(--primary);
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(26, 32, 53, 0.25);
+        transform: translateY(-2px); /* léger effet mais pas de scale */
+    }
+
+    .quick-action-btn i {
+        font-size: 1rem;
+    }
+
+    /* Comparaison annuelle académique */
+    .year-comparison-card {
+        background-color: var(--primary);
+        color: white;
+        border-radius: 15px;
+    }
+    .year-comparison-card .card-title {
+        color: white;
+    }
+    .year-stat-box {
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .year-stat-box h2 {
+        font-size: 2.4rem;
+        margin-bottom: 5px;
+        color: var(--accent);
+    }
+    .evolution-badge {
+        display: inline-block;
+        padding: 7px 18px;
+        border-radius: 20px;
+        font-weight: bold;
+        background-color: var(--accent);
+        color: #fff;
+    }
+
+    /* Table des années */
+    .table-years {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .table-years thead th {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 15px;
+    }
+    .table-years tbody tr:hover {
+        background-color: rgba(26, 32, 53, 0.05);
+    }
+
+    /* Message pas de données */
+    .no-data-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 200px;
+        color: #888;
+    }
+    .no-data-message i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    /* Harmonisation couleurs Bootstrap sur cette page */
+    .btn-primary, .btn-info {
+        background-color: var(--primary) !important;
+        border-color: var(--primary) !important;
+    }
+    .btn-success, .btn-warning {
+        background-color: var(--accent) !important;
+        border-color: var(--accent) !important;
+        color: #1a1a1a !important;
+    }
+    .btn-danger {
+        background-color: #b3211a !important;
+        border-color: #b3211a !important;
+    }
+
+    .bg-primary { background-color: var(--primary) !important; }
+    .bg-success { background-color: var(--accent) !important; }
+    .bg-warning { background-color: var(--accent-light) !important; color: #333 !important; }
+    .bg-danger { background-color: #b3211a !important; }
+    .bg-info { background-color: var(--primary-light) !important; }
+
+</style>
+{% endblock %}
 
 {% block body %}
-
-
-      <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
-
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Libraries Stylesheet -->
-    <link href="{% static 'user/lib//animate/animate.min.css" rel="stylesheet'%}">
-    <link href="{% static 'user/lib//owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
-
+<!-- Google Web Fonts & Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <div class="page-inner">
-  <div
-    class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
-  >
-    <div>
-      <h3 class="fw-bold mb-3">Dashboard</h3>
-      <h6 class="op-7 mb-2">Free Bootstrap 5 Admin Dashboard</h6>
-    </div>
-    <div class="ms-md-auto py-2 py-md-0">
-      <a href="#" class="btn btn-label-info btn-round me-2">Manage</a>
-      <a href="#" class="btn btn-primary btn-round">Add Customer</a>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-6 col-md-3">
-      <div class="card card-stats card-round">
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-icon">
-              <div
-                class="icon-big text-center icon-primary bubble-shadow-small"
-              >
-                <i class="fas fa-users"></i>
-              </div>
-            </div>
-            <div class="col col-stats ms-3 ms-sm-0">
-              <div class="numbers">
-                <p class="card-category">Visitors</p>
-                <h4 class="card-title">1,294</h4>
-              </div>
-            </div>
-          </div>
+    <!-- Header -->
+    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+        <div>
+            <h3 class="fw-bold mb-1" style="color: var(--primary);">Dashboard</h3>
+            <h6 class="op-7 mb-0 text-muted">
+                Bienvenue {{ request.user.username }} • {{ date_actuelle|date:"d/m/Y" }}
+            </h6>
         </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-md-3">
-      <div class="card card-stats card-round">
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-icon">
-              <div
-                class="icon-big text-center icon-info bubble-shadow-small"
-              >
-                <i class="fas fa-user-check"></i>
-              </div>
-            </div>
-            <div class="col col-stats ms-3 ms-sm-0">
-              <div class="numbers">
-                <p class="card-category">Subscribers</p>
-                <h4 class="card-title">1303</h4>
-              </div>
-            </div>
-          </div>
+        <div class="ms-md-auto py-2 py-md-0">
+            <a href="{% url 'creer_membre' %}" class="btn btn-primary btn-round">
+                <i class="fas fa-plus me-1"></i> Nouveau Membre
+            </a>
         </div>
-      </div>
     </div>
-    <div class="col-sm-6 col-md-3">
-      <div class="card card-stats card-round">
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-icon">
-              <div
-                class="icon-big text-center icon-success bubble-shadow-small"
-              >
-                <i class="fas fa-luggage-cart"></i>
-              </div>
-            </div>
-            <div class="col col-stats ms-3 ms-sm-0">
-              <div class="numbers">
-                <p class="card-category">Sales</p>
-                <h4 class="card-title">$ 1,345</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm-6 col-md-3">
-      <div class="card card-stats card-round">
-        <div class="card-body">
-          <div class="row align-items-center">
-            <div class="col-icon">
-              <div
-                class="icon-big text-center icon-secondary bubble-shadow-small"
-              >
-                <i class="far fa-check-circle"></i>
-              </div>
-            </div>
-            <div class="col col-stats ms-3 ms-sm-0">
-              <div class="numbers">
-                <p class="card-category">Order</p>
-                <h4 class="card-title">576</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-8">
-      <div class="card card-round">
-        <div class="card-header">
-          <div class="card-head-row">
-            <div class="card-title">User Statistics</div>
-            <div class="card-tools">
-              <a
-                href="#"
-                class="btn btn-label-success btn-round btn-sm me-2"
-              >
-                <span class="btn-label">
-                  <i class="fa fa-pencil"></i>
-                </span>
-                Export
-              </a>
-              <a href="#" class="btn btn-label-info btn-round btn-sm">
-                <span class="btn-label">
-                  <i class="fa fa-print"></i>
-                </span>
-                Print
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="chart-container" style="min-height: 375px">
-            <canvas id="statisticsChart"></canvas>
-          </div>
-          <div id="myChartLegend"></div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card card-primary card-round">
-        <div class="card-header">
-          <div class="card-head-row">
-            <div class="card-title">Daily Sales</div>
-            <div class="card-tools">
-              <div class="dropdown">
-                <button
-                  class="btn btn-sm btn-label-light dropdown-toggle"
-                  type="button"
-                  id="dropdownMenuButton"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Export
-                </button>
-                <div
-                  class="dropdown-menu"
-                  aria-labelledby="dropdownMenuButton"
-                >
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <a class="dropdown-item" href="#"
-                    >Something else here</a
-                  >
+
+    <!-- Statistiques principales -->
+    <div class="row">
+        <!-- Total Membres -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-primary bubble-shadow-small">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Total Membres</p>
+                                <h4 class="card-title">{{ total_membres }}</h4>
+                                <span class="stat-evolution {% if evolution_membres >= 0 %}positive{% else %}negative{% endif %}">
+                                    <i class="fas fa-{% if evolution_membres >= 0 %}arrow-up{% else %}arrow-down{% endif %}"></i>
+                                    {{ evolution_membres|floatformat:1 }}% ce mois
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <div class="card-category">March 25 - April 02</div>
         </div>
-        <div class="card-body pb-0">
-          <div class="mb-4 mt-2">
-            <h1>$4,578.58</h1>
-          </div>
-          <div class="pull-in">
-            <canvas id="dailySalesChart"></canvas>
-          </div>
-        </div>
-      </div>
-      <div class="card card-round">
-        <div class="card-body pb-0">
-          <div class="h1 fw-bold float-end text-primary">+5%</div>
-          <h2 class="mb-2">17</h2>
-          <p class="text-muted">Users online</p>
-          <div class="pull-in sparkline-fix">
-            <div id="lineChart"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card card-round">
-        <div class="card-header">
-          <div class="card-head-row card-tools-still-right">
-            <h4 class="card-title">Users Geolocation</h4>
-            <div class="card-tools">
-              <button
-                class="btn btn-icon btn-link btn-primary btn-xs"
-              >
-                <span class="fa fa-angle-down"></span>
-              </button>
-              <button
-                class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card"
-              >
-                <span class="fa fa-sync-alt"></span>
-              </button>
-              <button
-                class="btn btn-icon btn-link btn-primary btn-xs"
-              >
-                <span class="fa fa-times"></span>
-              </button>
-            </div>
-          </div>
-          <p class="card-category">
-            Map of the distribution of users around the world
-          </p>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="table-responsive table-hover table-sales">
-                <table class="table">
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div class="flag">
-                          <img
-                            src="{% static 'assets/img/flags/id.png' %}"
-                            alt="indonesia"
-                          />
+
+        <!-- Membres Validés -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-success bubble-shadow-small">
+                                <i class="fas fa-user-check"></i>
+                            </div>
                         </div>
-                      </td>
-                      <td>Indonesia</td>
-                      <td class="text-end">2.320</td>
-                      <td class="text-end">42.18%</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="flag">
-                          <img
-                            src="{% static 'assets/img/flags/us.png' %}"
-                            alt="united states"
-                          />
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Membres Validés</p>
+                                <h4 class="card-title">{{ membres_valides }}</h4>
+                                <div class="progress progress-sm mt-2">
+                                    <div class="progress-bar bg-success" style="width: {% widthratio membres_valides total_membres 100 %}%"></div>
+                                </div>
+                            </div>
                         </div>
-                      </td>
-                      <td>USA</td>
-                      <td class="text-end">240</td>
-                      <td class="text-end">4.36%</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="flag">
-                          <img
-                            src="{% static 'assets/img/flags/au.png' %}"
-                            alt="australia"
-                          />
-                        </div>
-                      </td>
-                      <td>Australia</td>
-                      <td class="text-end">119</td>
-                      <td class="text-end">2.16%</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="flag">
-                          <img
-                            src="{% static 'assets/img/flags/ru.png' %}"
-                            alt="russia"
-                          />
-                        </div>
-                      </td>
-                      <td>Russia</td>
-                      <td class="text-end">1.081</td>
-                      <td class="text-end">19.65%</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="flag">
-                          <img
-                            src="{% static 'assets/img/flags/cn.png' %}"
-                            alt="china"
-                          />
-                        </div>
-                      </td>
-                      <td>China</td>
-                      <td class="text-end">1.100</td>
-                      <td class="text-end">20%</td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="flag">
-                          <img
-                            src="{% static 'assets/img/flags/br.png' %}"
-                            alt="brazil"
-                          />
-                        </div>
-                      </td>
-                      <td>Brasil</td>
-                      <td class="text-end">640</td>
-                      <td class="text-end">11.63%</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="mapcontainer">
-                <div
-                  id="world-map"
-                  class="w-100"
-                  style="height: 300px"
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card card-round">
-        <div class="card-body">
-          <div class="card-head-row card-tools-still-right">
-            <div class="card-title">New Customers</div>
-            <div class="card-tools">
-              <div class="dropdown">
-                <button
-                  class="btn btn-icon btn-clean me-0"
-                  type="button"
-                  id="dropdownMenuButton"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  <i class="fas fa-ellipsis-h"></i>
-                </button>
-                <div
-                  class="dropdown-menu"
-                  aria-labelledby="dropdownMenuButton"
-                >
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <a class="dropdown-item" href="#"
-                    >Something else here</a
-                  >
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <div class="card-list py-4">
-            <div class="item-list">
-              <div class="avatar">
-                <img
-                  src="{% static 'assets/img/jm_denis.jpg' %}"
-                  alt="..."
-                  class="avatar-img rounded-circle"
-                />
-              </div>
-              <div class="info-user ms-3">
-                <div class="username">Jimmy Denis</div>
-                <div class="status">Graphic Designer</div>
-              </div>
-              <button class="btn btn-icon btn-link op-8 me-1">
-                <i class="far fa-envelope"></i>
-              </button>
-              <button class="btn btn-icon btn-link btn-danger op-8">
-                <i class="fas fa-ban"></i>
-              </button>
-            </div>
-            <div class="item-list">
-              <div class="avatar">
-                <span
-                  class="avatar-title rounded-circle border border-white"
-                  >CF</span
-                >
-              </div>
-              <div class="info-user ms-3">
-                <div class="username">Chandra Felix</div>
-                <div class="status">Sales Promotion</div>
-              </div>
-              <button class="btn btn-icon btn-link op-8 me-1">
-                <i class="far fa-envelope"></i>
-              </button>
-              <button class="btn btn-icon btn-link btn-danger op-8">
-                <i class="fas fa-ban"></i>
-              </button>
-            </div>
-            <div class="item-list">
-              <div class="avatar">
-                <img
-                  src="{% static 'assets/img/talha.jpg' %}"
-                  alt="..."
-                  class="avatar-img rounded-circle"
-                />
-              </div>
-              <div class="info-user ms-3">
-                <div class="username">Talha</div>
-                <div class="status">Front End Designer</div>
-              </div>
-              <button class="btn btn-icon btn-link op-8 me-1">
-                <i class="far fa-envelope"></i>
-              </button>
-              <button class="btn btn-icon btn-link btn-danger op-8">
-                <i class="fas fa-ban"></i>
-              </button>
-            </div>
-            <div class="item-list">
-              <div class="avatar">
-                <img
-                  src="{% static 'assets/img/chadengle.jpg' %}"
-                  alt="..."
-                  class="avatar-img rounded-circle"
-                />
-              </div>
-              <div class="info-user ms-3">
-                <div class="username">Chad</div>
-                <div class="status">CEO Zeleaf</div>
-              </div>
-              <button class="btn btn-icon btn-link op-8 me-1">
-                <i class="far fa-envelope"></i>
-              </button>
-              <button class="btn btn-icon btn-link btn-danger op-8">
-                <i class="fas fa-ban"></i>
-              </button>
-            </div>
-            <div class="item-list">
-              <div class="avatar">
-                <span
-                  class="avatar-title rounded-circle border border-white bg-primary"
-                  >H</span
-                >
-              </div>
-              <div class="info-user ms-3">
-                <div class="username">Hizrian</div>
-                <div class="status">Web Designer</div>
-              </div>
-              <button class="btn btn-icon btn-link op-8 me-1">
-                <i class="far fa-envelope"></i>
-              </button>
-              <button class="btn btn-icon btn-link btn-danger op-8">
-                <i class="fas fa-ban"></i>
-              </button>
-            </div>
-            <div class="item-list">
-              <div class="avatar">
-                <span
-                  class="avatar-title rounded-circle border border-white bg-secondary"
-                  >F</span
-                >
-              </div>
-              <div class="info-user ms-3">
-                <div class="username">Farrah</div>
-                <div class="status">Marketing</div>
-              </div>
-              <button class="btn btn-icon btn-link op-8 me-1">
-                <i class="far fa-envelope"></i>
-              </button>
-              <button class="btn btn-icon btn-link btn-danger op-8">
-                <i class="fas fa-ban"></i>
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-8">
-      <div class="card card-round">
-        <div class="card-header">
-          <div class="card-head-row card-tools-still-right">
-            <div class="card-title">Transaction History</div>
-            <div class="card-tools">
-              <div class="dropdown">
-                <button
-                  class="btn btn-icon btn-clean me-0"
-                  type="button"
-                  id="dropdownMenuButton"
-                  data-bs-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  <i class="fas fa-ellipsis-h"></i>
-                </button>
-                <div
-                  class="dropdown-menu"
-                  aria-labelledby="dropdownMenuButton"
-                >
-                  <a class="dropdown-item" href="#">Action</a>
-                  <a class="dropdown-item" href="#">Another action</a>
-                  <a class="dropdown-item" href="#"
-                    >Something else here</a
-                  >
+
+        <!-- En Attente -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-warning bubble-shadow-small">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">En Attente</p>
+                                <h4 class="card-title">{{ membres_en_attente }}</h4>
+                                <a href="{% url 'liste_membres' %}?statut=en_attente" class="small text-muted">Voir les demandes →</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <!-- Projects table -->
-            <table class="table align-items-center mb-0">
-              <thead class="thead-light">
-                <tr>
-                  <th scope="col">Payment Number</th>
-                  <th scope="col" class="text-end">Date & Time</th>
-                  <th scope="col" class="text-end">Amount</th>
-                  <th scope="col" class="text-end">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <button
-                      class="btn btn-icon btn-round btn-success btn-sm me-2"
-                    >
-                      <i class="fa fa-check"></i>
-                    </button>
-                    Payment from #10231
-                  </th>
-                  <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                  <td class="text-end">$250.00</td>
-                  <td class="text-end">
-                    <span class="badge badge-success">Completed</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+        <!-- Total Paiements -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-info bubble-shadow-small">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Total Recettes</p>
+                                <h4 class="card-title">{{ total_paiements|floatformat:0 }} F</h4>
+                                <span class="text-success small">
+                                    +{{ paiements_ce_mois|floatformat:0 }} ce mois
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+
+    <!-- Comparaison Annuelle (ANNÉE ACADÉMIQUE) -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-round year-comparison-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Comparaison Annuelle des Inscriptions (années académiques)
+                    </h5>
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <div class="year-stat-box">
+                                <h2>{{ membres_acad_precedente }}</h2>
+                                {% if annee_academique_precedente %}
+                                    <p class="mb-0">
+                                        {{ annee_academique_precedente.debutAnnee|date:"Y" }}
+                                        -
+                                        {{ annee_academique_precedente.finAnnee|date:"Y" }}
+                                    </p>
+                                {% else %}
+                                    <p class="mb-0">Année précédente</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="year-stat-box">
+                                <h2>{{ membres_acad_actuelle }}</h2>
+                                {% if annee_academique_actuelle %}
+                                    <p class="mb-0">
+                                        {{ annee_academique_actuelle.debutAnnee|date:"Y" }}
+                                        -
+                                        {{ annee_academique_actuelle.finAnnee|date:"Y" }}
+                                    </p>
+                                {% else %}
+                                    <p class="mb-0">Année actuelle</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="year-stat-box">
+                                <h2>{{ total_membres }}</h2>
+                                <p class="mb-0">Total historique</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="evolution-badge">
+                                <i class="fas fa-{% if evolution_academique >= 0 %}arrow-up{% else %}arrow-down{% endif %} me-1"></i>
+                                {{ evolution_academique|floatformat:1 }}%
+                            </div>
+                            <p class="mt-2 mb-0">Évolution académique</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques secondaires -->
+    <div class="row">
+        <!-- Membres cette année civile -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-primary bubble-shadow-small">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Inscrits {{ date_actuelle|date:"Y" }}</p>
+                                <h4 class="card-title">{{ membres_cette_annee }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Événements -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-danger bubble-shadow-small">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Événements</p>
+                                <h4 class="card-title">{{ total_evenements }}</h4>
+                                <small class="text-muted">{{ evenements_publies }} publiés</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Réinscriptions -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                                <i class="fas fa-redo"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Réinscriptions</p>
+                                <h4 class="card-title">{{ total_reinscriptions }}</h4>
+                                <small class="text-muted">{{ reinscriptions_annee_courante }} cette année</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Annonces -->
+        <div class="col-sm-6 col-md-3">
+            <div class="card card-stats card-round">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-icon">
+                            <div class="icon-big text-center icon-success bubble-shadow-small">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                        </div>
+                        <div class="col col-stats ms-3 ms-sm-0">
+                            <div class="numbers">
+                                <p class="card-category">Annonces</p>
+                                <h4 class="card-title">{{ total_annonces }}</h4>
+                                <small class="text-muted">{{ annonces_publiees }} publiées</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques par Année (civile) -->
+    <div class="row">
+        <!-- Total Membres par Année -->
+        <div class="col-md-6">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-bar me-2" style="color: var(--primary);"></i>
+                        Total des Membres par Année (civile)
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="membresParAnneeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inscriptions Cumulées par Année -->
+        <div class="col-md-6">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line me-2" style="color: var(--accent);"></i>
+                        Inscriptions Cumulées par Année (civile)
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="membresCumulesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau détaillé par année civile -->
+    {% if annees_stats %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-table me-2" style="color: var(--primary);"></i>
+                        Statistiques Détaillées par Année (civile)
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-years table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Année</th>
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Hommes</th>
+                                    <th class="text-center">Femmes</th>
+                                    <th class="text-center">Validés</th>
+                                    <th class="text-center">En Attente</th>
+                                    <th class="text-center">Refusés</th>
+                                    <th class="text-center">Taux Validation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in annees_stats %}
+                                <tr>
+                                    <td><strong>{{ stat.annee }}</strong></td>
+                                    <td class="text-center"><span class="badge bg-primary">{{ stat.total }}</span></td>
+                                    <td class="text-center"><span class="badge bg-info">{{ stat.hommes }}</span></td>
+                                    <td class="text-center"><span class="badge" style="background-color: var(--accent-light);">{{ stat.femmes }}</span></td>
+                                    <td class="text-center"><span class="badge bg-success">{{ stat.valides }}</span></td>
+                                    <td class="text-center"><span class="badge bg-warning text-dark">{{ stat.en_attente }}</span></td>
+                                    <td class="text-center"><span class="badge bg-danger">{{ stat.refuses }}</span></td>
+                                    <td class="text-center">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <div class="progress" style="width: 80px; height: 8px;">
+                                                <div class="progress-bar bg-success" style="width: {{ stat.taux_validation }}%"></div>
+                                            </div>
+                                            <span class="ms-2">{{ stat.taux_validation }}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Graphiques principaux (déjà existants, conservés) -->
+    <div class="row">
+        <!-- Évolution des Inscriptions (12 mois) -->
+        <div class="col-md-8">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">Évolution des Inscriptions (12 derniers mois)</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="inscriptionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statut & Genre -->
+        <div class="col-md-4">
+            <!-- Statut des Membres -->
+            <div class="card card-round mb-4">
+                <div class="card-header">
+                    <div class="card-title">Statut des Membres</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-sm">
+                        <canvas id="statutChart"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle" style="color: var(--accent);"></i> Validés</span>
+                            <strong>{{ membres_valides }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span><i class="fas fa-circle" style="color: var(--accent-light);"></i> En attente</span>
+                            <strong>{{ membres_en_attente }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span><i class="fas fa-circle" style="color: var(--primary);"></i> Refusés</span>
+                            <strong>{{ membres_refuses }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Répartition par Genre -->
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">Répartition par Genre</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-sm">
+                        <canvas id="genreChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques Paiements et Événements -->
+    <div class="row">
+        <!-- Revenus Mensuels -->
+        <div class="col-md-6">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-head-row">
+                        <div class="card-title">Revenus Mensuels</div>
+                        <span class="badge bg-primary">{{ paiements_ce_mois|floatformat:0 }} F ce mois</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="paiementsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Événements par Type -->
+        <div class="col-md-6">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">Événements par Type</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="evenementsTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Autres graphiques -->
+    <div class="row">
+        <!-- Statut des Paiements -->
+        <div class="col-md-4">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">Statut des Paiements</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-sm">
+                        <canvas id="paiementsStatutChart"></canvas>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="text-success mb-0">{{ montant_paye|floatformat:0 }}</h5>
+                            <small class="text-muted">FCFA Encaissés</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-warning mb-0">{{ montant_en_attente|floatformat:0 }}</h5>
+                            <small class="text-muted">FCFA En attente</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Réinscriptions par Année académique -->
+        <div class="col-md-4">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">Réinscriptions par Année académique</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-sm">
+                        <canvas id="reinscriptionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inscriptions (30 jours) -->
+        <div class="col-md-4">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">Inscriptions (30 derniers jours)</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container-sm">
+                        <canvas id="inscriptionsJourChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableaux & listes (membres en attente, derniers paiements, etc.) -->
+    <div class="row">
+        <!-- Membres en attente -->
+        <div class="col-md-6">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-head-row">
+                        <div class="card-title">
+                            <i class="fas fa-user-clock me-2" style="color: var(--accent);"></i>
+                            Membres en Attente
+                        </div>
+                        <span class="badge bg-warning text-dark">{{ membres_en_attente }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if membres_attente_validation %}
+                    <div class="card-list">
+                        {% for membre in membres_attente_validation %}
+                        <div class="item-list">
+                            <div class="avatar">
+                                {% if membre.photo %}
+                                <img src="{{ membre.photo.url }}" alt="{{ membre.nom }}" class="avatar-img rounded-circle">
+                                {% else %}
+                                <span class="avatar-title rounded-circle bg-warning text-dark">
+                                    {{ membre.nom|slice:":1" }}{{ membre.prenom|slice:":1" }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="info-user ms-3">
+                                <div class="username">{{ membre.nom_complet }}</div>
+                                <div class="status">{{ membre.email }}</div>
+                            </div>
+                            <a href="{% url 'valider_membre' membre.id %}" class="btn btn-success btn-sm me-1" title="Valider">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <a href="{% url 'refuser_membre' membre.id %}" class="btn btn-danger btn-sm" title="Refuser">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">Aucune demande en attente</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers paiements -->
+        <div class="col-md-6">
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-head-row">
+                        <div class="card-title">
+                            <i class="fas fa-receipt me-2" style="color: var(--primary);"></i>
+                            Derniers Paiements
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Membre</th>
+                                    <th>Événement</th>
+                                    <th class="text-end">Montant</th>
+                                    <th class="text-end">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in derniers_paiements %}
+                                <tr>
+                                    <td>
+                                        {% if paiement.membre_Reinscris and paiement.membre_Reinscris.membre %}
+                                        {{ paiement.membre_Reinscris.membre.nom_complet }}
+                                        {% else %}N/A{% endif %}
+                                    </td>
+                                    <td>{{ paiement.evenement.titre|truncatechars:15 }}</td>
+                                    <td class="text-end">{{ paiement.montant|floatformat:0 }} F</td>
+                                    <td class="text-end">
+                                        {% if paiement.statut == 'payé' %}
+                                        <span class="badge bg-success">Payé</span>
+                                        {% elif paiement.statut == 'non_payé' %}
+                                        <span class="badge bg-danger">Non payé</span>
+                                        {% elif paiement.statut == 'moitié_payé' %}
+                                        <span class="badge bg-warning">Moitié</span>
+                                        {% else %}
+                                        <span class="badge bg-info">Avance</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-3">Aucun paiement</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides & résumé -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Nouveaux membres -->
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-head-row">
+                        <div class="card-title">
+                            <i class="fas fa-user-plus me-2" style="color: var(--accent);"></i>
+                            Nouveaux Membres
+                        </div>
+                        <span class="badge bg-success">{{ nouveaux_membres_semaine }} cette semaine</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for membre in derniers_membres|slice:":6" %}
+                        <div class="col-md-6">
+                            <div class="item-list">
+                                <div class="avatar">
+                                    {% if membre.photo %}
+                                    <img src="{{ membre.photo.url }}" alt="{{ membre.nom }}" class="avatar-img rounded-circle">
+                                    {% else %}
+                                    <span class="avatar-title rounded-circle">
+                                        {{ membre.nom|slice:":1" }}{{ membre.prenom|slice:":1" }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="info-user ms-3">
+                                    <div class="username">{{ membre.nom_complet }}</div>
+                                    <div class="status">{{ membre.profession|default:"Non renseigné" }}</div>
+                                </div>
+                                {% if membre.statut == 'valide' %}
+                                <span class="badge bg-success">Validé</span>
+                                {% elif membre.statut == 'en_attente' %}
+                                <span class="badge bg-warning text-dark">En attente</span>
+                                {% else %}
+                                <span class="badge bg-danger">Refusé</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides & résumé du mois -->
+        <div class="col-md-4">
+            <!-- Actions rapides -->
+            <div class="card card-round">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bolt me-2"></i>
+                        Actions Rapides
+                    </div>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'creer_membre' %}" class="quick-action-btn w-100 mb-2">
+                        <i class="fas fa-user-plus me-2"></i> Ajouter un Membre
+                    </a>
+                    <a href="{% url 'ajoutEvenement' %}" class="quick-action-btn w-100 mb-2">
+                        <i class="fas fa-calendar-plus me-2"></i> Créer un Événement
+                    </a>
+                    <a href="{% url 'creer_annonce' %}" class="quick-action-btn w-100 mb-2">
+                        <i class="fas fa-bullhorn me-2"></i> Ajouter une Annonce
+                    </a>
+                    <a href="{% url 'ajouter_paiement' %}" class="quick-action-btn w-100">
+                        <i class="fas fa-money-check me-2"></i> Enregistrer un Paiement
+                    </a>
+                </div>
+            </div>
+
+            <!-- Résumé du mois -->
+            <div class="card card-round mt-4 bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="text-white mb-3">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Résumé du Mois
+                    </h5>
+                    <hr class="border-light">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Nouvelles inscriptions</span>
+                        <strong>{{ nouveaux_membres_mois }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Paiements reçus</span>
+                        <strong>{{ paiements_ce_mois|floatformat:0 }} F</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Événements publiés</span>
+                        <strong>{{ evenements_publies }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Taux validation</span>
+                        <strong>{% widthratio membres_valides total_membres 100 %}%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Scripts pour les graphiques -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Palette unique
+    const colors = {
+        primary: '#1a2035',
+        primaryLight: 'rgba(26, 32, 53, 0.15)',
+        accent: '#FF6F0F',
+        accentLight: 'rgba(255, 111, 15, 0.20)',
+        success: '#FF6F0F',
+        successLight: 'rgba(255, 111, 15, 0.20)',
+        warning: '#FF6F0F',
+        warningLight: 'rgba(255, 111, 15, 0.14)',
+        danger: '#1a2035',
+        dangerLight: 'rgba(26, 32, 53, 0.2)',
+        info: '#1a2035',
+        infoLight: 'rgba(26, 32, 53, 0.12)',
+    };
+
+    const labelsMois = {{ labels_mois|safe }};
+    const dataInscriptions = {{ data_inscriptions|safe }};
+    const labelsPaiementsMois = {{ labels_paiements_mois|safe }};
+    const dataPaiementsMois = {{ data_paiements_mois|safe }};
+    const labelsTypesEvt = {{ labels_types_evt|safe }};
+    const dataTypesEvt = {{ data_types_evt|safe }};
+    const labelsJours = {{ labels_jours|safe }};
+    const dataInscriptionsJour = {{ data_inscriptions_jour|safe }};
+    const labelsAnneesReinscription = {{ labels_annees_reinscription|safe }};
+    const dataReinscriptions = {{ data_reinscriptions|safe }};
+    const labelsAnneesMembres = {{ labels_annees_membres|safe }};
+    const dataMembresParAnnee = {{ data_membres_par_annee|safe }};
+    const dataMembresCumules = {{ data_membres_cumules|safe }};
+    const labelsPaiementsAnnee = {{ labels_paiements_annee|safe }};
+    const dataPaiementsAnnee = {{ data_paiements_annee|safe }};
+
+    const membresValides = {{ membres_valides }};
+    const membresEnAttente = {{ membres_en_attente }};
+    const membresRefuses = {{ membres_refuses }};
+    const membresHommes = {{ membres_hommes }};
+    const membresFemmes = {{ membres_femmes }};
+    const membresAutres = {{ membres_autres }};
+    const paiementsPayes = {{ paiements_payes }};
+    const paiementsNonPayes = {{ paiements_non_payes }};
+    const paiementsMoitie = {{ paiements_moitie }};
+    const paiementsAvance = {{ paiements_avance }};
+
+    // Membres par année (barres)
+    const membresParAnneeCtx = document.getElementById('membresParAnneeChart');
+    if (membresParAnneeCtx) {
+        new Chart(membresParAnneeCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsAnneesMembres,
+                datasets: [{
+                    label: 'Membres inscrits',
+                    data: dataMembresParAnnee,
+                    backgroundColor: colors.accentLight,
+                    borderColor: colors.accent,
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    // Membres cumulés (ligne)
+    const membresCumulesCtx = document.getElementById('membresCumulesChart');
+    if (membresCumulesCtx) {
+        new Chart(membresCumulesCtx, {
+            type: 'line',
+            data: {
+                labels: labelsAnneesMembres,
+                datasets: [{
+                    label: 'Total cumulé',
+                    data: dataMembresCumules,
+                    borderColor: colors.primary,
+                    backgroundColor: colors.primaryLight,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: colors.primary,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // Inscriptions mensuelles
+    const inscriptionsCtx = document.getElementById('inscriptionsChart');
+    if (inscriptionsCtx) {
+        new Chart(inscriptionsCtx, {
+            type: 'line',
+            data: {
+                labels: labelsMois,
+                datasets: [{
+                    label: 'Inscriptions',
+                    data: dataInscriptions,
+                    borderColor: colors.accent,
+                    backgroundColor: colors.accentLight,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: colors.accent,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // Statut des membres (doughnut)
+    const statutCtx = document.getElementById('statutChart');
+    if (statutCtx) {
+        const totalStatut = membresValides + membresEnAttente + membresRefuses;
+        if (totalStatut > 0) {
+            new Chart(statutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Validés', 'En attente', 'Refusés'],
+                    datasets: [{
+                        data: [membresValides, membresEnAttente, membresRefuses],
+                        backgroundColor: [colors.accent, colors.accentLight, colors.primary],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    cutout: '65%'
+                }
+            });
+        }
+    }
+
+    // Répartition par genre (pie)
+    const genreCtx = document.getElementById('genreChart');
+    if (genreCtx) {
+        const totalGenre = membresHommes + membresFemmes + membresAutres;
+        if (totalGenre > 0) {
+            new Chart(genreCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Hommes', 'Femmes', 'Autres'],
+                    datasets: [{
+                        data: [membresHommes, membresFemmes, membresAutres],
+                        backgroundColor: [colors.primary, colors.accent, colors.primaryLight],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12 }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Paiements mensuels (barres)
+    const paiementsCtx = document.getElementById('paiementsChart');
+    if (paiementsCtx) {
+        new Chart(paiementsCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsPaiementsMois,
+                datasets: [{
+                    label: 'Revenus (FCFA)',
+                    data: dataPaiementsMois,
+                    backgroundColor: colors.successLight,
+                    borderColor: colors.success,
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    // Événements par type (polar)
+    const evenementsTypeCtx = document.getElementById('evenementsTypeChart');
+    if (evenementsTypeCtx) {
+        const totalEvt = dataTypesEvt.reduce((a, b) => a + b, 0);
+        if (totalEvt > 0) {
+            new Chart(evenementsTypeCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: labelsTypesEvt,
+                    datasets: [{
+                        data: dataTypesEvt,
+                        backgroundColor: [
+                            colors.accentLight,
+                            colors.primaryLight,
+                            colors.accentLight,
+                            colors.primaryLight,
+                            colors.accentLight,
+                            colors.primaryLight
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10 } }
+                    }
+                }
+            });
+        } else {
+            evenementsTypeCtx.parentElement.innerHTML = '<div class="no-data-message"><i class="fas fa-calendar-times"></i><p>Aucun événement</p></div>';
+        }
+    }
+
+    // Statut des paiements (doughnut)
+    const paiementsStatutCtx = document.getElementById('paiementsStatutChart');
+    if (paiementsStatutCtx) {
+        const totalPaiements = paiementsPayes + paiementsNonPayes + paiementsMoitie + paiementsAvance;
+        if (totalPaiements > 0) {
+            new Chart(paiementsStatutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Payé', 'Non payé', 'Moitié payé', 'Avance'],
+                    datasets: [{
+                        data: [paiementsPayes, paiementsNonPayes, paiementsMoitie, paiementsAvance],
+                        backgroundColor: [colors.accent, colors.primary, colors.accentLight, colors.primaryLight],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10 } }
+                    },
+                    cutout: '60%'
+                }
+            });
+        } else {
+            paiementsStatutCtx.parentElement.innerHTML = '<div class="no-data-message"><i class="fas fa-money-bill-wave"></i><p>Aucun paiement</p></div>';
+        }
+    }
+
+    // Réinscriptions par année académique
+    const reinscriptionsCtx = document.getElementById('reinscriptionsChart');
+    if (reinscriptionsCtx) {
+        const totalReinsc = dataReinscriptions.reduce((a, b) => a + b, 0);
+        if (totalReinsc > 0) {
+            new Chart(reinscriptionsCtx, {
+                type: 'bar',
+                data: {
+                    labels: labelsAnneesReinscription,
+                    datasets: [{
+                        label: 'Réinscriptions',
+                        data: dataReinscriptions,
+                        backgroundColor: colors.infoLight,
+                        borderColor: colors.info,
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        } else {
+            reinscriptionsCtx.parentElement.innerHTML = '<div class="no-data-message"><i class="fas fa-redo"></i><p>Aucune réinscription</p></div>';
+        }
+    }
+
+    // Inscriptions (30 derniers jours)
+    const inscriptionsJourCtx = document.getElementById('inscriptionsJourChart');
+    if (inscriptionsJourCtx) {
+        new Chart(inscriptionsJourCtx, {
+            type: 'line',
+            data: {
+                labels: labelsJours,
+                datasets: [{
+                    label: 'Inscriptions',
+                    data: dataInscriptionsJour,
+                    borderColor: colors.warning,
+                    backgroundColor: colors.warningLight,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { ticks: { maxTicksLimit: 10 } }
+                }
+            }
+        });
+    }
+
+});
+</script>
 
 {% endblock %}

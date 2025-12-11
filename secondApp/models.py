@@ -58,15 +58,21 @@ class Annee(models.Model):
         # Format plus lisible pour l'affichage dans les filtres
         return f"{self.debutAnnee.year}-{self.finAnnee.year}"
     
-
 class Membre(models.Model):
     GENRE_CHOICES = [
         ('M', 'Masculin'),
         ('F', 'Féminin'),
         ('A', 'Autre')
     ]
+    
+    # Nouveau champ pour le statut de validation
+    STATUT_CHOICES = [
+        ('en_attente', 'En attente de validation'),
+        ('valide', 'Validé'),
+        ('refuse', 'Refusé'),
+    ]
 
-    utilisateur = models.OneToOneField(Utilisateur, on_delete= models.CASCADE, null = True, blank= True, related_name= "membre")
+    utilisateur = models.OneToOneField(Utilisateur, on_delete=models.CASCADE, null=True, blank=True, related_name="membre")
 
     # Informations de base
     nom = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
@@ -87,8 +93,6 @@ class Membre(models.Model):
     ecole = models.CharField(max_length=20, blank=True, null=True)
     filiere = models.CharField(max_length=150, blank=True, null= True)
 
-
-    
     # Informations supplémentaires
     date_inscription = models.DateTimeField(auto_now_add=True)
     date_derniere_modification = models.DateTimeField(auto_now=True)
@@ -99,9 +103,27 @@ class Membre(models.Model):
         verbose_name="Photo de profil"
     )
     
+    # Nouveau champ statut
+    statut = models.CharField(
+        max_length=20,
+        choices=STATUT_CHOICES,
+        default='en_attente',
+        verbose_name="Statut de validation"
+    )
+    
+    # Date de validation
+    date_validation = models.DateTimeField(null=True, blank=True, verbose_name="Date de validation")
+    valide_par = models.ForeignKey(
+        Utilisateur, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="membres_valides",
+        verbose_name="Validé par"
+    )
+    
     # Métadonnées
     notes = models.TextField(blank=True, null=True, verbose_name="Remarques")
-
 
     # information sur l'identité
     ner = models.CharField(max_length=20, blank=True, null=True)
@@ -120,11 +142,20 @@ class Membre(models.Model):
         indexes = [
             models.Index(fields=['nom', 'prenom']),
             models.Index(fields=['email']),
+            models.Index(fields=['statut']),
         ]
     
     @property
     def nom_complet(self):
         return f"{self.nom} {self.prenom}"
+    
+    @property
+    def est_valide(self):
+        return self.statut == 'valide'
+    
+    @property
+    def est_en_attente(self):
+        return self.statut == 'en_attente'
 
 
 #--------------------ANNONCES ET PAYEMENTS--------------------------------
@@ -139,7 +170,6 @@ class Annonce(models.Model):
 
     def __str__(self):
         return self.titre
-
 
 
 # Create your models here.

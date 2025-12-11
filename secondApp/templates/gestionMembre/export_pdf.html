@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Membres</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1.5cm;
+            @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 0.5cm;
+                margin-left: 1cm;
+                margin-right: 1cm;
+                height: 1cm;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 9pt;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        /* En-tête du document */
+        .header {
+            background: linear-gradient(135deg, #FF6F0F 0%, #073841 100%);
+            color: white;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        .header-content {
+            display: table;
+            width: 100%;
+        }
+        
+        .header-left {
+            display: table-cell;
+            vertical-align: middle;
+            width: 70%;
+        }
+        
+        .header-right {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: right;
+            width: 30%;
+        }
+        
+        .header h1 {
+            font-size: 22pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .header .subtitle {
+            font-size: 10pt;
+            opacity: 0.9;
+        }
+        
+        .header .stats {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .header .stats .number {
+            font-size: 24pt;
+            font-weight: bold;
+        }
+        
+        .header .stats .label {
+            font-size: 9pt;
+        }
+        
+        /* Informations de filtre */
+        .filter-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            font-size: 9pt;
+        }
+        
+        .filter-info span {
+            display: inline-block;
+            margin-right: 20px;
+            color: #666;
+        }
+        
+        .filter-info strong {
+            color: #FF6F0F;
+        }
+        
+        /* Tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        thead tr {
+            background: #073841;
+            color: white;
+        }
+        
+        th {
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #073841;
+        }
+        
+        th.center {
+            text-align: center;
+        }
+        
+        td {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            font-size: 8pt;
+            vertical-align: middle;
+        }
+        
+        td.center {
+            text-align: center;
+        }
+        
+        td.numero {
+            text-align: center;
+            font-weight: bold;
+            color: #FF6F0F;
+            background: #fff5f0;
+            width: 30px;
+        }
+        
+        /* Lignes alternées */
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
+        
+        /* Hover effect (pour écran, pas pour PDF) */
+        tbody tr:hover {
+            background: #fff3e6;
+        }
+        
+        /* Cellules spéciales */
+        .nom-cell {
+            font-weight: 600;
+            color: #073841;
+        }
+        
+        .empty-cell {
+            color: #adb5bd;
+            font-style: italic;
+        }
+        
+        /* Photo placeholder */
+        .photo-cell {
+            width: 40px;
+            text-align: center;
+        }
+        
+        .photo-placeholder {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: inline-block;
+            text-align: center;
+            line-height: 30px;
+            font-size: 12pt;
+            color: #adb5bd;
+        }
+        
+        .photo-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FF6F0F;
+        }
+        
+        /* Pied de page */
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e9ecef;
+            font-size: 8pt;
+            color: #888;
+        }
+        
+        .footer-content {
+            display: table;
+            width: 100%;
+        }
+        
+        .footer-left {
+            display: table-cell;
+            text-align: left;
+            width: 50%;
+        }
+        
+        .footer-right {
+            display: table-cell;
+            text-align: right;
+            width: 50%;
+        }
+        
+        /* Badge de statut */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 7pt;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .badge-valide {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-en_attente {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-refuse {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Résumé */
+        .summary-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-top: 20px;
+        }
+        
+        .summary-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #073841;
+            margin-bottom: 10px;
+        }
+        
+        .summary-grid {
+            display: table;
+            width: 100%;
+        }
+        
+        .summary-item {
+            display: table-cell;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .summary-number {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #FF6F0F;
+        }
+        
+        .summary-label {
+            font-size: 8pt;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            bottom: 50%;
+            left: 30%;
+            font-size: 80pt;
+            color: rgba(0, 0, 0, 0.03);
+            transform: rotate(-30deg);
+            z-index: -1;
+        }
+        
+        /* Page break */
+        .page-break {
+            page-break-after: always;
+        }
+        
+        /* Pour les adresses longues */
+        .address-cell {
+            max-width: 150px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <!-- Watermark -->
+    <div class="text-center" style="font-size: 20px; text-align: center;">LISTE DES MEMBRES </div>
+    
+    <!-- En-tête -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>📋 Liste des Membres</h1>
+                <p class="subtitle">
+                    Document généré le {{ date_export|date:"d F Y" }} à {{ date_export|time:"H:i" }}
+                </p>
+            </div>
+            <div class="header-right">
+                <div class="stats">
+                    <div class="number">{{ total }}</div>
+                    <div class="label">Membre{% if total > 1 %}s{% endif %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informations de filtre -->
+    <div class="filter-info">
+        <span>📅 <strong>Date:</strong> {{ date_export|date:"d/m/Y" }}</span>
+        
+        {% if annee_selectionnee %}
+        <span>📆 <strong>Année:</strong> {{ annee_selectionnee.debutAnnee|date:"Y" }} - {{ annee_selectionnee.finAnnee|date:"Y" }}</span>
+        {% endif %}
+        
+        {% if statut_filter and statut_filter != 'tous' %}
+        <span>🏷️ <strong>Statut:</strong> 
+            {% if statut_filter == 'valide' %}Validés
+            {% elif statut_filter == 'en_attente' %}En attente
+            {% elif statut_filter == 'refuse' %}Refusés
+            {% else %}{{ statut_filter }}{% endif %}
+        </span>
+        {% endif %}
+        
+        {% if search_query %}
+        <span>🔍 <strong>Recherche:</strong> "{{ search_query }}"</span>
+        {% endif %}
+        
+        <span>👤 <strong>Exporté par:</strong> {{ exporteur.get_full_name|default:exporteur.username }}</span>
+    </div>
+    
+    <!-- Tableau des membres -->
+    <table>
+        <thead>
+            <tr>
+                <th class="center" style="width: 30px;">N°</th>
+                <th style="width: 100px;">Nom</th>
+                <th style="width: 100px;">Prénom</th>
+                <th style="width: 70px;">Ner</th>
+                <th style="width: 70px;">Keri</th>
+                <th style="width: 70px;">Keribour</th>
+                <th style="width: 90px;">Téléphone</th>
+                <th style="width: 100px;">École</th>
+                <th style="width: 80px;">Niveau</th>
+                <th>Adresse</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for membre in membres %}
+            <tr>
+                <td class="numero">{{ forloop.counter }}</td>
+                <td class="nom-cell">{{ membre.nom|upper }}</td>
+                <td>{{ membre.prenom|title }}</td>
+                <td>{% if membre.ner %}{{ membre.ner }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if membre.keri %}{{ membre.keri }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if membre.keribour %}{{ membre.keribour }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if membre.telephone %}{{ membre.telephone }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if membre.ecole %}{{ membre.ecole }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if membre.niveauEtude %}{{ membre.niveauEtude }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td class="address-cell">{% if membre.adresse %}{{ membre.adresse }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 30px; color: #888;">
+                    Aucun membre trouvé avec les critères sélectionnés.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Résumé -->
+    <div class="summary-box">
+        <div class="summary-title">📊 Résumé</div>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-number">{{ total }}</div>
+                <div class="summary-label">Total Membres</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-number">{{ membres|length }}</div>
+                <div class="summary-label">Dans cette liste</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pied de page -->
+    <div class="footer">
+        <div class="footer-content">
+           
+            <div class="footer-right">
+                Généré par {{ exporteur.get_full_name|default:exporteur.username }} | {{ date_export|date:"d/m/Y H:i" }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer pour numérotation des pages -->
+    <div id="footerContent">
+        <div style="text-align: center; font-size: 8pt; color: #888;">
+            Page <pdf:pagenumber> sur <pdf:pagecount>
+        </div>
+    </div>
+</body>
+</html>

@@ -440,15 +440,18 @@
                             <td>{{ reinscription.date_reinscription|date:"d/m/Y H:i" }}</td>
                             <td>
                                 <div class="action-buttons" style="display: flex!important; justify-content: space-between!important;">
-                                    <a href="{% url 'detail_membre' reinscription.membre.pk %}" class="btn-details">
+                                    <a href="{% url 'detail_membre' reinscription.membre.pk %}" 
+                                    class="btn btn-sm btn-outline-dark">
                                         <i class="fas fa-eye"></i> 
                                     </a>
                                     <a href="{% url 'supprimer_reinscription' reinscription.pk %}"
-                                        class="btn-details"
+                                        class="btn btn-sm btn-outline-danger"
                                         title="Supprimer"
                                         onclick="return confirm('Voulez-vous vraiment supprimer cette réinscription ?')">
                                         <i class="fas fa-trash-alt"></i> 
                                     </a>
+
+
                                 </div>
                             </td>
                         </tr>

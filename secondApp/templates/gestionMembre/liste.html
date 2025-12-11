@@ -1,156 +1,308 @@
 {% extends 'base.html' %}
-
-{% load static %} 
+{% load static %}
 
 {% block title %}Liste membres{% endblock %}
 
 {% block style %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+<link href="{% static 'user/css/bootstrap.min.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'assets/css/membres/listeMembre.css' %}" />
 
+<style>
+    /* === TOUT VOTRE STYLE D'ORIGINE EST CONSERVÉ À 100% === */
+    :root {
+        --primary-color: #FF6F0F;
+        --secondary-color: #073841;
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --info-color: #17a2b8;
+    }
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet"> 
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .year-selector select { padding: 10px 40px 10px 15px; border: 2px solid #e0e0e0; border-radius: 10px; background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center; background-size: 20px; min-width: 200px; cursor: pointer; }
+    .year-selector select:focus { border-color: var(--primary-color); outline: none; }
 
-    <!-- Icon Font Stylesheet -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    .btn-export { padding: 10px 20px; border: none; border-radius: 10px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; transition: all 0.3s ease; }
+    .btn-export:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .btn-export-pdf { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; }
+    .btn-export-csv { background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white; }
+    .btn-export-print { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; }
+    .btn-add-membre { background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; }
 
-    <!-- Libraries Stylesheet -->
-    <link href="{% static 'user/lib//animate/animate.min.css" rel="stylesheet'%}">
-    <link href="{% static 'user/lib//owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    .year-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 600; }
 
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="{% static 'user/css/bootstrap.min.css'%}" rel="stylesheet">
+    .filter-tabs { display: flex; gap: 12px; margin-bottom: 25px; flex-wrap: wrap; }
+    .filter-tab { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 25px; background: white; color: #666; text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+    .filter-tab:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    .filter-tab.active { background: var(--secondary-color); border-color: var(--secondary-color); color: white; }
+    .filter-tab.active.en-attente { background: var(--warning-color); color: #000; }
+    .filter-tab.active.valide { background: var(--success-color); }
+    .filter-tab.active.refuse { background: var(--danger-color); }
+    .badge-count { background: rgba(0,0,0,0.15); padding: 3px 10px; border-radius: 12px; font-size: 0.85em; }
+    .filter-tab.active .badge-count { background: rgba(255,255,255,0.3); }
 
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+    .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.85em; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+    .status-badge.en_attente { background: #fff3cd; color: #856404; }
+    .status-badge.valide { background: #d4edda; color: #155724; }
+    .status-badge.refuse { background: #f8d7da; color: #721c24; }
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-action { padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 500; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-details { background: var(--info-color); color: white; }
+    .btn-valider { background: var(--success-color); color: white; }
+    .btn-refuser { background: var(--danger-color); color: white; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); color: white; }
 
+    .bulk-actions { background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); padding: 18px 25px; border-radius: 12px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+    .btn-bulk { padding: 12px 24px; border: none; border-radius: 25px; cursor: pointer; font-weight: 600; background: var(--success-color); color: white; display: inline-flex; align-items: center; gap: 8px; }
 
-    {% comment %} css pour la page {% endcomment %}
-    <link rel="stylesheet" href="{% static 'assets/css/membres/listeMembre.css' %}" />
+    .alert { padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .alert-success { background: #d4edda; color: #155724; }
+    .alert-warning { background: #fff3cd; color: #856404; }
+    .alert-error, .alert-danger { background: #f8d7da; color: #721c24; }
+    .alert-close { margin-left: auto; background: none; border: none; font-size: 1.5em; cursor: pointer; opacity: 0.5; }
 
+    .table-warning { background-color: rgba(255, 193, 7, 0.1) !important; }
+
+    @media (max-width: 992px) {
+        .toolbar { flex-direction: column; align-items: stretch; }
+        .toolbar-left, .toolbar-right { justify-content: center; }
+        .year-selector { flex-direction: column; width: 100%; }
+        .year-selector select { width: 100%; }
+    }
+    @media (max-width: 768px) {
+        .filter-tabs { justify-content: center; }
+        .btn-export span { display: none; }
+        .toolbar-right { justify-content: center; }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-    <!-- Page Header -->
-    <header class="page-header">
-        <div class="container-custom text-center">
-            <h1 class="page-title text-white">📋 Liste des Membres</h1>
-            <p class="page-subtitle">Gérez et consultez les informations de tous les membres</p>
-            <p>Total: <span style = "font-weight: bold; font-size: 20px; ">{{nombreMembre}}</span></p>
-        </div>
-    </header>
+<!-- Toast container (gardé pour les messages futurs si besoin) -->
+<div class="toast-container" id="toastContainer"></div>
 
-    <div class="page-inner">
-        <div class="container-custom">
-            <!-- Barre de recherche -->
-            <div class="search-section">
-                <form method="get" class="search-bar">
-                    <input type="text" name="search" 
-                        placeholder="Rechercher un membre par nom, email ou téléphone..." 
-                       >
-                    <button type="submit" class="search-button">
-                        <i class="fas fa-search"></i> Rechercher
-                    </button>
-                </form>
-            </div>
-
-            <!-- Tableau des membres -->
-            <div class="table-responsive">
-                <table class="members-table">
-                    <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Ner</th>
-                            <th>Keri</th>
-                            <th>Téléphone</th>
-                            <th>Ecole</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for membre in page_obj %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="member-avatar me-2">
-                                        <i class="fas fa-user-circle text-primary"></i>
-                                    </div>
-                                    <strong>{{ membre.nom_complet }}</strong>
-                                </div>
-                            </td>
-                            <td>{{ membre.ner }}</td>
-                            <td>{{ membre.keri }}</td>
-                            <td>{{ membre.telephone|default:"-" }}</td>
-                            <td>{{ membre.ecole }}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="{% url 'detail_membre' membre.pk %}" class="btn-details">
-                                        <i class="fas fa-eye"></i> Détails
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4">
-                                <div class="empty-state">
-                                    <i class="fas fa-users"></i>
-                                    <h3>Aucun membre trouvé</h3>
-                                    <p>Essayez d'ajuster votre recherche ou vos filtres</p>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            {% if page_obj.has_other_pages %}
-                <div class="pagination-container">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination">
-                            {% if page_obj.has_previous %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page=1&search={{ search_query }}">
-                                    <i class="fas fa-angle-double-left"></i>
-                                </a>
-                            </li>
-                            {% endif %}
-                            
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                                {% else %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
-                                </li>
-                                {% endif %}
-                            {% endfor %}
-                            
-                            {% if page_obj.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}">
-                                    <i class="fas fa-angle-double-right"></i>
-                                </a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
-                </div>
-            {% endif %}
-        </div>
+<header class="page-header">
+    <div class="container-custom text-center">
+        <h1 class="page-title text-white">Liste des Membres</h1>
+        <p class="page-subtitle">Gérez et consultez les informations de tous les membres</p>
+        <p>Total: <span style="font-weight: bold; font-size: 20px;">{{ nombreMembre }}</span></p>
+        {% if annee_selectionnee %}
+            <span class="year-badge mt-2">
+                <i class="fas fa-calendar-alt"></i> Année {{ annee_selectionnee }}
+            </span>
+        {% endif %}
     </div>
+</header>
 
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+<div class="page-inner">
+    <div class="container-custom">
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="year-selector">
+                    <label for="anneeSelect"><i class="fas fa-calendar-alt"></i> Année:</label>
+                    <select id="anneeSelect" onchange="filterByYear(this.value)">
+                        <option value="">Toutes les années</option>
+                        {% for annee in annees %}
+                            <option value="{{ annee.pk }}" {% if annee_filter == annee.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ annee.debutAnnee|date:"Y" }} - {{ annee.finAnnee|date:"Y" }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="toolbar-right">
+                {% if pdf_enabled %}
+                <a href="{% url 'exporter_membres_pdf' %}?statut={{ statut_filter }}&annee={{ annee_filter }}&search={{ search_query }}" 
+                   class="btn-export btn-export-pdf"><i class="fas fa-file-pdf"></i> <span>PDF</span></a>
+                {% endif %}
+                <a href="{% url 'exporter_membres_csv' %}?statut={{ statut_filter }}&annee={{ annee_filter }}&search={{ search_query }}" 
+                   class="btn-export btn-export-csv"><i class="fas fa-file-excel"></i> <span>Excel</span></a>
+                <button onclick="window.print()" class="btn-export btn-export-print"><i class="fas fa-print"></i> <span>Imprimer</span></button>
+                {% if user.is_authenticated and user.est_membre_equipe %}
+                <a href="{% url 'creer_membre' %}" class="btn-export btn-add-membre"><i class="fas fa-user-plus"></i> <span>Ajouter</span></a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Filtres statut -->
+        <div class="filter-tabs">
+            <a href="?statut=tous&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab {% if statut_filter == 'tous' %}active{% endif %}">
+                <i class="fas fa-users"></i> Tous <span class="badge-count">{{ nombre_en_attente|add:nombre_valide|add:nombre_refuse }}</span>
+            </a>
+            <a href="?statut=en_attente&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab en-attente {% if statut_filter == 'en_attente' %}active{% endif %}">
+                <i class="fas fa-clock"></i> En attente <span class="badge-count">{{ nombre_en_attente }}</span>
+            </a>
+            <a href="?statut=valide&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab valide {% if statut_filter == 'valide' %}active{% endif %}">
+                <i class="fas fa-check-circle"></i> Validés <span class="badge-count">{{ nombre_valide }}</span>
+            </a>
+            <a href="?statut=refuse&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab refuse {% if statut_filter == 'refuse' %}active{% endif %}">
+                <i class="fas fa-times-circle"></i> Refusés <span class="badge-count">{{ nombre_refuse }}</span>
+            </a>
+        </div>
+
+        <!-- Validation en masse -->
+        {% if nombre_en_attente > 0 and user.is_authenticated and user.est_membre_equipe %}
+        <div class="bulk-actions">
+            <div class="bulk-actions-info">
+                <i class="fas fa-exclamation-circle" style="font-size: 1.5em; color: #856404;"></i>
+                <span><strong>{{ nombre_en_attente }}</strong> demande(s) en attente</span>
+            </div>
+            <form method="post" action="{% url 'valider_tous_en_attente' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-bulk" onclick="return confirm('Valider TOUTES les demandes en attente ?\nUn compte sera créé pour chaque membre.')">
+                    <i class="fas fa-check-double"></i> Tout valider
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Recherche -->
+        <div class="search-section">
+            <form method="get" class="search-bar">
+                <input type="hidden" name="statut" value="{{ statut_filter }}">
+                <input type="hidden" name="annee" value="{{ annee_filter }}">
+                <input type="text" name="search" placeholder="Rechercher par nom, email, téléphone, ner, keri..." value="{{ search_query }}">
+                <button type="submit" class="search-button"><i class="fas fa-search"></i> Rechercher</button>
+                {% if search_query %}
+                <a href="?statut={{ statut_filter }}&annee={{ annee_filter }}" class="btn-export" style="background:#6c757d;color:white;margin-left:10px;">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Tableau -->
+        <div class="table-responsive">
+            <table class="members-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Ner</th>
+                        <th>Keri</th>
+                        <th>Téléphone</th>
+                        <th>École</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for membre in page_obj %}
+                    <tr class="{% if membre.statut == 'en_attente' %}table-warning{% endif %}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if membre.photo %}
+                                    <img src="{{ membre.photo.url }}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;object-fit:cover;border:2px solid var(--primary-color);">
+                                {% else %}
+                                    <i class="fas fa-user-circle" style="font-size:2.2em;margin-right:10px;color:#ccc;"></i>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ membre.nom_complet }}</strong><br>
+                                    <small class="text-muted">{{ membre.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ membre.ner|default:"-" }}</td>
+                        <td>{{ membre.keri|default:"-" }}</td>
+                        <td>{{ membre.telephone|default:"-" }}</td>
+                        <td>{{ membre.ecole|default:"-" }}</td>
+                        <td>
+                            <span class="status-badge {{ membre.statut }}">
+                                {% if membre.statut == 'en_attente' %}<i class="fas fa-clock"></i> En attente
+                                {% elif membre.statut == 'valide' %}<i class="fas fa-check"></i> Validé
+                                {% else %}<i class="fas fa-times"></i> Refusé{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'detail_membre' membre.pk %}" class="btn-action btn-details" title="Voir détails">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                {% if user.is_authenticated and user.est_membre_equipe and membre.statut == 'en_attente' %}
+                                    <a href="{% url 'valider_membre' membre.pk %}" 
+                                       class="btn-action btn-valider" 
+                                       title="Valider"
+                                       onclick="return confirm('Valider l\'inscription de {{ membre.nom_complet|escapejs }} ?\nUn compte sera créé automatiquement.')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{% url 'refuser_membre' membre.pk %}" 
+                                       class="btn-action btn-refuser" 
+                                       title="Refuser"
+                                       onclick="return confirm('Refuser définitivement l\'inscription de {{ membre.nom_complet|escapejs }} ?')">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fas fa-users" style="font-size:4em;color:#ddd;margin-bottom:15px;"></i>
+                            <h4>Aucun membre trouvé</h4>
+                            <p class="text-muted">Essayez de modifier vos filtres ou votre recherche</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&statut={{ statut_filter }}&annee={{ annee_filter }}"><i class="fas fa-chevron-left"></i></a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}&search={{ search_query }}&statut={{ statut_filter }}&annee={{ annee_filter }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&statut={{ statut_filter }}&annee={{ annee_filter }}"><i class="fas fa-chevron-right"></i></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function filterByYear(anneeId) {
+        const url = new URL(window.location.href);
+        anneeId ? url.searchParams.set('annee', anneeId) : url.searchParams.delete('annee');
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    }
+
+    // Auto-hide alerts
+    document.querySelectorAll('.alert').forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'all 0.3s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 300);
+        }, 5000);
+    });
+</script>
 {% endblock %}
+

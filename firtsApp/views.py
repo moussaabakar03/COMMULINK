@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from commulink.utils.decorators import admin_required, membre_required
-from firtsApp.forms import ConnexionForm
+from firtsApp.forms import ConnexionForm, MembreInscriptionForm
 from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Temoingnage, TypeEvenement
 from django.contrib.auth.decorators import login_required
 
@@ -32,7 +32,7 @@ def connexion(request):
 
             # 3️Sinon, ton comportement normal
             if utilisateur.is_superuser or utilisateur.role == "membreEquipe":
-                messages.success(request, f"Bienvenue {utilisateur}")
+                messages.success(request, f"Bienvenue 'Admin' ")
                 return redirect(reverse('admin_dashboard'))
             
             elif utilisateur.role == "membreLambda":
@@ -71,15 +71,91 @@ def feteIs(request):
 def formulaireInformation(request):
     return render(request, 'user/formulaireInformation.html')
 
-def inscription(request):
-    return render(request, 'user/inscription.html')
+# def inscription(request):
+#     return render(request, 'user/inscription.html')
+
+
+def inscription_membre(request):
+    """
+    Inscription publique - Crée une demande en attente de validation
+    """
+    if request.method == 'POST':
+        form = MembreInscriptionForm(request.POST, request.FILES)
+        
+        if form.is_valid():
+            try:
+                # Créer le membre avec statut "en_attente"
+                membre = Membre(
+                    nom=form.cleaned_data['nom'],
+                    prenom=form.cleaned_data['prenom'],
+                    sexe=form.cleaned_data['sexe'],
+                    email=form.cleaned_data['email'],
+                    telephone=form.cleaned_data.get('telephone') or '',
+                    adresse=form.cleaned_data.get('adresse') or '',
+                    profession=form.cleaned_data['profession'],
+                    numeroUrgence=form.cleaned_data.get('numeroUrgence') or '',
+                    niveauEtude=form.cleaned_data.get('niveauEtude') or '',
+                    ecole=form.cleaned_data.get('ecole') or '',
+                    ner=form.cleaned_data.get('ner') or '',
+                    keri=form.cleaned_data.get('keri') or '',
+                    keribour=form.cleaned_data.get('keribour') or '',
+                    keriBa=form.cleaned_data.get('keriBa') or '',
+                    keribourBa=form.cleaned_data.get('keribourBa') or '',
+                    notes=form.cleaned_data.get('notes') or '',
+                    statut='en_attente',
+                    utilisateur=None,
+                )
+                
+                # Photo
+                if form.cleaned_data.get('photo'):
+                    membre.photo = form.cleaned_data['photo']
+                
+                membre.save()
+                
+                # Ajouter la filière dans les notes si présente
+                filiere = form.cleaned_data.get('filiere', '')
+                if filiere:
+                    if membre.notes:
+                        membre.notes += f"\nFilière: {filiere}"
+                    else:
+                        membre.notes = f"Filière: {filiere}"
+                    membre.save()
+                
+                messages.success(
+                    request, 
+                    f"Merci {membre.prenom} ! Votre demande d'inscription a été envoyée avec succès. "
+                    f"Elle sera examinée par notre équipe dans les plus brefs délais."
+                )
+                return redirect('inscription_confirmation', pk=membre.pk)
+                
+            except Exception as e:
+                messages.error(request, f"Une erreur est survenue lors de l'inscription: {str(e)}")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        form = MembreInscriptionForm()
+    
+    return render(request, 'user/inscription.html', {
+        'form': form,
+        'titre': "Demande d'inscription"
+    })
+
+
+def inscription_confirmation(request, pk):
+    """Page de confirmation après inscription"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    return render(request, 'user/inscription_confirmation.html', {
+        'membre': membre
+    })
+
 
 # def connexion(request):
 #     return render(request, 'user/connexion.html')
 
 def affichageEvenement(request, id):  
     evenement = TypeEvenement.objects.get(id = id)
-    evenementsFiltrer = Evenement.objects.filter(typeEvenement__id = id)
+    evenementsFiltrer = Evenement.objects.filter(typeEvenement__id = id, est_publie = True)
     return render(request, 'dynamiquePart/affichageEvenement.html', {'evenement': evenement, 'evenementsFiltrer': evenementsFiltrer})
 
 
