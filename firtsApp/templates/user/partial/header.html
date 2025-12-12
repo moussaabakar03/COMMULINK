@@ -116,22 +116,39 @@
                     </div>
                 </div>
                 
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle contact-toggle" data-bs-toggle="dropdown">Contact</a>
-                    <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
-                        <a href="{% url 'contact' %}" class="dropdown-item">Contact</a>
-                        <a href="{% url 'faq' %}" class="dropdown-item">FAQ</a>
-                    </div>
-                </div>
+             
                 
-                <div class=" nav-item dropdown">
-                    <a class="btn btn-outline-primary py-2 px-3" href="{% url 'connexion' %}">
-                        Connexion
-                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
-                            <i class="fa fa-arrow-right"></i>
-                        </div>
-                    </a>
-                </div>
+                {% if user.is_authenticated %}
+<!-- Menu déroulant pour utilisateur connecté -->
+<div class="nav-item dropdown">
+    <a class="btn btn-outline-primary py-2 px-3 dropdown-toggle" href="#" role="button" 
+       data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-user me-2"></i>{{ user.username }}
+    </a>
+    <div class="dropdown-menu dropdown-menu-end">
+        <a href="{% url 'profil_membre' user.pk %}" class="dropdown-item">
+            <i class="fas fa-id-card me-2"></i>Mon Profil
+        </a>
+        <a href="#" class="dropdown-item">
+            <i class="fas fa-cog me-2"></i>Paramètres
+        </a>
+        <hr class="dropdown-divider">
+        <a href="{% url 'logout' %}" class="dropdown-item">
+            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+        </a>
+    </div>
+</div>
+{% else %}
+<!-- Bouton Connexion pour utilisateur non connecté -->
+<div class="nav-item">
+    <a class="btn btn-outline-primary py-2 px-3" href="{% url 'connexion' %}">
+        Connexion
+        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+            <i class="fa fa-arrow-right"></i>
+        </div>
+    </a>
+</div>
+{% endif %}
             </div>
            
         </div>

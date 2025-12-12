@@ -21,6 +21,10 @@ urlpatterns = [
 
     path('evenements/', views.liste_evenements, name='liste_evenements'),
     path('evenements/<int:type_id>/', views.affichageEvenement, name='affichageEvenement'),
+      
+    path('profil/<int:pk>/', views.profil_membre, name='profil_membre'),
+    path('profil/<int:pk>/modifier/', views.modifier_profil, name='modifier_profil'),
+    path('profil/<int:pk>/modifier-photo/', views.modifier_photo_profil, name='modifier_photo_profil'),
    
     
 ]

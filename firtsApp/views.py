@@ -91,3 +91,120 @@ def liste_evenements(request):
         'upcoming_events': upcoming_events,    # Pour les statistiques
     }
     return render(request, 'user/listeEvenement.html', context)
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from secondApp.models import Membre
+
+import os
+from django.conf import settings
+
+@login_required
+def profil_membre(request, pk):
+    """Afficher le profil d'un membre"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    context = {
+        'membre': membre,
+        'page_title': f'Profil - {membre.nom_complet}',
+        'genres': Membre.GENRE_CHOICES,
+    }
+    
+    return render(request, 'membres/profil.html', context)
+
+@login_required
+def modifier_profil(request, pk):
+    """Modifier les informations du profil"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                # Récupérer et nettoyer les données
+                data = {}
+                for field in ['nom', 'prenom', 'sexe', 'email', 'telephone', 'adresse', 
+                             'profession', 'numeroUrgence', 'niveauEtude', 'ecole',
+                             'ner', 'keri', 'keribour', 'keriBa', 'keribourBa', 'notes']:
+                    value = request.POST.get(field, '').strip()
+                    data[field] = value if value != '' else None
+                
+                # Validation
+                if len(data['nom']) < 2:
+                    messages.error(request, 'Le nom doit contenir au moins 2 caractères')
+                    return redirect('profil_membre', pk=pk)
+                
+                if len(data['prenom']) < 2:
+                    messages.error(request, 'Le prénom doit contenir au moins 2 caractères')
+                    return redirect('profil_membre', pk=pk)
+                
+                if len(data['profession']) < 2:
+                    messages.error(request, 'La profession doit contenir au moins 2 caractères')
+                    return redirect('profil_membre', pk=pk)
+                
+                # Validation email
+                try:
+                    validate_email(data['email'])
+                except ValidationError:
+                    messages.error(request, 'Veuillez entrer une adresse email valide')
+                    return redirect('profil_membre', pk=pk)
+                
+                # Vérifier l'unicité de l'email
+                if Membre.objects.filter(email=data['email']).exclude(pk=membre.pk).exists():
+                    messages.error(request, 'Cet email est déjà utilisé par un autre membre')
+                    return redirect('profil_membre', pk=pk)
+                
+                # Mettre à jour les champs
+                for field, value in data.items():
+                    setattr(membre, field, value)
+                
+                membre.save()
+                messages.success(request, 'Profil mis à jour avec succès!')
+                
+        except Exception as e:
+            messages.error(request, f'Une erreur est survenue: {str(e)}')
+    
+    return redirect('profil_membre', pk=pk)
+
+@login_required
+def modifier_photo_profil(request, pk):
+    """Modifier la photo de profil d'un membre"""
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    if request.method == 'POST':
+        try:
+            nouvelle_photo = request.FILES.get('photo')
+            
+            if nouvelle_photo:
+                # Vérifier la taille (max 5MB)
+                if nouvelle_photo.size > 5 * 1024 * 1024:
+                    messages.error(request, 'La photo ne doit pas dépasser 5MB')
+                    return redirect('profil_membre', pk=pk)
+                
+                # Vérifier le type de fichier
+                allowed_types = ['image/jpeg', 'image/png', 'image/gif']
+                if nouvelle_photo.content_type not in allowed_types:
+                    messages.error(request, 'Format de fichier non supporté. Utilisez JPG, PNG ou GIF.')
+                    return redirect('profil_membre', pk=pk)
+                
+                # Supprimer l'ancienne photo si elle existe
+                if membre.photo:
+                    old_photo_path = membre.photo.path
+                    if os.path.exists(old_photo_path):
+                        os.remove(old_photo_path)
+                
+                # Sauvegarder la nouvelle photo
+                membre.photo = nouvelle_photo
+                membre.save()
+                
+                messages.success(request, 'Photo de profil mise à jour avec succès!')
+            else:
+                messages.error(request, 'Veuillez sélectionner une photo.')
+                
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la mise à jour de la photo: {str(e)}')
+    
+    return redirect('profil_membre', pk=pk)
