@@ -42,14 +42,156 @@ class ConnexionForm(forms.Form):
         return self.cleaned_data.get('user')
 
 
-class MembreInscriptionForm(MembreForm):
-    """Formulaire pour l'inscription publique (avec conditions)"""
+
+class MembreInscriptionForm(forms.ModelForm):
+    """
+    Formulaire d'inscription publique pour les membres
+    """
     
-    accepte_conditions = forms.BooleanField(
-        required=True,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        label="J'accepte les conditions d'utilisation et la politique de confidentialité *"
-    )
+    class Meta:
+        model = Membre
+        fields = [
+            'nom', 'prenom', 'sexe', 'email', 'telephone',
+            'profession', 'niveauEtude', 'ecole', 'filiere',
+            'numeroUrgence', 'ner', 'keri', 'keribour', 
+            'keriBa', 'keribourBa', 'adresse', 'photo', 'notes'
+        ]
+        
+        widgets = {
+            'nom': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre nom de famille',
+                'maxlength': 50,
+            }),
+            'prenom': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre prénom',
+                'maxlength': 50,
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'votre.email@exemple.com',
+            }),
+            'telephone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre numéro de téléphone',
+                'maxlength': 20,
+            }),
+            'sexe': forms.RadioSelect(attrs={
+                'class': 'radio-input'
+            }),
+            'profession': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre profession actuelle',
+                'maxlength': 50,
+            }),
+            'niveauEtude': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre niveau d\'étude',
+                'maxlength': 20,
+            }),
+            'ecole': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Nom de votre établissement',
+                'maxlength': 20,
+            }),
+            'filiere': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre filière d\'étude',
+                'maxlength': 20,
+            }),
+            'numeroUrgence': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Numéro d\'une personne à contacter',
+                'maxlength': 20,
+            }),
+            'ner': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Entrez la valeur pour Ner',
+                'maxlength': 20,
+            }),
+            'keri': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Entrez la valeur pour Keri',
+                'maxlength': 20,
+            }),
+            'keribour': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Entrez la valeur pour Keribour',
+                'maxlength': 20,
+            }),
+            'keriBa': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Entrez la valeur pour Keri Bâ',
+                'maxlength': 20,
+            }),
+            'keribourBa': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Entrez la valeur pour Keribour Bâ',
+                'maxlength': 20,
+            }),
+            'adresse': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Votre adresse complète (rue, ville, code postal)',
+                'rows': 4,
+            }),
+            'photo': forms.FileInput(attrs={
+                'class': 'file-input',
+                'accept': 'image/*',
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-textarea',
+                'placeholder': 'Ajoutez ici toute information complémentaire...',
+                'rows': 4,
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Champs obligatoires
+        self.fields['nom'].required = True
+        self.fields['prenom'].required = True
+        self.fields['email'].required = True
+        self.fields['sexe'].required = True
+        self.fields['profession'].required = True
+        
+        # Champs optionnels
+        optional_fields = [
+            'telephone', 'niveauEtude', 'ecole', 'filiere',
+            'numeroUrgence', 'ner', 'keri', 'keribour',
+            'keriBa', 'keribourBa', 'adresse', 'photo', 'notes'
+        ]
+        for field in optional_fields:
+            self.fields[field].required = False
+    
+    def clean_email(self):
+        """Valider l'unicité de l'email"""
+        email = self.cleaned_data.get('email')
+        if email:
+            # Vérifier si l'email existe déjà (exclure l'instance actuelle si modification)
+            qs = Membre.objects.filter(email=email)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("Cette adresse email est déjà utilisée.")
+        return email
+    
+    def clean(self):
+        """Validation globale du formulaire"""
+        cleaned_data = super().clean()
+        
+        # Vérifier qu'au moins un champ d'identité est rempli
+        identite_fields = ['ner', 'keri', 'keribour', 'keriBa', 'keribourBa']
+        has_identite = any(cleaned_data.get(field) for field in identite_fields)
+        
+        if not has_identite:
+            raise forms.ValidationError(
+                "Veuillez remplir au moins un des champs d'identité "
+                "(Ner, Keri, Keribour, Keri Bâ, ou Keribour Bâ)."
+            )
+        
+        return cleaned_data
 
 class MembreModificationForm(MembreForm):
     """Formulaire pour modifier un membre existant"""

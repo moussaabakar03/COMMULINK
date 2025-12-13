@@ -1295,17 +1295,11 @@ def detail_membre(request, pk):
 
 @login_required
 @admin_required
-
-@login_required
 def creer_membre(request):
     """
     Création directe par un admin - Crée membre + utilisateur + réinscription
     Le membre est directement validé
     """
-    # Vérifier les droits
-    if not request.user.est_membre_equipe():
-        messages.error(request, "Vous n'avez pas les droits pour créer un membre.")
-        return redirect('liste_membres')
     
     if request.method == 'POST':
         form = MembreForm(request.POST, request.FILES)
@@ -1353,7 +1347,7 @@ def creer_membre(request):
                         keriBa=form.cleaned_data.get('keriBa', ''),
                         keribourBa=form.cleaned_data.get('keribourBa', ''),
                         notes=form.cleaned_data.get('notes', ''),
-                        statut='valide',  # Validé directement
+                        statut='valide',  
                         date_validation=timezone.now(),
                         valide_par=request.user,
                     )
@@ -1395,55 +1389,55 @@ def creer_membre(request):
     })
 
 
-@login_required
-@admin_required
-def modidfier_membre(request, pk):
-    membre = Membre.objects.get(pk=pk)
+# @login_required
+# @admin_required
+# def modidfier_membre(request, pk):
+#     membre = Membre.objects.get(pk=pk)
     
-    if request.method == 'POST':
-        form = MembreForm(request.POST, request.FILES)
-        if form.is_valid():
+#     if request.method == 'POST':
+#         form = MembreForm(request.POST, request.FILES)
+#         if form.is_valid():
             
             
-            email = form.cleaned_data['email']
-            telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+#             email = form.cleaned_data['email']
+#             telephone = form.cleaned_data.get('telephone') or "defaultpass123"
             
-            if Utilisateur.objects.filter(email=email).exists():
-                messages.error(request, 'Un utilisateur avec cet email existe déjà.')
-                return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+#             if Utilisateur.objects.filter(email=email).exists():
+#                 messages.error(request, 'Un utilisateur avec cet email existe déjà.')
+#                 return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
             
             
-            membre.utilisateur.username = email
-            membre.utilisateur.password=make_password(telephone),
+#             membre.utilisateur.username = email
+#             membre.utilisateur.password=make_password(telephone),
 
-            form.update(membre)
-            messages.success(request, "Membre modifié avec succès!")
-            return redirect('liste_membres')
-    else:
-        # Initialiser le formulaire avec les données du membre
-        initial_data = {
-            'nom': membre.nom,
-            'prenom': membre.prenom,
-            'sexe': membre.sexe,
-            'email': membre.email,
-            'telephone': membre.telephone,
-            'adresse': membre.adresse,
-            'profession': membre.profession,
-            'numeroUrgence': membre.numeroUrgence,
-            'niveauEtude': membre.niveauEtude,
-            'ecole': membre.ecole,
-            'photo': membre.photo,
-            'notes': membre.notes,
-            'ner': membre.ner,
-            'keri': membre.keri,
-            'keribour': membre.keribour,
-            'keriBa': membre.keriBa,
-            'keribourBa': membre.keribourBa,
-        }
+#             form.update(membre)
+#             messages.success(request, "Membre modifié avec succès!")
+#             return redirect('liste_membres')
+#     else:
+#         # Initialiser le formulaire avec les données du membre
+#         initial_data = {
+#             'nom': membre.nom,
+#             'prenom': membre.prenom,
+#             'sexe': membre.sexe,
+#             'email': membre.email,
+#             'telephone': membre.telephone,
+#             'adresse': membre.adresse,
+#             'profession': membre.profession,
+#             'numeroUrgence': membre.numeroUrgence,
+#             'niveauEtude': membre.niveauEtude,
+#             'ecole': membre.ecole,
+#             'photo': membre.photo,
+#             'notes': membre.notes,
+#             'ner': membre.ner,
+#             'keri': membre.keri,
+#             'keribour': membre.keribour,
+#             'keriBa': membre.keriBa,
+#             'keribourBa': membre.keribourBa,
+#         }
 
-        form = MembreForm(initial=initial_data)
+#         form = MembreForm(initial=initial_data)
     
-    return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
+#     return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
 
 
 @login_required
@@ -1539,6 +1533,7 @@ def get_annee_active():
     
 
 @login_required
+@admin_required
 def valider_membre(request, pk):
     """
     Valide une demande d'inscription
@@ -1546,9 +1541,6 @@ def valider_membre(request, pk):
     """
     membre = get_object_or_404(Membre, pk=pk)
     
-    if not request.user.est_membre_equipe():
-        messages.error(request, "Vous n'avez pas les droits pour valider les inscriptions.")
-        return redirect('liste_membres')
     
     if membre.statut != 'en_attente':
         messages.warning(request, f"Ce membre a déjà été traité (statut: {membre.get_statut_display()}).")
@@ -1619,13 +1611,11 @@ def valider_membre(request, pk):
 
 
 @login_required
+@admin_required
 def refuser_membre(request, pk):
     """Refuse une demande d'inscription"""
     membre = get_object_or_404(Membre, pk=pk)
     
-    if not request.user.est_membre_equipe():
-        messages.error(request, "Vous n'avez pas les droits pour refuser les inscriptions.")
-        return redirect('liste_membres')
     
     if membre.statut != 'en_attente':
         messages.warning(request, f"Ce membre a déjà été traité (statut: {membre.get_statut_display()}).")
@@ -1644,16 +1634,12 @@ def refuser_membre(request, pk):
     return redirect('liste_membres')
     
 
-
-
 @login_required
+@admin_required
 @require_POST
 def valider_tous_en_attente(request):
     """Valide toutes les demandes en attente"""
-    
-    if not request.user.est_membre_equipe():
-        messages.error(request, "Vous n'avez pas les droits pour cette action.")
-        return redirect('liste_membres')
+ 
     
     membres_en_attente = Membre.objects.filter(statut='en_attente')
     count_success = 0
@@ -1747,7 +1733,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from .models import Reinscription, Annee
 
-# def listess_reinscriptions(request):
+# def liste_reinscriptions(request):
 #     """
 #     Vue pour afficher la liste des réinscriptions avec recherche et filtres
 #     """

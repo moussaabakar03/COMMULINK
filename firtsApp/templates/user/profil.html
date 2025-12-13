@@ -1,0 +1,582 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block body %}
+
+
+
+<style>
+    .fadeIn{
+        background-color: rgba(128, 12, 12, 0.07);
+    }
+    .contacts{
+        margin-top: 55px;
+    }
+    .headerNav nav{
+        background-color: #001D23;
+    }
+
+    .headerNav .header, .headerNav .header div small, .headerNav .header div a i {
+        background-color: white;
+        color: #FF6F0F;
+    }
+    
+    .hero-about {
+        background: linear-gradient(135deg, #001D23 0%, #E55A00 100%);
+        padding: 100px 0;
+        color: white;
+        margin-top: 100px;
+    }
+
+    .section-title {
+        color: #FF6B00;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    
+</style>
+
+    <div class="container-fluid py-5" style="margin-top: 100px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh;">
+        <div class="container">
+           
+
+            <!-- Header du profil -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-10">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-white py-4 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h2 class="text-orange fw-bold mb-1">Profil du Membre</h2>
+                                    <p class="text-muted mb-0">Informations détaillées</p>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-dark btn-sm me-2" onclick="toggleEditMode()">
+                                        <i class="fas fa-edit me-2"></i>Mode Édition
+                                    </button>
+                                    <button type="button" class="btn btn-orange btn-sm" data-bs-toggle="modal" data-bs-target="#photoModal">
+                                        <i class="fas fa-camera me-2"></i>Modifier Photo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu principal -->
+            <div class="row justify-content-center">
+                <!-- Colonne Photo -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card shadow-lg border-0 h-100">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-4">
+                                <div class="position-relative d-inline-block">
+                                    <div class="rounded-circle overflow-hidden border-4 border-orange" style="width: 200px; height: 200px; margin: 0 auto;">
+                                        {% if membre.photo %}
+                                            <img src="{{ membre.photo.url }}" alt="{{ membre.nom_complet }}" 
+                                                class="w-100 h-100 object-fit-cover">
+                                        {% else %}
+                                            <div class="w-100 h-100 bg-gradient-orange d-flex align-items-center justify-content-center">
+                                                <span class="display-4 text-white fw-bold">
+                                                    {{ membre.nom|first|upper }}{{ membre.prenom|first|upper }}
+                                                </span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="position-absolute bottom-0 end-0">
+                                        <span class="badge bg-orange rounded-circle p-2" data-bs-toggle="modal" data-bs-target="#photoModal" style="cursor: pointer;">
+                                            <i class="fas fa-camera text-white"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4 class="fw-bold mb-1">{{ membre.nom_complet }}</h4>
+                            <p class="text-muted mb-3">{{ membre.profession }}</p>
+                            
+                            <div class="d-flex justify-content-center gap-2 mb-4">
+                                {% if membre.sexe == 'M' %}
+                                    <span class="badge bg-primary px-3 py-2">Homme</span>
+                                {% elif membre.sexe == 'F' %}
+                                    <span class="badge bg-primary px-3 py-2">Femme</span>
+                                {% else %}
+                                    <span class="badge bg-secondary px-3 py-2">Autre</span>
+                                {% endif %}
+                                
+                                <span class="badge bg-dark px-3 py-2">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Inscrit le {{ membre.date_inscription|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                            
+                            <div class="border-top pt-4">
+                                <h6 class="fw-bold text-dark mb-3">Contacts</h6>
+                                <div class="text-start">
+                                    <p class="mb-2">
+                                        <i class="fas fa-envelope text-orange me-2"></i>
+                                        <a href="mailto:{{ membre.email }}" class="text-decoration-none text-dark">
+                                            {{ membre.email }}
+                                        </a>
+                                    </p>
+                                    {% if membre.telephone %}
+                                    <p class="mb-0">
+                                        <i class="fas fa-phone text-orange me-2"></i>
+                                        <a href="tel:{{ membre.telephone }}" class="text-decoration-none text-dark">
+                                            {{ membre.telephone }}
+                                        </a>
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colonne Informations -->
+                <div class="col-lg-7">
+                    <form method="POST" action="{% url 'modifier_profil' %}" id="profilForm">
+                        {% csrf_token %}
+                        
+                        <!-- Informations Personnelles -->
+                        <div class="card shadow-lg border-0 mb-4">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="fw-bold text-dark mb-0">
+                                    <i class="fas fa-user-circle text-orange me-2"></i>
+                                    Informations Personnelles
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Nom</label>
+                                        <input type="text" name="nom" value="{{ membre.nom }}" 
+                                            class="form-control form-control-lg" disabled required minlength="2">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Prénom</label>
+                                        <input type="text" name="prenom" value="{{ membre.prenom }}" 
+                                            class="form-control form-control-lg" disabled required minlength="2">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Sexe</label>
+                                        <select name="sexe" class="form-select form-select-lg" disabled>
+                                            {% for value, label in genres %}
+                                                <option value="{{ value }}" {% if membre.sexe == value %}selected{% endif %}>
+                                                    {{ label }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Email</label>
+                                        <input type="email" name="email" value="{{ membre.email }}" 
+                                            class="form-control form-control-lg" disabled required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Téléphone</label>
+                                        <input type="text" name="telephone" value="{{ membre.telephone|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Profession</label>
+                                        <input type="text" name="profession" value="{{ membre.profession }}" 
+                                            class="form-control form-control-lg" disabled required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations d'Identité -->
+                        <div class="card shadow-lg border-0 mb-4">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="fw-bold text-dark mb-0">
+                                    <i class="fas fa-id-card text-orange me-2"></i>
+                                    Informations d'Identité
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">NER</label>
+                                        <input type="text" name="ner" value="{{ membre.ner|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">KERI</label>
+                                        <input type="text" name="keri" value="{{ membre.keri|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">KERIBOUR</label>
+                                        <input type="text" name="keribour" value="{{ membre.keribour|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">KERI BA</label>
+                                        <input type="text" name="keriBa" value="{{ membre.keriBa|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">KERIBOUR BA</label>
+                                        <input type="text" name="keribourBa" value="{{ membre.keribourBa|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations Supplémentaires -->
+                        <div class="card shadow-lg border-0 mb-4">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="fw-bold text-dark mb-0">
+                                    <i class="fas fa-graduation-cap text-orange me-2"></i>
+                                    Informations Supplémentaires
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Adresse</label>
+                                        <textarea name="adresse" rows="3" 
+                                                class="form-control form-control-lg" disabled>{{ membre.adresse|default:'' }}</textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Numéro d'Urgence</label>
+                                        <input type="text" name="numeroUrgence" value="{{ membre.numeroUrgence|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">Niveau d'Étude</label>
+                                        <input type="text" name="niveauEtude" value="{{ membre.niveauEtude|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label text-dark fw-semibold">École/Université</label>
+                                        <input type="text" name="ecole" value="{{ membre.ecole|default:'' }}" 
+                                            class="form-control form-control-lg" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Remarques -->
+                        <div class="card shadow-lg border-0 mb-4">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="fw-bold text-dark mb-0">
+                                    <i class="fas fa-sticky-note text-orange me-2"></i>
+                                    Remarques
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <textarea name="notes" rows="4" 
+                                                class="form-control form-control-lg" disabled>{{ membre.notes|default:'' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="row mb-5" id="editActions" style="display: none;">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-3">
+                                    <button type="button" class="btn btn-lg btn-dark px-5" onclick="cancelEdit()">
+                                        <i class="fas fa-times me-2"></i>Annuler
+                                    </button>
+                                    <button type="submit" class="btn btn-lg btn-orange px-5">
+                                        <i class="fas fa-save me-2"></i>Enregistrer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer Info -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="text-center text-muted">
+                        <small>
+                            <i class="fas fa-clock me-1"></i>
+                            Dernière modification : {{ membre.date_derniere_modification|date:"d/m/Y à H:i" }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour modifier la photo -->
+    <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-orange text-white">
+                    <h5 class="modal-title" id="photoModalLabel">
+                        <i class="fas fa-camera me-2"></i>Modifier la photo de profil
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'modifier_photo_profil' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <div class="rounded-circle overflow-hidden border-4 border-orange d-inline-block" style="width: 150px; height: 150px;">
+                                {% if membre.photo %}
+                                    <img src="{{ membre.photo.url }}" alt="Photo actuelle" 
+                                        class="w-100 h-100 object-fit-cover" id="currentPhoto">
+                                {% else %}
+                                    <div class="w-100 h-100 bg-gradient-orange d-flex align-items-center justify-content-center">
+                                        <span class="display-5 text-white fw-bold">
+                                            {{ membre.nom|first|upper }}{{ membre.prenom|first|upper }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="photoInput" class="form-label fw-semibold">Sélectionner une nouvelle photo</label>
+                            <input type="file" class="form-control form-control-lg" id="photoInput" 
+                                name="photo" accept="image/*" required>
+                            <div class="form-text">
+                                Formats acceptés: JPG, PNG, GIF. Taille max: 5MB
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4" id="previewContainer" style="display: none;">
+                            <h6 class="fw-bold mb-3">Prévisualisation</h6>
+                            <div class="rounded-circle overflow-hidden border-4 border-success d-inline-block" 
+                                style="width: 100px; height: 100px;">
+                                <img id="photoPreview" class="w-100 h-100 object-fit-cover">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </button>
+                        <button type="submit" class="btn btn-orange">
+                            <i class="fas fa-save me-2"></i>Mettre à jour
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<style>
+    /* Styles supplémentaires */
+    .text-orange {
+        color: #FF6600 !important;
+    }
+    
+    .bg-orange {
+        background-color: #FF6600 !important;
+    }
+    
+    .btn-orange {
+        background-color: #FF6600;
+        border-color: #FF6600;
+        color: white;
+    }
+    
+    .btn-orange:hover {
+        background-color: #E55A00;
+        border-color: #E55A00;
+        color: white;
+    }
+    
+    .border-orange {
+        border-color: #FF6600 !important;
+    }
+    
+    .bg-gradient-orange {
+        background: linear-gradient(135deg, #FF6600, #FF8C42);
+    }
+    
+    .bg-pink {
+        background-color: #e83e8c !important;
+    }
+    
+    .form-control:disabled, .form-select:disabled, textarea:disabled {
+        background-color: #f8f9fa;
+        border-color: #e9ecef;
+        color: #495057;
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .card {
+        border-radius: 15px;
+    }
+    
+    .border-4 {
+        border-width: 4px !important;
+    }
+    
+    .object-fit-cover {
+        object-fit: cover;
+    }
+</style>
+
+<script>
+    let isEditMode = false;
+    let originalData = {};
+    
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const formElements = document.querySelectorAll('#profilForm input, #profilForm select, #profilForm textarea');
+        const editActions = document.getElementById('editActions');
+        const editButton = document.querySelector('button[onclick="toggleEditMode()"]');
+        
+        if (isEditMode) {
+            // Sauvegarder les données originales
+            formElements.forEach(element => {
+                if (element.name) {
+                    originalData[element.name] = element.value;
+                }
+            });
+            
+            // Activer les champs
+            formElements.forEach(element => {
+                element.disabled = false;
+            });
+            
+            // Afficher les boutons d'action
+            editActions.style.display = 'block';
+            
+            // Changer le texte du bouton
+            editButton.innerHTML = '<i class="fas fa-eye me-2"></i>Mode Visualisation';
+            editButton.classList.remove('btn-dark');
+            editButton.classList.add('btn-orange');
+            
+            // Scroll vers le bouton Enregistrer
+            editActions.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // Restaurer les données originales
+            formElements.forEach(element => {
+                if (element.name && originalData[element.name]) {
+                    element.value = originalData[element.name];
+                }
+                element.disabled = true;
+            });
+            
+            // Cacher les boutons d'action
+            editActions.style.display = 'none';
+            
+            // Changer le texte du bouton
+            editButton.innerHTML = '<i class="fas fa-edit me-2"></i>Mode Édition';
+            editButton.classList.remove('btn-orange');
+            editButton.classList.add('btn-dark');
+        }
+    }
+    
+    function cancelEdit() {
+        // Revenir en mode visualisation
+        isEditMode = false;
+        toggleEditMode();
+    }
+    
+    // Prévisualisation de la photo
+    document.getElementById('photoInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('photoPreview');
+        const previewContainer = document.getElementById('previewContainer');
+        const currentPhoto = document.getElementById('currentPhoto');
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                
+                // Masquer la photo actuelle dans le modal
+                if (currentPhoto) {
+                    currentPhoto.style.display = 'none';
+                }
+            }
+            
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.style.display = 'none';
+            if (currentPhoto) {
+                currentPhoto.style.display = 'block';
+            }
+        }
+    });
+    
+    // Validation du formulaire
+    document.getElementById('profilForm').addEventListener('submit', function(e) {
+        const email = document.querySelector('input[name="email"]').value;
+        const nom = document.querySelector('input[name="nom"]').value;
+        const prenom = document.querySelector('input[name="prenom"]').value;
+        const profession = document.querySelector('input[name="profession"]').value;
+        
+        // Validation basique
+        if (nom.length < 2) {
+            e.preventDefault();
+            alert('Le nom doit contenir au moins 2 caractères');
+            return;
+        }
+        
+        if (prenom.length < 2) {
+            e.preventDefault();
+            alert('Le prénom doit contenir au moins 2 caractères');
+            return;
+        }
+        
+        if (profession.length < 2) {
+            e.preventDefault();
+            alert('La profession doit contenir au moins 2 caractères');
+            return;
+        }
+        
+        if (!validateEmail(email)) {
+            e.preventDefault();
+            alert('Veuillez entrer une adresse email valide');
+            return;
+        }
+    });
+    
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    // Nettoyer le modal à la fermeture
+    document.getElementById('photoModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('photoInput').value = '';
+        document.getElementById('previewContainer').style.display = 'none';
+        const currentPhoto = document.getElementById('currentPhoto');
+        if (currentPhoto) {
+            currentPhoto.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COMMULINK - Connexion</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         :root {
-            {% comment %} --primary-color:rgb(226, 205, 118); {% endcomment %}
-            --primary-light: #6ea1e1;
-            --primary-dark: #2c5ba8;
-            {% comment %} --secondary-color:rgb(177, 188, 93); {% endcomment %}
-            --text-color: #333;
+            --primary-color: #FF6B00;
+            --primary-light: #FF8C42;
+            --primary-dark: #E55A00;
+            --text-color: #333333;
             --light-gray: #f8f9fa;
             --medium-gray: #e9ecef;
             --dark-gray: #6c757d;
@@ -20,9 +19,9 @@
             --danger: #dc3545;
             --warning: #ffc107;
             --info: #17a2b8;
-            --border-radius: 8px;
-            --box-shadow: 10px 10px 30px 10px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         * {
@@ -32,8 +31,8 @@
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -43,25 +42,20 @@
         }
         
         .auth-container {
-            max-width: 900px;
+            max-width: 420px;
             width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
         }
         
         .auth-card {
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 40px;
-            width: 400px;
-            max-width: 100%;
+            padding: 40px 35px;
+            width: 100%;
             position: relative;
             overflow: hidden;
             transition: var(--transition);
-            border: 0.5px solid black;
+            border: none;
         }
         
         .auth-card::before {
@@ -70,29 +64,38 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
         }
         
         .auth-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
         
         .auth-header h2 {
-            color: var(--primary-color);
-            font-size: 28px;
+            color: #000;
+            font-size: 24px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .auth-header p {
             color: var(--dark-gray);
             font-size: 14px;
+            font-weight: 400;
         }
         
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 24px;
             position: relative;
         }
         
@@ -100,7 +103,7 @@
             display: block;
             font-weight: 500;
             margin-bottom: 8px;
-            color: var(--dark-gray);
+            color: #000;
             font-size: 14px;
         }
         
@@ -111,128 +114,111 @@
         .form-icon {
             position: absolute;
             top: 50%;
-            left: 15px;
+            left: 16px;
             transform: translateY(-50%);
             color: var(--dark-gray);
             font-size: 18px;
+            z-index: 1;
         }
         
         input[type="text"],
         input[type="password"],
         input[type="email"] {
             width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 2px solid var(--medium-gray);
+            padding: 14px 15px 14px 48px;
+            border: 1.5px solid var(--medium-gray);
             border-radius: var(--border-radius);
-            font-size: 16px;
+            font-size: 15px;
             transition: var(--transition);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+            color: #000;
         }
         
         input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15);
         }
         
         .password-toggle {
             position: absolute;
             top: 50%;
-            right: 15px;
+            right: 16px;
             transform: translateY(-50%);
             cursor: pointer;
             color: var(--dark-gray);
             font-size: 18px;
             user-select: none;
+            z-index: 1;
         }
         
         .password-toggle:hover {
             color: var(--primary-color);
         }
         
-        .password-requirements {
-            font-size: 12px;
-            color: var(--dark-gray);
-            margin-top: 8px;
-            padding-left: 15px;
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
         }
         
-        .requirement {
-            margin-bottom: 3px;
+        .remember-me {
             display: flex;
             align-items: center;
         }
         
-        .requirement span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: var(--medium-gray);
+        .remember-me input {
             margin-right: 8px;
+            accent-color: var(--primary-color);
         }
         
-        .requirement.valid span {
-            background-color: var(--success);
+        .remember-me label {
+            margin-bottom: 0;
+            color: #000;
+        }
+        
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .forgot-password:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
         }
         
         .btn {
-            {% comment %} background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%); {% endcomment %}
-            color: black;
+            background: var(--primary-color);
+            color: white;
             border: none;
             padding: 14px 20px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 50px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             width: 100%;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             position: relative;
             overflow: hidden;
         }
         
-        .btn:hover, .btn:focus {
-            box-shadow: 0 5px 15px rgba(58, 87, 127, 0.4);
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
         }
         
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
-        }
-        
-        .btn:active::after {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .switch-form {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: var(--dark-gray);
-        }
-        
-        .switch-form a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-        
-        .switch-form a:hover {
-            text-decoration: underline;
+        .btn:active {
+            transform: translateY(0);
         }
         
         .divider {
@@ -251,60 +237,77 @@
         }
         
         .divider::before {
-            margin-right: 10px;
+            margin-right: 12px;
         }
         
         .divider::after {
-            margin-left: 10px;
+            margin-left: 12px;
         }
         
         .social-login {
             display: flex;
             gap: 15px;
+            margin-bottom: 25px;
         }
         
         .social-btn {
             flex: 1;
             padding: 12px;
             border-radius: var(--border-radius);
-            border: 1px solid var(--medium-gray);
+            border: 1.5px solid var(--medium-gray);
             background-color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            color: #000;
         }
         
         .social-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
         
-        .social-btn i {
-            font-size: 18px;
+        .switch-form {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--dark-gray);
         }
         
-        .social-btn.facebook {
-            color: #3b5998;
+        .switch-form a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            transition: var(--transition);
         }
         
-        .social-btn.google {
-            color: #dd4b39;
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+        
+        .cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .cancel-link:hover {
+            color: #000;
         }
         
         .error-message {
             color: var(--danger);
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .success-message {
-            color: var(--success);
-            font-size: 14px;
-            margin-top: 5px;
+            font-size: 13px;
+            margin-top: 6px;
             display: none;
         }
         
@@ -312,121 +315,275 @@
             border-color: var(--danger);
         }
         
-        .shake {
-            animation: shake 0.5s;
-        }
-        
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-5px); }
-            80% { transform: translateX(5px); }
-            100% { transform: translateX(0); }
-        }
-        
-        .progress-bar {
-            height: 4px;
-            width: 100%;
-            background-color: var(--medium-gray);
-            border-radius: 2px;
-            margin-top: 8px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%);
-            transition: width 0.3s;
-        }
-        
         .fade-in {
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.5s ease-out;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
+        /* Messages Django */
+        .messages {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid var(--success);
+            color: #155724;
+        }
+        
+        .alert-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid var(--danger);
+            color: #721c24;
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid var(--warning);
+            color: #856404;
+        }
+        
         /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .auth-container {
-                flex-direction: column;
-                align-items: center;
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 25px;
             }
             
-            .auth-card {
-                width: 100%;
-                max-width: 400px;
+            .auth-header h2 {
+                font-size: 22px;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .social-login {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="auth-container">
-       
         <!-- Formulaire de connexion -->
         <div class="auth-card fade-in">
             <div class="auth-header">
+                <div class="logo">COMMULINK</div>
                 <h2>Connexion</h2>
-                <p>Accédez à votre compte COMMULINK</p>
+                <p>Accédez à votre compte</p>
             </div>
             
-            <form id="login-form" method="POST">
+            <!-- Affichage des messages Django -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {% if message.tags == 'error' %}
+                    ❌
+                    {% elif message.tags == 'success' %}
+                    ✅
+                    {% elif message.tags == 'warning' %}
+                    ⚠️
+                    {% else %}
+                    ℹ️
+                    {% endif %}
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Affichage des erreurs de formulaire -->
+            {% if form.errors %}
+            <div class="alert alert-error">
+                ❌ Identifiant ou mot de passe incorrect.
+            </div>
+            {% endif %}
+            
+            <form id="login-form" method="POST" action="{% url 'connexion' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
                 {% csrf_token %}
+                
+                <!-- Champ caché pour next_url -->
+                {% if request.GET.next %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                {% endif %}
+                
                 <div class="form-group">
-                    <label for="login-username">Nom d'utilisateur</label>
+                    <label for="{{ form.identifiant.id_for_label }}">Identifiant ou email</label>
                     <div class="form-control">
                         <span class="form-icon">👤</span>
-                        {{ form.identifiant }}
-                        {% comment %} <input type="text" id="login-username" name="login-username" placeholder="Votre nom d'utilisateur" required> {% endcomment %}
+                        {{ form.identifiant  }}
+                        {% if form.identifiant.errors %}
+                        <div class="error-message" style="display: block;">
+                            {{ form.identifiant.errors.0 }}
+                        </div>
+                        {% endif %}
                     </div>
-                    <div class="error-message" id="login-username-error"></div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="login-password">Mot de passe</label>
+                    <label for="{{ form.password.id_for_label }}">Mot de passe</label>
                     <div class="form-control">
                         <span class="form-icon">🔒</span>
-                        {% comment %} <input type="password" id="login-password" name="login-password" placeholder="Votre mot de passe" required> {% endcomment %}
                         {{ form.password }}
-
-                        <span class="password-toggle" id="login-password-toggle">👁️</span>
+                        {% if form.password.errors %}
+                        <div class="error-message" style="display: block;">
+                            {{ form.password.errors.0 }}
+                        </div>
+                        {% endif %}
+                        <span class="password-toggle" id="password-toggle">👁</span>
                     </div>
-                    <div class="error-message" id="login-password-error"></div>
                 </div>
                 
-                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center;">
-                        <input type="checkbox" id="remember-me" style="margin-right: 8px;">
-                        <label for="remember-me" style="margin-bottom: 0; font-size: 14px;">Se souvenir de moi</label>
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember-me" name="remember_me">
+                        <label for="remember-me">Se souvenir de moi</label>
                     </div>
-                    <a href="#" style="font-size: 14px; color: var(--primary-color); text-decoration: none;">Mot de passe oublié?</a>
+                    <a href="#" class="forgot-password">Mot de passe oublié?</a>
                 </div>
                 
                 <button type="submit" class="btn" id="login-btn">Se connecter</button>
                 
-                <div class="divider">ou</div>
+                <div class="divider">ou continuer avec</div>
                 
                 <div class="social-login">
-                    <button type="button" class="social-btn facebook">
-                        <i>f</i>
+                    <button type="button" class="social-btn">
+                        <span>Google</span>
                     </button>
-                    <button type="button" class="social-btn google">
-                        <i>G</i>
+                    <button type="button" class="social-btn">
+                        <span>Facebook</span>
                     </button>
                 </div>
                 
                 <div class="switch-form">
-                    Nouveau sur COMMULINK ? <a href="{% url 'inscription' %}" style="color: red;" id="switch-to-signup">S'inscrire</a>
+                    Nouveau sur COMMULINK ? 
+                    <a href="{% url 'inscription' %}" id="switch-to-signup">Créer un compte</a>
                 </div>
-                <div class="switch-form">
-                    <a href="{% url 'index' %}" style="color: red; font-weight: bold; font-size: 20px;" id="switch-to-signup">Annuler</a>
-                </div>
+                
+                <a href="{% url 'index' %}" class="cancel-link">Retour à l'accueil</a>
             </form>
         </div>
     </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('password-toggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁' : '🔒';
+        });
+
+        // Form validation
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            const username = document.getElementById('{{ form.username.id_for_label }}').value;
+            const password = document.getElementById('{{ form.password.id_for_label }}').value;
+            let isValid = true;
+            
+            // Reset errors
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('input').forEach(el => {
+                el.classList.remove('error');
+            });
+            
+            if (!username) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = 'Veuillez saisir votre identifiant ou email';
+                errorDiv.style.display = 'block';
+                
+                const usernameField = document.getElementById('{{ form.identifiant.id_for_label }}');
+                usernameField.classList.add('error');
+                
+                if (!usernameField.nextElementSibling || !usernameField.nextElementSibling.classList.contains('error-message')) {
+                    usernameField.parentNode.insertBefore(errorDiv, usernameField.nextSibling);
+                }
+                isValid = false;
+            }
+            
+            if (!password) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = 'Veuillez saisir votre mot de passe';
+                errorDiv.style.display = 'block';
+                
+                const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+                passwordField.classList.add('error');
+                
+                if (!passwordField.nextElementSibling || !passwordField.nextElementSibling.classList.contains('error-message')) {
+                    passwordField.parentNode.insertBefore(errorDiv, passwordField.nextSibling);
+                }
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Si validation réussie, montrer l'indicateur de chargement
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.innerHTML = '<span>Connexion en cours...</span>';
+            loginBtn.disabled = true;
+        });
+        
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            const messages = document.querySelectorAll('.alert');
+            messages.forEach(function(message) {
+                message.style.transition = 'opacity 0.5s ease';
+                message.style.opacity = '0';
+                setTimeout(function() {
+                    message.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+        
+        // Pré-remplir le champ username s'il y a une erreur
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameField = document.getElementById('{{ form.identifiant.id_for_label }}');
+            const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+            
+            // Focus sur le premier champ vide ou le champ username
+            if (!usernameField.value) {
+                usernameField.focus();
+            } else if (!passwordField.value) {
+                passwordField.focus();
+            }
+            
+            // Ajout de classes CSS aux champs du formulaire Django
+            if (usernameField) {
+                usernameField.classList.add('form-input');
+                usernameField.setAttribute('placeholder', 'Votre identifiant ou email');
+            }
+            
+            if (passwordField) {
+                passwordField.classList.add('form-input');
+                passwordField.setAttribute('placeholder', 'Votre mot de passe');
+            }
+        });
+    </script>
 </body>
 </html>
+
+

@@ -17,7 +17,7 @@ from django.contrib.auth import authenticate, login, logout
 
 
 def connexion(request):
-    next_url = request.GET.get("next")  #  on récupère le paramètre next
+    next_url = request.GET.get("next")  
 
     if request.method == "POST":
         form = ConnexionForm(request.POST, request=request)
@@ -74,6 +74,9 @@ def formulaireInformation(request):
 # def inscription(request):
 #     return render(request, 'user/inscription.html')
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.db import IntegrityError
 
 def inscription_membre(request):
     """
@@ -82,76 +85,129 @@ def inscription_membre(request):
     if request.method == 'POST':
         form = MembreInscriptionForm(request.POST, request.FILES)
         
-        if form.is_valid():
-            try:
-                # Créer le membre avec statut "en_attente"
-                membre = Membre(
-                    nom=form.cleaned_data['nom'],
-                    prenom=form.cleaned_data['prenom'],
-                    sexe=form.cleaned_data['sexe'],
-                    email=form.cleaned_data['email'],
-                    telephone=form.cleaned_data.get('telephone') or '',
-                    adresse=form.cleaned_data.get('adresse') or '',
-                    profession=form.cleaned_data['profession'],
-                    numeroUrgence=form.cleaned_data.get('numeroUrgence') or '',
-                    niveauEtude=form.cleaned_data.get('niveauEtude') or '',
-                    ecole=form.cleaned_data.get('ecole') or '',
-                    ner=form.cleaned_data.get('ner') or '',
-                    keri=form.cleaned_data.get('keri') or '',
-                    keribour=form.cleaned_data.get('keribour') or '',
-                    keriBa=form.cleaned_data.get('keriBa') or '',
-                    keribourBa=form.cleaned_data.get('keribourBa') or '',
-                    notes=form.cleaned_data.get('notes') or '',
-                    statut='en_attente',
-                    utilisateur=None,
-                )
-                
-                # Photo
-                if form.cleaned_data.get('photo'):
-                    membre.photo = form.cleaned_data['photo']
-                
-                membre.save()
-                
-                # Ajouter la filière dans les notes si présente
-                filiere = form.cleaned_data.get('filiere', '')
-                if filiere:
-                    if membre.notes:
-                        membre.notes += f"\nFilière: {filiere}"
-                    else:
-                        membre.notes = f"Filière: {filiere}"
-                    membre.save()
-                
-                messages.success(
+        # Debug: Afficher les erreurs de validation
+        if not form.is_valid():
+            
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            
+            return render(request, 'user/formulaireInscription.html', {
+                'form': form,
+                'titre': "Demande d'inscription"
+            })
+        
+        try:
+            # Créer le membre avec statut "en_attente"
+            membre = form.save(commit=False)
+            membre.statut = 'en_attente'
+            membre.utilisateur = None
+            
+            # Valider qu'au moins un champ d'identité est rempli
+            identite_fields = ['ner', 'keri', 'keribour', 'keriBa', 'keribourBa']
+            has_identite = any(
+                form.cleaned_data.get(field) 
+                for field in identite_fields
+            )
+            
+            if not has_identite:
+                messages.error(
                     request, 
-                    f"Merci {membre.prenom} ! Votre demande d'inscription a été envoyée avec succès. "
-                    f"Elle sera examinée par notre équipe dans les plus brefs délais."
+                    "Veuillez remplir au moins un des champs d'identité (Ner, Keri, Keribour, Keri Bâ, ou Keribour Bâ)."
                 )
-                return redirect('inscription_confirmation', pk=membre.pk)
-                
-            except Exception as e:
-                messages.error(request, f"Une erreur est survenue lors de l'inscription: {str(e)}")
-        else:
-            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+                return render(request, 'user/formulaireInscription.html', {
+                    'form': form,
+                    'titre': "Demande d'inscription"
+                })
+            
+            membre.save()
+            
+            messages.success(
+                request, 
+                f"Merci {membre.prenom} ! Votre demande d'inscription a été envoyée avec succès. "
+                f"Elle sera examinée par notre équipe dans les plus brefs délais."
+            )
+            return redirect('index')
+            
+        except IntegrityError as e:
+            messages.error(
+                request, 
+                "Cette adresse email est déjà utilisée. Veuillez en choisir une autre."
+            )
+            return render(request, 'user/formulaireInscription.html', {
+                'form': form,
+                'titre': "Demande d'inscription"
+            })
+            
+        except Exception as e:
+            print(f"ERREUR: {str(e)}")
+            messages.error(
+                request, 
+                f"Une erreur est survenue lors de l'inscription. Veuillez réessayer."
+            )
+            return render(request, 'user/formulaireInscription.html', {
+                'form': form,
+                'titre': "Demande d'inscription"
+            })
     else:
         form = MembreInscriptionForm()
     
-    return render(request, 'user/inscription.html', {
+    return render(request, 'user/formulaireInscription.html', {
         'form': form,
         'titre': "Demande d'inscription"
     })
+    
+    
+    
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.views.generic import FormView
+from .forms import MembreForm
+
+# class InscriptionMembreView(FormView):
+#     template_name = 'user/formulaireInscription.html'
+#     form_class = MembreForm
+    
+#     def get(self, request, *args, **kwargs):
+#         form = self.form_class()
+#         return render(request, self.template_name, {'form': form})
+    
+#     def post(self, request, *args, **kwargs):
+#         form = self.form_class(request.POST, request.FILES)
+        
+#         if form.is_valid():
+#             try:
+#                 # Sauvegarder le membre
+#                 membre = form.save()
+                
+#                 messages.success(request, 
+#                     f"Le membre {membre.nom_complet} a été inscrit avec succès !")
+#                 return redirect('liste_membres')  # Ou une autre page
+                
+#             except Exception as e:
+#                 messages.error(request, 
+#                     f"Une erreur est survenue lors de l'inscription: {str(e)}")
+#                 return render(request, self.template_name, {'form': form})
+        
+#         messages.error(request, 
+#             "Veuillez corriger les erreurs dans le formulaire.")
+#         return render(request, self.template_name, {'form': form})
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['page_title'] = 'Inscription - COMMULINK'
+#         return context
 
 
-def inscription_confirmation(request, pk):
+def inscription_confirmation(request):
     """Page de confirmation après inscription"""
-    membre = get_object_or_404(Membre, pk=pk)
+    membre = get_object_or_404(Membre, utilisateur=request.user)
+    
     
     return render(request, 'user/inscription_confirmation.html', {
         'membre': membre
     })
 
-
-# def connexion(request):
-#     return render(request, 'user/connexion.html')
 
 def affichageEvenement(request, id):  
     evenement = TypeEvenement.objects.get(id = id)
@@ -172,5 +228,174 @@ def detailEvenement(request, id):
     temoingnages = Temoingnage.objects.filter(evenement=evenement).order_by('-id')
     
     return render(request, 'user/detailEvenement.html', {'evenement': evenement, 'evenementImage': evenementImage, 'evenementVideos': evenementVideos, 'temoingnages': temoingnages,})
+
+
+
+
+
+from django.views.generic import TemplateView
+
+class AboutView(TemplateView):
+    template_name = 'user/apropos.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'À Propos - CommuLink'
+        return context
+
+class FAQView(TemplateView):
+    template_name = 'user/faq.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'FAQ - CommuLink'
+        return context
+
+from django.shortcuts import render
+from datetime import datetime
+from secondApp.models import TypeEvenement, Evenement
+
+def liste_evenements(request):
+    """
+    Vue pour afficher la liste des types d'événements avec statistiques
+    ET les  événements
+    """
+    # Récupérer tous les types d'événements
+    type_evenements = TypeEvenement.objects.all().order_by('nom_type_evenement')
+    
+    # Récupérer les  événements 
+    derniers_evenements = Evenement.objects.all().order_by('-dateHeure')
+    
+    # Calculer les statistiques pour le hero
+    total_events = Evenement.objects.count()
+    now = datetime.now()
+    upcoming_events = Evenement.objects.filter(dateHeure__gte=now).count()
+    
+    context = {
+        'typeEvenement': type_evenements,      # Pour la boucle des types d'événements
+        'evenements': derniers_evenements,     # Pour la section "DERNIERS EVENEMENTS"
+        'total_events': total_events,          # Pour les statistiques
+        'upcoming_events': upcoming_events,    # Pour les statistiques
+    }
+    return render(request, 'user/listeEvenement.html', context)
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from secondApp.models import Membre
+
+import os
+from django.conf import settings
+
+@login_required
+def profil_membre(request):
+    """Afficher le profil d'un membre"""
+    
+    membre = get_object_or_404(Membre, utilisateur=request.user)
+    
+    context = {
+        'membre': membre,
+        'page_title': f'Profil - {membre.nom_complet}',
+        'genres': Membre.GENRE_CHOICES,
+    }
+    
+    return render(request, 'user/profil.html', context)
+
+@login_required
+def modifier_profil(request):
+    """Modifier les informations du profil"""
+    membre = get_object_or_404(Membre, utilisateur=request.user)
+    
+    
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                # Récupérer et nettoyer les données
+                data = {}
+                for field in ['nom', 'prenom', 'sexe', 'email', 'telephone', 'adresse', 
+                             'profession', 'numeroUrgence', 'niveauEtude', 'ecole',
+                             'ner', 'keri', 'keribour', 'keriBa', 'keribourBa', 'notes']:
+                    value = request.POST.get(field, '').strip()
+                    data[field] = value if value != '' else None
+                
+                # Validation
+                if len(data['nom']) < 2:
+                    messages.error(request, 'Le nom doit contenir au moins 2 caractères')
+                    return redirect('profil_membre')
+                
+                if len(data['prenom']) < 2:
+                    messages.error(request, 'Le prénom doit contenir au moins 2 caractères')
+                    return redirect('profil_membre')
+                
+                if len(data['profession']) < 2:
+                    messages.error(request, 'La profession doit contenir au moins 2 caractères')
+                    return redirect('profil_membre')
+                
+                # Validation email
+                try:
+                    validate_email(data['email'])
+                except ValidationError:
+                    messages.error(request, 'Veuillez entrer une adresse email valide')
+                    return redirect('profil_membre')
+                
+                # Vérifier l'unicité de l'email
+                if Membre.objects.filter(email=data['email']).exclude(pk=membre.pk).exists():
+                    messages.error(request, 'Cet email est déjà utilisé par un autre membre')
+                    return redirect('profil_membre')
+                
+                # Mettre à jour les champs
+                for field, value in data.items():
+                    setattr(membre, field, value)
+                
+                membre.save()
+                messages.success(request, 'Profil mis à jour avec succès!')
+                
+        except Exception as e:
+            messages.error(request, f'Une erreur est survenue: {str(e)}')
+    
+    return redirect('profil_membre')
+
+@login_required
+def modifier_photo_profil(request):
+    """Modifier la photo de profil d'un membre"""
+    membre = get_object_or_404(Membre, utilisateur=request.user)
+    
+    if request.method == 'POST':
+        try:
+            nouvelle_photo = request.FILES.get('photo')
+            
+            if nouvelle_photo:
+                # Vérifier la taille (max 5MB)
+                if nouvelle_photo.size > 5 * 1024 * 1024:
+                    messages.error(request, 'La photo ne doit pas dépasser 5MB')
+                    return redirect('profil_membre')
+                
+                # Vérifier le type de fichier
+                allowed_types = ['image/jpeg', 'image/png', 'image/gif']
+                if nouvelle_photo.content_type not in allowed_types:
+                    messages.error(request, 'Format de fichier non supporté. Utilisez JPG, PNG ou GIF.')
+                    return redirect('profil_membre')
+                
+                # Supprimer l'ancienne photo si elle existe
+                if membre.photo:
+                    old_photo_path = membre.photo.path
+                    if os.path.exists(old_photo_path):
+                        os.remove(old_photo_path)
+                
+                # Sauvegarder la nouvelle photo
+                membre.photo = nouvelle_photo
+                membre.save()
+                
+                messages.success(request, 'Photo de profil mise à jour avec succès!')
+            else:
+                messages.error(request, 'Veuillez sélectionner une photo.')
+                
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la mise à jour de la photo: {str(e)}')
+    
+    return redirect('profil_membre')
 
 
