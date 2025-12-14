@@ -3,13 +3,29 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from commulink.utils.decorators import admin_required, membre_required
 from firtsApp.forms import ConnexionForm, MembreInscriptionForm
-from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Temoingnage, TypeEvenement
+from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Reinscription, Temoingnage, TypeEvenement
 from django.contrib.auth.decorators import login_required
 
 
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
+
+
+
+from datetime import datetime
+from django.db import transaction
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
+import os
+from django.conf import settings
+
+
+
 # Create your views here.
+
+
+
 
 
 from django.contrib.auth import authenticate, login, logout
@@ -67,9 +83,6 @@ def contact(request):
 
 def feteIs(request):
     return render(request, 'user/feteIs.html')
-
-def formulaireInformation(request):
-    return render(request, 'user/formulaireInformation.html')
 
 # def inscription(request):
 #     return render(request, 'user/inscription.html')
@@ -199,14 +212,6 @@ from .forms import MembreForm
 #         return context
 
 
-def inscription_confirmation(request):
-    """Page de confirmation après inscription"""
-    membre = get_object_or_404(Membre, utilisateur=request.user)
-    
-    
-    return render(request, 'user/inscription_confirmation.html', {
-        'membre': membre
-    })
 
 
 def affichageEvenement(request, id):  
@@ -251,9 +256,6 @@ class FAQView(TemplateView):
         context['title'] = 'FAQ - CommuLink'
         return context
 
-from django.shortcuts import render
-from datetime import datetime
-from secondApp.models import TypeEvenement, Evenement
 
 def liste_evenements(request):
     """
@@ -264,7 +266,7 @@ def liste_evenements(request):
     type_evenements = TypeEvenement.objects.all().order_by('nom_type_evenement')
     
     # Récupérer les  événements 
-    derniers_evenements = Evenement.objects.all().order_by('-dateHeure')
+    Evenements = Evenement.objects.all().order_by('-dateHeure')
     
     # Calculer les statistiques pour le hero
     total_events = Evenement.objects.count()
@@ -273,30 +275,24 @@ def liste_evenements(request):
     
     context = {
         'typeEvenement': type_evenements,      # Pour la boucle des types d'événements
-        'evenements': derniers_evenements,     # Pour la section "DERNIERS EVENEMENTS"
+        'evenements': Evenements,     
         'total_events': total_events,          # Pour les statistiques
         'upcoming_events': upcoming_events,    # Pour les statistiques
     }
     return render(request, 'user/listeEvenement.html', context)
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-from secondApp.models import Membre
-
-import os
-from django.conf import settings
 
 @login_required
+@membre_required
 def profil_membre(request):
     """Afficher le profil d'un membre"""
-    
+    if request.user.role != "membreLambda":
+        return redirect("index")
     membre = get_object_or_404(Membre, utilisateur=request.user)
-    
+    reinscription = Reinscription.objects.filter(membre=membre).last()
+    print(f"=========================={reinscription.annee}")
     context = {
+        'reinscription':reinscription,
         'membre': membre,
         'page_title': f'Profil - {membre.nom_complet}',
         'genres': Membre.GENRE_CHOICES,

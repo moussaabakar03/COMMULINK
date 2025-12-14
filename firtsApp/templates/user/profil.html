@@ -39,7 +39,6 @@
 
     <div class="container-fluid py-5" style="margin-top: 100px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh;">
         <div class="container">
-           
 
             <!-- Header du profil -->
             <div class="row justify-content-center mb-5">
@@ -48,7 +47,7 @@
                         <div class="card-header bg-white py-4 border-bottom">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h2 class="text-orange fw-bold mb-1">Profil du Membre</h2>
+                                    <h2 class="text-orange fw-bold mb-1">{{page_title}}</h2>
                                     <p class="text-muted mb-0">Informations détaillées</p>
                                 </div>
                                 <div>
@@ -74,13 +73,13 @@
                             <div class="mb-4">
                                 <div class="position-relative d-inline-block">
                                     <div class="rounded-circle overflow-hidden border-4 border-orange" style="width: 200px; height: 200px; margin: 0 auto;">
-                                        {% if membre.photo %}
-                                            <img src="{{ membre.photo.url }}" alt="{{ membre.nom_complet }}" 
+                                        {% if reinscription.photo_annuelle %}
+                                            <img src="{{ reinscription.photo_annuelle.url }}" alt="{{ reinscription.membre.nom_complet }}" 
                                                 class="w-100 h-100 object-fit-cover">
                                         {% else %}
                                             <div class="w-100 h-100 bg-gradient-orange d-flex align-items-center justify-content-center">
                                                 <span class="display-4 text-white fw-bold">
-                                                    {{ membre.nom|first|upper }}{{ membre.prenom|first|upper }}
+                                                    {{ reinscription.nom|first|upper }}{{ reinscription.prenom|first|upper }}
                                                 </span>
                                             </div>
                                         {% endif %}
@@ -93,21 +92,21 @@
                                 </div>
                             </div>
                             
-                            <h4 class="fw-bold mb-1">{{ membre.nom_complet }}</h4>
-                            <p class="text-muted mb-3">{{ membre.profession }}</p>
+                            <h4 class="fw-bold mb-1">{{ reinscription.membre.nom_complet }}</h4>
+                            <p class="text-muted mb-3">{{ reinscription.profession }}</p>
                             
                             <div class="d-flex justify-content-center gap-2 mb-4">
-                                {% if membre.sexe == 'M' %}
+                                {% if reinscription.sexe == 'M' %}
                                     <span class="badge bg-primary px-3 py-2">Homme</span>
-                                {% elif membre.sexe == 'F' %}
+                                {% elif reinscription.sexe == 'F' %}
                                     <span class="badge bg-primary px-3 py-2">Femme</span>
                                 {% else %}
-                                    <span class="badge bg-secondary px-3 py-2">Autre</span>
+                                    <span class="badge bg-primary px-3 py-2">Autre</span>
                                 {% endif %}
                                 
                                 <span class="badge bg-dark px-3 py-2">
                                     <i class="fas fa-calendar me-1"></i>
-                                    Inscrit le {{ membre.date_inscription|date:"d/m/Y" }}
+                                    Inscrit le {{ reinscription.date_reinscription|date:"d/m/Y" }}
                                 </span>
                             </div>
                             
@@ -116,15 +115,15 @@
                                 <div class="text-start">
                                     <p class="mb-2">
                                         <i class="fas fa-envelope text-orange me-2"></i>
-                                        <a href="mailto:{{ membre.email }}" class="text-decoration-none text-dark">
-                                            {{ membre.email }}
+                                        <a href="mailto:{{ reinscription.membre.email }}" class="text-decoration-none text-dark">
+                                            {{ reinscription.membre.email }}
                                         </a>
                                     </p>
-                                    {% if membre.telephone %}
+                                    {% if reinscription.numeroUrgence %}
                                     <p class="mb-0">
                                         <i class="fas fa-phone text-orange me-2"></i>
-                                        <a href="tel:{{ membre.telephone }}" class="text-decoration-none text-dark">
-                                            {{ membre.telephone }}
+                                        <a href="tel:{{ reinscription.numeroUrgence }}" class="text-decoration-none text-dark">
+                                            {{ reinscription.numeroUrgence }}
                                         </a>
                                     </p>
                                     {% endif %}
@@ -151,12 +150,12 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Nom</label>
-                                        <input type="text" name="nom" value="{{ membre.nom }}" 
+                                        <input type="text" name="nom" value="{{ reinscription.membre.nom }}" 
                                             class="form-control form-control-lg" disabled required minlength="2">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Prénom</label>
-                                        <input type="text" name="prenom" value="{{ membre.prenom }}" 
+                                        <input type="text" name="prenom" value="{{ reinscription.membre.prenom }}" 
                                             class="form-control form-control-lg" disabled required minlength="2">
                                     </div>
                                 </div>
@@ -166,7 +165,7 @@
                                         <label class="form-label text-dark fw-semibold">Sexe</label>
                                         <select name="sexe" class="form-select form-select-lg" disabled>
                                             {% for value, label in genres %}
-                                                <option value="{{ value }}" {% if membre.sexe == value %}selected{% endif %}>
+                                                <option value="{{ value }}" {% if reinscription.membre.sexe == value %}selected{% endif %}>
                                                     {{ label }}
                                                 </option>
                                             {% endfor %}
@@ -174,7 +173,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Email</label>
-                                        <input type="email" name="email" value="{{ membre.email }}" 
+                                        <input type="email" name="email" value="{{ reinscription.membre.email }}" 
                                             class="form-control form-control-lg" disabled required>
                                     </div>
                                 </div>
@@ -182,12 +181,12 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Téléphone</label>
-                                        <input type="text" name="telephone" value="{{ membre.telephone|default:'' }}" 
+                                        <input type="text" name="telephone" value="{{ reinscription.numeroUrgence|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Profession</label>
-                                        <input type="text" name="profession" value="{{ membre.profession }}" 
+                                        <input type="text" name="profession" value="{{ reinscription.membre.profession }}" 
                                             class="form-control form-control-lg" disabled required>
                                     </div>
                                 </div>
@@ -195,7 +194,7 @@
                         </div>
 
                         <!-- Informations d'Identité -->
-                        <div class="card shadow-lg border-0 mb-4">
+                        {% comment %} <div class="card shadow-lg border-0 mb-4">
                             <div class="card-header bg-white border-bottom py-3">
                                 <h5 class="fw-bold text-dark mb-0">
                                     <i class="fas fa-id-card text-orange me-2"></i>
@@ -206,12 +205,12 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">NER</label>
-                                        <input type="text" name="ner" value="{{ membre.ner|default:'' }}" 
+                                        <input type="text" name="ner" value="{{ reinscription.ner|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">KERI</label>
-                                        <input type="text" name="keri" value="{{ membre.keri|default:'' }}" 
+                                        <input type="text" name="keri" value="{{ reinscription.keri|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                 </div>
@@ -219,12 +218,12 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">KERIBOUR</label>
-                                        <input type="text" name="keribour" value="{{ membre.keribour|default:'' }}" 
+                                        <input type="text" name="keribour" value="{{ reinscription.keribour|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">KERI BA</label>
-                                        <input type="text" name="keriBa" value="{{ membre.keriBa|default:'' }}" 
+                                        <input type="text" name="keriBa" value="{{ reinscription.keriBa|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                 </div>
@@ -232,12 +231,12 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">KERIBOUR BA</label>
-                                        <input type="text" name="keribourBa" value="{{ membre.keribourBa|default:'' }}" 
+                                        <input type="text" name="keribourBa" value="{{ reinscription.keribourBa|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> {% endcomment %}
 
                         <!-- Informations Supplémentaires -->
                         <div class="card shadow-lg border-0 mb-4">
@@ -252,19 +251,19 @@
                                     <div class="col-12 mb-3">
                                         <label class="form-label text-dark fw-semibold">Adresse</label>
                                         <textarea name="adresse" rows="3" 
-                                                class="form-control form-control-lg" disabled>{{ membre.adresse|default:'' }}</textarea>
+                                                class="form-control form-control-lg" disabled>{{ reinscription.adresse|default:'' }}</textarea>
                                     </div>
                                 </div>
                                 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Numéro d'Urgence</label>
-                                        <input type="text" name="numeroUrgence" value="{{ membre.numeroUrgence|default:'' }}" 
+                                        <input type="text" name="numeroUrgence" value="{{ reinscription.numeroUrgence|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">Niveau d'Étude</label>
-                                        <input type="text" name="niveauEtude" value="{{ membre.niveauEtude|default:'' }}" 
+                                        <input type="text" name="niveauEtude" value="{{ reinscription.niveauEtude|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                 </div>
@@ -272,7 +271,7 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label text-dark fw-semibold">École/Université</label>
-                                        <input type="text" name="ecole" value="{{ membre.ecole|default:'' }}" 
+                                        <input type="text" name="ecole" value="{{ reinscription.ecole|default:'' }}" 
                                             class="form-control form-control-lg" disabled>
                                     </div>
                                 </div>
@@ -291,7 +290,7 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <textarea name="notes" rows="4" 
-                                                class="form-control form-control-lg" disabled>{{ membre.notes|default:'' }}</textarea>
+                                                class="form-control form-control-lg" disabled>{{ reinscription.membre.description|default:'' }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -320,7 +319,7 @@
                     <div class="text-center text-muted">
                         <small>
                             <i class="fas fa-clock me-1"></i>
-                            Dernière modification : {{ membre.date_derniere_modification|date:"d/m/Y à H:i" }}
+                            Dernière modification : {{ reinscription.date_reinscription|date:"d/m/Y à H:i" }}
                         </small>
                     </div>
                 </div>
@@ -343,13 +342,13 @@
                     <div class="modal-body">
                         <div class="text-center mb-4">
                             <div class="rounded-circle overflow-hidden border-4 border-orange d-inline-block" style="width: 150px; height: 150px;">
-                                {% if membre.photo %}
-                                    <img src="{{ membre.photo.url }}" alt="Photo actuelle" 
+                                {% if reinscription.photo %}
+                                    <img src="{{ reinscription.photo.url }}" alt="Photo actuelle" 
                                         class="w-100 h-100 object-fit-cover" id="currentPhoto">
                                 {% else %}
                                     <div class="w-100 h-100 bg-gradient-orange d-flex align-items-center justify-content-center">
                                         <span class="display-5 text-white fw-bold">
-                                            {{ membre.nom|first|upper }}{{ membre.prenom|first|upper }}
+                                            {{ reinscription.nom|first|upper }}{{ reinscription.prenom|first|upper }}
                                         </span>
                                     </div>
                                 {% endif %}

@@ -67,12 +67,17 @@
                 <!-- Boutons d'authentification pour mobile (dans le menu collapsed) -->
                 <div class="d-lg-none mt-3">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'profil_membre' %}" class="nav-item nav-link">
-                            <i class="fas fa-user me-2"></i>{{ user.nom|default:user.username }}
-                        </a>
+
+                        {% if user.role == "membreLambda" %}
+                            <a href="{% url 'profil_membre' %}" class="nav-item nav-link">
+                                <i class="fas fa-user me-2"></i>{{ user.nom|default:user.username }}
+                            </a>
+                        {% endif %}
+
                         <a href="{% url 'deconnexion' %}" class="nav-item nav-link text-danger">
                             <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
                         </a>
+
                     {% else %}
                         <a class="btn btn-outline-primary py-2 px-3 w-100" href="{% url 'connexion' %}">
                             Connexion
@@ -81,6 +86,7 @@
                             </div>
                         </a>
                     {% endif %}
+
                 </div>
             </div>
 
@@ -92,7 +98,9 @@
                     <i class="fas fa-user-circle"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{% url 'profil_membre' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                    {% if user.role == "membreLambda" %}
+                        <li><a class="dropdown-item" href="{% url 'profil_membre' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                    {% endif %}
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="{% url 'deconnexion' %}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
                 </ul>

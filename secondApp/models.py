@@ -70,6 +70,7 @@ class Membre(models.Model):
         ('en_attente', 'En attente de validation'),
         ('valide', 'Validé'),
         ('refuse', 'Refusé'),
+        ('bloquer', 'Bloquer'),
     ]
 
     utilisateur = models.OneToOneField(Utilisateur, on_delete=models.CASCADE, null=True, blank=True, related_name="membre")

@@ -48,6 +48,9 @@ urlpatterns = [
     path('membres/<int:pk>/valider/', views.valider_membre, name='valider_membre'),
     path('membres/<int:pk>/refuser/', views.refuser_membre, name='refuser_membre'),
     
+    path('bloquer-membre/<int:pk>/refuser/', views.bloquerMembre, name='bloquerMembre'),
+    path('debloquer-membre/<int:pk>/refuser/', views.debloquerMembre, name='debloquerMembre'),
+    
     path('membres/valider-tous/', views.valider_tous_en_attente, name='valider_tous_en_attente'),
     
     

@@ -962,7 +962,7 @@ def liste_membres(request):
     nombre_refuse = base_qs.filter(statut='refuse').count()
     
     # Pagination
-    paginator = Paginator(membres, 10)
+    paginator = Paginator(membres, 7)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -1063,58 +1063,65 @@ def get_filtered_membres(request):
     }
 
 
-
 @login_required
 @admin_required
 def exporter_membres_pdf(request):
-    """Exporte la liste des membres en PDF avec belle mise en forme"""
+    """Exporte UNIQUEMENT les membres au statut 'Validé'"""
     
     if not PDF_ENABLED:
-        messages.error(request, "L'export PDF n'est pas disponible. Installez xhtml2pdf avec: pip install xhtml2pdf")
+        messages.error(
+            request,
+            "L'export PDF n'est pas disponible. Installez xhtml2pdf avec : pip install xhtml2pdf"
+        )
         return redirect('liste_membres')
     
-    # Récupérer les membres filtrés
+    # Récupérer les membres (peu importe les filtres envoyés)
     membres, filters = get_filtered_membres(request)
-    
+
+    #  FORCER le statut Validé
+    membres = membres.filter(statut="valide")
+
     # Contexte pour le template
     context = {
         'membres': membres,
         'total': membres.count(),
-        'statut_filter': filters['statut_filter'],
-        'annee_selectionnee': filters['annee_selectionnee'],
-        'search_query': filters['search_query'],
+        'statut_filter': 'Validé',
+        'annee_selectionnee': filters.get('annee_selectionnee'),
+        'search_query': filters.get('search_query'),
         'date_export': timezone.now(),
         'exporteur': request.user,
     }
-    
-    # Générer le HTML à partir du template
+
     template = get_template('gestionMembre/export_pdf.html')
     html = template.render(context)
-    
-    # Créer la réponse PDF
+
     response = HttpResponse(content_type='application/pdf')
-    filename = f"liste_membres_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    filename = f"liste_membres_valides_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    
-    # Générer le PDF
+
     pisa_status = pisa.CreatePDF(html, dest=response, encoding='utf-8')
-    
+
     if pisa_status.err:
         messages.error(request, "Erreur lors de la génération du PDF.")
         return redirect('liste_membres')
-    
-    return response
 
+    return response
 
 
 @login_required
 @admin_required
 def exporter_membres_csv(request):
-    """Exporte la liste des membres en Excel ou CSV"""
-    
-    # Récupérer les membres filtrés
+    """Exporte UNIQUEMENT les membres au statut 'Validé' (Excel ou CSV)"""
+
+    # Récupérer les membres (peu importe les filtres utilisateur)
     membres, filters = get_filtered_membres(request)
-    
+
+    # 🔐 Forcer le statut Validé
+    membres = membres.filter(statut="valide")
+
+    # Mettre à jour le filtre pour cohérence
+    filters['statut_filter'] = 'Validé'
+
     if EXCEL_ENABLED:
         return exporter_membres_excel(request, membres, filters)
     else:
@@ -1354,6 +1361,7 @@ def creer_membre(request):
                     
                     if form.cleaned_data.get('photo'):
                         membre.photo = form.cleaned_data['photo']
+                    photo = form.cleaned_data['photo']
                     
                     membre.save()
                     
@@ -1369,7 +1377,7 @@ def creer_membre(request):
                             numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
                             ecole=form.cleaned_data.get('ecole', ''),
                             niveauEtude=form.cleaned_data.get('niveauEtude', ''),
-                            photo_annuelle=form.cleaned_data.get('photo'),
+                            photo_annuelle=photo,
                             filiere=form.cleaned_data.get('filiere', '')
                         )
                     
@@ -1500,7 +1508,9 @@ def modifier_membre(request, pk):
 @login_required
 @admin_required
 def supprimer_membre(request, pk):
-    membre = Membre.objects.get(pk=pk).delete()
+    membre = Membre.objects.get(pk=pk)
+    membre.utilisateur.delete()
+    membre.delete()
     messages.success(request, "Membre supprimé avec succès!")
     return redirect('liste_membres')
     
@@ -1542,9 +1552,6 @@ def valider_membre(request, pk):
     membre = get_object_or_404(Membre, pk=pk)
     
     
-    if membre.statut != 'en_attente':
-        messages.warning(request, f"Ce membre a déjà été traité (statut: {membre.get_statut_display()}).")
-        return redirect('liste_membres')
     
     try:
         with transaction.atomic():
@@ -1578,13 +1585,6 @@ def valider_membre(request, pk):
             # 3. Créer la réinscription pour l'année active
             annee_active = get_annee_active()
             if annee_active:
-                # Extraire la filière des notes si présente
-                filiere = ''
-                if membre.notes and 'Filière:' in membre.notes:
-                    for line in membre.notes.split('\n'):
-                        if line.startswith('Filière:'):
-                            filiere = line.replace('Filière:', '').strip()
-                            break
                 
                 Reinscription.objects.create(
                     membre=membre,
@@ -1596,7 +1596,7 @@ def valider_membre(request, pk):
                     ecole=membre.ecole or '',
                     niveauEtude=membre.niveauEtude or '',
                     photo_annuelle=membre.photo if membre.photo else None,
-                    filiere=filiere
+                    filiere=membre.filiere
                 )
             
             messages.success(request, f"L'inscription de {membre.nom_complet} a été validée avec succès. Mot de passe: {telephone}")
@@ -1620,12 +1620,21 @@ def refuser_membre(request, pk):
     if membre.statut != 'en_attente':
         messages.warning(request, f"Ce membre a déjà été traité (statut: {membre.get_statut_display()}).")
         return redirect('liste_membres')
-    
     try:
         membre.statut = 'refuse'
         membre.date_validation = timezone.now()
         membre.valide_par = request.user
         membre.save()
+        
+        
+        # membre.statut = 'refuse'
+        # membre.utilisateur = None
+        # membre.utilisateur.is_active=False
+        # membre.date_validation = timezone.now()
+        # membre.valide_par = request.user
+        
+        # membre.utilisateur.save()
+        # membre.save()
         
         messages.info(request, f"L'inscription de {membre.nom_complet} a été refusée.")
     except Exception as e:
@@ -1727,7 +1736,43 @@ def valider_tous_en_attente(request):
     return redirect('liste_membres') 
 
     
+@login_required
+@admin_required
+def bloquerMembre(request, pk):
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    try:
+        membre.utilisateur.is_active = False
+        membre.statut= "bloquer"
+        membre.valide_par = request.user
+        
+        membre.utilisateur.save()
+        membre.save()
+        
+        messages.info(request, f"Le membre {membre.nom_complet} a été bloqué.")
+    except Exception as e:
+        messages.error(request, f"Erreur: {str(e)}")
+    
+    return redirect('liste_membres')
 
+@login_required
+@admin_required
+def debloquerMembre(request, pk):
+    membre = get_object_or_404(Membre, pk=pk)
+    
+    try:
+        membre.utilisateur.is_active = True
+        membre.statut= "valide"
+        membre.valide_par = request.user
+        
+        membre.utilisateur.save()
+        membre.save()
+        
+        messages.info(request, f"Le membre {membre.nom_complet} a été débloqué.")
+    except Exception as e:
+        messages.error(request, f"Erreur: {str(e)}")
+    
+    return redirect('liste_membres')
 
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -1899,7 +1944,7 @@ def liste_reinscriptions(request):
 
     # Pagination
     page = request.GET.get('page', 1)
-    paginator = Paginator(reinscriptions, 5)  # 20 réinscriptions par page
+    paginator = Paginator(reinscriptions, 10)  # 20 réinscriptions par page
     
     try:
         page_obj = paginator.page(page)
@@ -2044,7 +2089,7 @@ def liste_EquipeDirigeante(request):
         membres = EquipeDirigeante.objects.all().order_by('nom')
     
     # Pagination (10 membres par page)
-    paginator = Paginator(membres, 3)
+    paginator = Paginator(membres, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
@@ -2065,7 +2110,7 @@ def ajoutMembreEquipe(request):
         twitter = request.POST.get('twitter')
         
         utilisateur = Utilisateur.objects.create(
-            username = role,
+            username = nom,
             password = make_password(role),
             role="membreEquipe",
             is_active=True,
@@ -2749,8 +2794,7 @@ def supprimer_paiement(request, pk_membre, pk_evenement):
         return redirect('paiementParEvenement', pk=pk_evenement)
 
 
-@login_required
-@admin_required
+
 def reinscriptionUser(request):
     if request.method == 'POST':
         form = ReinscriptionForm(request.POST, request.FILES)
