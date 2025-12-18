@@ -658,7 +658,7 @@
                         <div class="swiper-slide">
                             <div class="team-item position-relative rounded overflow-hidden">
                                 <div class="overflow-hidden">
-                                    {% if equipe.image != None %}
+                                    {% if equipe.image %}
                                         <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{{ equipe.image.url }}" alt="image {{ equipe.role }}">
                                     {% else %}
                                         <div class="no-image">

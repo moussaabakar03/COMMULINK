@@ -36,6 +36,179 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
     
 
+    <style>
+        /* ===== Styles pour sectionStatic ===== */
+        .sectionStatic {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1a2035 0%, #2a3550 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(26, 32, 53, 0.3);
+        }
+
+        .sectionStatic > div {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 0.8rem 0.6rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sectionStatic > div::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #FF6F0F, #ff8c3a);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .sectionStatic > div:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(255, 111, 15, 0.3);
+            border-color: #FF6F0F;
+        }
+
+        .sectionStatic > div:hover::before {
+            transform: scaleX(1);
+        }
+
+        .sectionStatic > div > div:first-child {
+            font-size: 0.7rem;
+            color: #1a2035;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.4rem;
+            line-height: 1.2;
+        }
+
+        .sectionStatic > div > div:last-child {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #FF6F0F;
+            margin-top: 0.3rem;
+        }
+
+        /* Variations de couleurs avec #1a2035 et #FF6F0F */
+        .sectionStatic > div:nth-child(1) {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .sectionStatic > div:nth-child(1) > div:first-child {
+            color: #1a2035;
+        }
+
+        .sectionStatic > div:nth-child(1) > div:last-child {
+            color: #1a2035;
+        }
+
+        .sectionStatic > div:nth-child(2) {
+            background: linear-gradient(135deg, #fff5ed 0%, #ffe8d6 100%);
+        }
+
+        .sectionStatic > div:nth-child(2) > div:last-child {
+            color: #FF6F0F;
+        }
+
+        .sectionStatic > div:nth-child(3) {
+            background: linear-gradient(135deg, #e8eaf0 0%, #d5d9e5 100%);
+        }
+
+        .sectionStatic > div:nth-child(3) > div:last-child {
+            color: #1a2035;
+        }
+
+        .sectionStatic > div:nth-child(4) {
+            background: linear-gradient(135deg, #fff5ed 0%, #ffe8d6 100%);
+        }
+
+        .sectionStatic > div:nth-child(4) > div:last-child {
+            color: #FF6F0F;
+        }
+
+        .sectionStatic > div:nth-child(5) {
+            background: linear-gradient(135deg, #e8eaf0 0%, #d5d9e5 100%);
+        }
+
+        .sectionStatic > div:nth-child(5) > div:last-child {
+            color: #1a2035;
+        }
+
+        .sectionStatic > div:nth-child(6) {
+            background: linear-gradient(135deg, #fff5ed 0%, #ffe8d6 100%);
+        }
+
+        .sectionStatic > div:nth-child(6) > div:last-child {
+            color: #FF6F0F;
+        }
+
+        /* Effet décoratif subtil */
+        .sectionStatic > div::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            bottom: -15px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 111, 15, 0.08);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .sectionStatic > div:hover::after {
+            right: -8px;
+            bottom: -8px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 111, 15, 0.12);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sectionStatic {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.6rem;
+                padding: 0.8rem;
+            }
+            
+            .sectionStatic > div {
+                padding: 0.6rem 0.5rem;
+            }
+            
+            .sectionStatic > div > div:first-child {
+                font-size: 0.65rem;
+            }
+            
+            .sectionStatic > div > div:last-child {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sectionStatic {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .sectionStatic > div > div:first-child {
+                font-size: 0.6rem;
+            }
+            
+            .sectionStatic > div > div:last-child {
+                font-size: 1rem;
+            }
+        }
+    </style>
 {% endblock %}
 
 
@@ -46,25 +219,13 @@
     <header class="page-header">
         <div class="container-custom text-center">
             <h1 class="page-title text-white">💳 Paiements: {{evenement}} ({{evenement.prix}}) Fcfa</h1>
+            <span> {{ evenement.annee.debutAnnee|date:"Y" }}- {{ evenement.annee.finAnnee|date:"Y" }} </span>
         </div>
     </header>
 
     <div class="page-inner">
         <div class="container-custom"> 
-            <!-- Messages d'alerte -->
-            {% if messages %}
-            <div class="alert-container">
-                {% for message in messages %}
-                <div class="alert-custom alert-{{ message.tags }} alert-dismissible fade show">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
-                        <div>{{ message }}</div>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+          
             
             <!-- Carte principale -->
             <div class="main-card">
@@ -83,7 +244,7 @@
                             <form method="post" action="{% url 'rappeler_paiements' %}" class="d-inline">
                                 {% csrf_token %}
                                 <input type="number" name="event_id" value="{{evenement.id}}" hidden>
-                                <button type="submit" class="btn-remind">
+                                <button type="submit" class="btn-remind" onclick="return confirm('Voulez-vous vraiment notifier les membres en retard de payement?');">
                                     <i class="fas fa-bell"></i> Rappeler Paiements
                                 </button>
                             </form>
@@ -91,7 +252,29 @@
                         </div>
                     </div>
                 </div>
-                
+                <div class="sectionStatic">
+                    <div>
+                        <div> Total Membres: {{ totalReinscris }} </div>
+                    </div>
+                    <div>
+                        <div> toute personnes Ayant donnée quelque chose: {{ reinscrisPayee }} </div>
+                        <div> {{ budget_total }} FCFA </div>
+                        
+                    </div>
+                    <div>
+                        <div> Ayant tout payé: {{ reinscrisToutPayee }} </div>
+                    </div>
+                    <div>
+                        <div> Ayant payé moitié: {{ reinscrisMoitiePayee }} </div>
+                    </div>
+                    <div>
+                        <div> Ayant rien payé: {{ reinscrisNonPayee }} </div>
+                    </div>
+                    <div>
+                        <div> Ayant donnée avance: {{ reinscrisDonneAvance }} </div>
+                    </div>
+                </div>
+
                 <!-- Corps -->
                 <div class="card-body-custom">
                     <!-- Formulaire de filtrage -->
@@ -104,9 +287,9 @@
                                 </label>
                                 <select name="membreReinscris_id" id="membreReinscris_id" class="form-select form-control w-100">
                                     <option value="">Tous les membres</option>
-                                    {% for membre in membres %}
-                                        <option value="{{ membre.id }}" {% if selected_membre == membre.id %}{% endif %}>
-                                            {{ membre.nom_complet }}- {{ membre.ner }}. {{ membre.keri }}
+                                    {% for reinscris in membres_reinscris %}
+                                        <option value="{{ reinscris.id }}">
+                                            {{ reinscris.membre.nom_complet }}- {{ reinscris.membre.ner }}. {{ reinscris.membre.keri }}
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -118,7 +301,7 @@
                             </div>
                         </div>
                     </form>
-                    
+
                     <!-- Tableau des paiements -->
                     <div class="table-responsive">
                         <table class="payments-table">
@@ -126,33 +309,16 @@
                                 <tr>
                                     <th>Membre</th>
                                     <th>Événement</th>
-                                    <th>Montant (FCFA)</th>
-                                    <th>Reste à Payer (FCFA)</th>
+                                    <th>Montant(FCFA)</th>
+                                    <th>Reste_à_Payer_(FCFA)</th>
                                     <th>Statut</th>
                                     <th>Date</th>
+                                    <th>Ajout par</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for reinscri in reinscris %}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="member-avatar me-2">
-                                                    <i class="fas fa-user-circle text-primary"></i>
-                                                </div>
-                                                <strong>{{ reinscri.membre.nom_complet }}</strong>
-                                            </div>
-                                        </td>
-                                        <td>{{ evenement.titre }}</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td><span class="fw-bold text-primary">Non payé</span></td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        
-                                    </tr>
-                                {% endfor %}
+                                
                                 {% for paiement in paiements %}
                                     <tr>
                                         <td>
@@ -163,7 +329,7 @@
                                                 <strong>{{ paiement.membre_Reinscris.membre.nom_complet }}</strong>
                                             </div>
                                         </td>
-                                        <td>{{ evenement.titre }}</td>
+                                        <td>{{ evenement.titre|truncatechars:15  }}</td>
                                         <td>
                                             <span class="fw-bold text-primary">{{ paiement.montant }} </span>
                                         </td> 
@@ -178,6 +344,7 @@
                                             </span>
                                         </td>
                                         <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ paiement.ajout_par}}</td>
                                         <td>
                                             <div class="action-buttons">
                                                 <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
@@ -188,6 +355,26 @@
                                                 </a>
                                             </div>  
                                         </td>
+                                    </tr>
+                                {% endfor %}
+                                {% for reinscri in reinscris %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="member-avatar me-2">
+                                                    <i class="fas fa-user-circle text-primary"></i>
+                                                </div>
+                                                <strong>{{ reinscri.membre.nom_complet }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>{{ evenement.titre|truncatechars:15 }}</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td><span class="fw-bold text-primary">Non payé</span></td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td></td>
+                                        
                                     </tr>
                                 {% endfor %}
                             </tbody>

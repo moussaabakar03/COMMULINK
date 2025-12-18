@@ -389,11 +389,11 @@
                 <td>{% if membre.niveauEtude %}{{ membre.niveauEtude }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
                 <td class="address-cell">{% if membre.adresse %}{{ membre.adresse }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
                 <td>
-                        {% if membre.photo %}
-                            <img src="{{ membre.photo.url }}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;object-fit:cover;border:2px solid black;">
-                        {% else %}
-                            <i class="fas fa-user-circle" style="font-size:2.2em;margin-right:10px;color:#ccc;"></i>
-                        {% endif %}
+                    {% if membre.photo_annuelle %}
+                        <img src="{{ membre.photo_annuelle.url }}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;object-fit:cover;border:2px solid black;">
+                    {% else %}
+                        <i class="fas fa-user-circle" style="font-size:2.2em;margin-right:10px;color:#ccc;"></i>
+                    {% endif %}
                     ---
                 </td>
             </tr>

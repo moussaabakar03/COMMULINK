@@ -134,7 +134,7 @@ class Membre(models.Model):
     keribourBa = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.nom} {self.prenom}--- {self.ner}. {self.keri}"
+        return f"{self.nom} {self.prenom}- *{self.ner}. {self.keri}*"
 
     class Meta:
         verbose_name = "Membre"
@@ -316,7 +316,7 @@ class Reinscription(models.Model):
     )
     
     def __str__(self):
-        return f"{self.membre.nom_complet}  *{self.membre.ner}- {self.membre.keri}* ({self.membre.ecole})"
+        return f"{self.membre.nom_complet}  *{self.membre.ner}- {self.membre.keri}* - {self.annee}"
 
 
 class Paiement(models.Model):
@@ -327,14 +327,16 @@ class Paiement(models.Model):
         ('avance', 'Avance'),
     ]
     
-    membre_Reinscris = models.ForeignKey(Reinscription, on_delete=models.CASCADE, null=True, blank=True)
-    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE)
+    membre_Reinscris = models.ForeignKey(Reinscription, on_delete=models.CASCADE, null=True, blank=True, related_name="paiement")
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, null=True, blank=True, related_name="paiement")
     montant = models.IntegerField()
     date_paiement = models.DateTimeField(null=True, blank=True)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, null=True, blank=True)
     preuve_paiement = models.FileField(upload_to='paiements/', null=True, blank=True)
 
     reste_a_payer = models.IntegerField(null=True, blank=True) 
+    
+    ajout_par = models.CharField(max_length=350, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.evenement.prix > self.montant:

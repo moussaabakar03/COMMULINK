@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from commulink.utils.decorators import admin_required, membre_required
 from firtsApp.forms import ConnexionForm, MembreInscriptionForm
-from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Reinscription, Temoingnage, TypeEvenement
+from secondApp.models import EquipeDirigeante, Evenement, EvenementImage, EvenementVideo, Membre, Paiement, Reinscription, Temoingnage, TypeEvenement
 from django.contrib.auth.decorators import login_required
 
 
@@ -290,15 +290,25 @@ def profil_membre(request):
         return redirect("index")
     membre = get_object_or_404(Membre, utilisateur=request.user)
     reinscription = Reinscription.objects.filter(membre=membre).last()
-    print(f"=========================={reinscription.annee}")
+    
+    reinscriptions = Reinscription.objects.filter(membre=membre).order_by("-annee")
+    paiements= Paiement.objects.filter(membre_Reinscris__in=reinscriptions)
+    
     context = {
         'reinscription':reinscription,
         'membre': membre,
         'page_title': f'Profil - {membre.nom_complet}',
         'genres': Membre.GENRE_CHOICES,
+        'paiements': paiements
+        
     }
     
     return render(request, 'user/profil.html', context)
+
+
+    
+  
+
 
 @login_required
 def modifier_profil(request):
@@ -353,6 +363,7 @@ def modifier_profil(request):
             messages.error(request, f'Une erreur est survenue: {str(e)}')
     
     return redirect('profil_membre')
+
 
 @login_required
 def modifier_photo_profil(request):

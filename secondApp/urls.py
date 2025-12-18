@@ -86,6 +86,7 @@ urlpatterns = [
     path('<int:pk>/ajout-Paiement-Evenement/', views.ajoutPaiementEvenement, name='ajoutPaiementEvenement'),
     path('<int:pk>/detail-paiment-membre/', views.detailPaimentMembre, name='detailPaimentMembre'),
     path('<int:pk_membre>/<int:pk_evenement>/supprimer-paiement/', views.supprimer_paiement, name='supprimer_paiement'),
+    path('<int:pk>/supprimer-Paiement/', views.supprimerPaiement, name='supprimerPaiement'),
     
     
     

@@ -36,6 +36,7 @@
 
     
 </style>
+    <link rel="stylesheet" href="{% static 'assets/css/membres/detailMembre.css' %}" />
 
     <div class="container-fluid py-5" style="margin-top: 100px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh;">
         <div class="container">
@@ -311,8 +312,49 @@
                         </div>
                     </form>
                 </div>
-            </div>
 
+                
+                <!-- Paiement -->
+                <div class="info-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-file-alt"></i>
+                        Paiements
+                    </h2>
+                    
+                    <div class="table-responsive">
+                        <table class="members-table">
+                            <thead>
+                                <tr>
+                                    <th>Année</th>
+                                    <th>Evenement</th>
+                                    <th>Montant(FCFA)   </th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in paiements %}
+                                <tr>
+                                    <td>{{ paiement.evenement.annee.debutAnnee|date:"Y" }}- {{ paiement.evenement.annee.finAnnee|date:"Y" }}</td>
+                                    <td>{{ paiement.evenement }}</td>
+                                    <td>{{ paiement.montant }}</td>
+                                    <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-users"></i>
+                                            <h3>Aucun paiement trouvé</h3>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
             <!-- Footer Info -->
             <div class="row justify-content-center mt-4">
                 <div class="col-lg-10">

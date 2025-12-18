@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from commulink.utils.decorators import admin_required
 from .models import Annee, EvenementVideo, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
-from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementForm, ReinscriptionForm
+from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementEvenementForm, PaiementForm, ReinscriptionForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
@@ -473,6 +473,10 @@ def admin_dashboard(request):
 
     return render(request, 'index.html', context)
 
+def navBar(request):
+    membreEquipe = get_object_or_404(EquipeDirigeante, utilisateur = request.user)
+    return render(request, "partial/navbar.html", {"membreEquipe": membreEquipe})
+
 
 #----------------------------------GESTION DES EVENEMENTS--------------------------------------
 
@@ -713,47 +717,81 @@ def detailEvenements(request, id):
 @login_required
 @admin_required
 def modifierEvenement(request, id):
-    evenement = Evenement.objects.get(id=id)
+    evenement = get_object_or_404(Evenement, id=id)
     typeEvenement = TypeEvenement.objects.all()
     toutes_annees = Annee.objects.all()
-    imageEvenement = EvenementImage.objects.filter(evenement=evenement)
-    videoEvements = EvenementVideo.objects.filter(evenement=evenement)
+
     if request.method == "POST":
-        titre = request.POST.get('titre')
-        description = request.POST.get('description')
-        type_evenement = request.POST.get('type_evenement')
-        anneeSelect = request.POST.get('annee')
+        evenement.titre = request.POST.get('titre')
+        evenement.description = request.POST.get('description')
+        evenement.prix = request.POST.get('prix')
+
+        evenement.typeEvenement = TypeEvenement.objects.get(
+            pk=request.POST.get('type_evenement')
+        )
+        evenement.annee = Annee.objects.get(
+            pk=request.POST.get('annee')
+        )
+
         images = request.FILES.getlist('photos[]')
         videos = request.FILES.getlist('videos[]')
-        prix = request.POST.get("prix")
-        
-        evenementType = TypeEvenement.objects.get(pk=int(type_evenement))
-        annee = Annee.objects.get(pk=int(anneeSelect))
-        
-        evenement.typeEvenement = evenementType
-        evenement.prix = prix
-        evenement.description = description
-        evenement.titre = titre
-        evenement.annee = annee
-        evenement.save()
-        
+
+        # ================= IMAGE PRINCIPALE =================
         if images:
-            # imageEvenement.delete()
-            
-            photoCouverture = images[0]      
-            evenement.photo = photoCouverture
-                  
-            evenement.save()
-          
-            for image in range(0, len(images)):
+            if evenement.photo:
+                evenement.photo.delete(save=False)
+            evenement.photo = images[0]
+
+        # ================= IMAGES SECONDAIRES =================
+        if images:
+            for img in evenement.images.all():
+                img.image.delete(save=False)
+                img.delete()
+
+            for image in images:
                 EvenementImage.objects.create(
-                    evenement = evenement,
-                    image = images[image]
+                    evenement=evenement,
+                    image=image
                 )
-                return redirect('affichageEvenement')
+
+        # ================= VIDEOS =================
+        if videos:
+            for vid in evenement.videos.all():
+                if vid.video:
+                    vid.video.delete(save=False)
+                if vid.miniature:
+                    vid.miniature.delete(save=False)
+                vid.delete()
+
+            for video in videos:
+                if video.size > 100 * 1024 * 1024:
+                    messages.warning(
+                        request,
+                        f"La vidéo {video.name} dépasse 100MB."
+                    )
+                    continue
+
+                EvenementVideo.objects.create(
+                    evenement=evenement,
+                    video=video,
+                    titre=video.name
+                )
+
+        evenement.save()
+        messages.success(request, "Événement modifié avec succès.")
         return redirect('affichageEvenement')
-        
-    return render(request, 'gestionEvenement/modifierEvenement.html', {'evenement' : evenement, 'typeEvenem': typeEvenement, 'imageEvenements': imageEvenement, "videoEvements": videoEvements, "toutes_annees": toutes_annees})
+
+    return render(
+        request,
+        'gestionEvenement/modifierEvenement.html',
+        {
+            'evenement': evenement,
+            'typeEvenem': typeEvenement,
+            'imageEvenements': evenement.images.all(),
+            'videoEvements': evenement.videos.all(),
+            'toutes_annees': toutes_annees
+        }
+    )
 
 
 @login_required
@@ -1292,11 +1330,14 @@ def exporter_membres_csv_simple(request, membres, filters):
 def detail_membre(request, pk):
     membre = get_object_or_404(Membre, pk=pk)
     
-    reinscriptionMembres = membre.reinscriptions.all()
+    reinscriptionMembres = membre.reinscriptions.all().order_by("-annee")
 
+    paiements= Paiement.objects.filter(membre_Reinscris__in=reinscriptionMembres)
+    
     return render(request, 'gestionMembre/detail.html', {
         'membre': membre,
-        "reinscriptionMembres": reinscriptionMembres
+        "reinscriptionMembres": reinscriptionMembres,
+        'paiements': paiements
     })
 
 
@@ -1462,7 +1503,7 @@ def modifier_membre(request, pk):
             telephone = form.cleaned_data.get('telephone') or "defaultpass123"
 
             # Vérifier doublon email sans compter le compte actuel
-            if Utilisateur.objects.filter(email=email).exclude(pk=utilisateur.pk).exists():
+            if Utilisateur.objects.filter(email=email).exclude(id=utilisateur.id).exists():
                 messages.error(request, 'Un utilisateur avec cet email existe déjà.')
                 return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
 
@@ -1509,7 +1550,8 @@ def modifier_membre(request, pk):
 @admin_required
 def supprimer_membre(request, pk):
     membre = Membre.objects.get(pk=pk)
-    membre.utilisateur.delete()
+    if membre.utilisateur:
+        membre.utilisateur.delete()
     membre.delete()
     messages.success(request, "Membre supprimé avec succès!")
     return redirect('liste_membres')
@@ -1528,16 +1570,23 @@ except ImportError:
     print("xhtml2pdf non installé. L'export PDF sera désactivé.")
 
 
-def get_annee_active():
-    """Récupère l'année active ou la plus récente"""
-    today = timezone.now().date()
-    annee = Annee.objects.filter(
-        debutAnnee__lte=today,
-        finAnnee__gte=today
-    ).first()
+# def get_annee_active():
+#     """Récupère l'année active ou la plus récente"""
+#     today = timezone.now().date()
+#     annee = Annee.objects.filter(
+#         debutAnnee__lte=today,
+#         finAnnee__gte=today
+#     ).first()
     
-    if not annee:
-        annee = Annee.objects.order_by('-debutAnnee').first()
+#     if not annee:
+#         annee = Annee.objects.order_by('-debutAnnee').first()
+    
+#     return annee
+
+
+
+def get_annee_active():
+    annee = Annee.objects.last()
     
     return annee
     
@@ -1551,12 +1600,10 @@ def valider_membre(request, pk):
     """
     membre = get_object_or_404(Membre, pk=pk)
     
-    
-    
     try:
         with transaction.atomic():
             email = membre.email
-            telephone = membre.telephone or "defaultpass123"
+            telephone = membre.telephone or "defaut12345678"
             
             # Vérifier si un utilisateur existe déjà avec cet email
             if Utilisateur.objects.filter(email=email).exists():
@@ -2012,17 +2059,32 @@ def ajouter_reinscription(request):
                 )
                 return redirect('ajouter_reinscription')
             
-            # Création de la réinscription
-            reinscription = Reinscription.objects.create(
-                membre=membre,
-                annee=annee,
-                numeroUrgence=numeroUrgence,
-                adresse=adresse,
-                ecole=ecole,
-                niveauEtude=niveauEtude,
-                filiere=filiere,
-                photo_annuelle=photo_annuelle
-            )
+            if not photo_annuelle:
+                if membre.photo:
+                    photo_membre = membre.photo
+                    
+                    reinscription = Reinscription.objects.create(
+                        membre=membre,
+                        annee=annee,
+                        numeroUrgence=numeroUrgence,
+                        adresse=adresse,
+                        ecole=ecole,
+                        niveauEtude=niveauEtude,
+                        filiere=filiere,
+                        photo_annuelle=photo_membre
+                    )
+            else:
+                # Création de la réinscription
+                reinscription = Reinscription.objects.create(
+                    membre=membre,
+                    annee=annee,
+                    numeroUrgence=numeroUrgence,
+                    adresse=adresse,
+                    ecole=ecole,
+                    niveauEtude=niveauEtude,
+                    filiere=filiere,
+                    photo_annuelle=photo_annuelle
+                )
             
             messages.success(
                 request, 
@@ -2110,7 +2172,7 @@ def ajoutMembreEquipe(request):
         twitter = request.POST.get('twitter')
         
         utilisateur = Utilisateur.objects.create(
-            username = nom,
+            username = role,
             password = make_password(role),
             role="membreEquipe",
             is_active=True,
@@ -2148,6 +2210,10 @@ def modification_MembreEquipeDirigeante(request, pk):
         # Mettre à jour la photo seulement si une nouvelle est fournie
         if photo:
             membre.image = photo
+        
+        membre.utilisateur.username = role
+        membre.utilisateur.password = make_password(role)
+        membre.utilisateur.save()
         
         # Sauvegarder les modifications
         membre.save()
@@ -2284,7 +2350,7 @@ def supprimer_annonce(request, id):
 @login_required
 @admin_required
 def listeAnnee(request):
-    annees = Annee.objects.all().order_by("id")
+    annees = Annee.objects.all().order_by("-id")
 
     context = {
         'annees': annees,
@@ -2393,6 +2459,10 @@ def ajouter_paiement(request):
                 membre_Reinscris=membre_Reinscris,
                 evenement=evenement
             ).first()
+            
+            if montant <1:
+                messages.warning(request, "Le montant doit être superieur ou égal '1'!")
+                return redirect("ajouter_paiement")
 
             # --- Si le paiement existe déjà, on met à jour ---
             if paiement_existant:
@@ -2414,7 +2484,8 @@ def ajouter_paiement(request):
                     paiement_existant.statut = "avance"
                 else:
                     paiement_existant.statut = "non_payé"
-
+                
+                
                 paiement_existant.save()
                 messages.success(request, 'Paiement mis à jour avec succès !')
                 return redirect('liste_paiements')
@@ -2433,13 +2504,16 @@ def ajouter_paiement(request):
                 else:
                     paiement.statut = "non_payé"
 
+                paiement.ajout_par = request.user.username
+                
                 paiement.save()
                 messages.success(request, 'Nouveau paiement enregistré avec succès !')
                 return redirect('liste_paiements')
-    
+        else:
+            messages.error(request, f"Formulaire non valide : {form.errors}")
+
     else:
         form = PaiementForm()
-    
     return render(request, 'gestionPaiement/ajouter.html', {
         'form': form,
         'evenements': evenements
@@ -2448,20 +2522,29 @@ def ajouter_paiement(request):
 @login_required
 @admin_required
 def ajoutPaiementEvenement(request, pk):
-    evenement = get_object_or_404(Evenement, id=pk)
+    evenement = get_object_or_404(Evenement, id=pk)    
 
     if request.method == 'POST':
-        form = PaiementForm(request.POST, request.FILES)
+        form = PaiementEvenementForm(request.POST, request.FILES)
         if form.is_valid():
             montant = form.cleaned_data['montant']
-            membre_Reinscris = form.cleaned_data['membre_Reinscris']
+            # membre_Reinscris = form.cleaned_data['membre_Reinscris']
             date_paiement = form.cleaned_data['date_paiement']
             preuve_paiement = form.cleaned_data.get('preuve_paiement')
 
+            reinscris_id = request.POST.get("reinscris_id")
+            reinscription = None
+            if reinscris_id:
+                reinscription = get_object_or_404(Reinscription, id=reinscris_id)
+
             paiement_existant = Paiement.objects.filter(
-                membre_Reinscris=membre_Reinscris,
+                membre_Reinscris=reinscription,
                 evenement=evenement
             ).first()
+            
+            if montant <1:
+                messages.warning(request, "Le montant doit être superieur ou égal '1'!")
+                return redirect("ajoutPaiementEvenement", pk=pk)
 
             if paiement_existant:
                 paiement_existant.montant += montant
@@ -2480,8 +2563,12 @@ def ajoutPaiementEvenement(request, pk):
                     paiement_existant.statut = "avance"
                 else:
                     paiement_existant.statut = "non_payé"
-
+                if reinscris_id:
+                    paiement_existant.membre_Reinscris = reinscription
+                paiement_existant.evenement = evenement
+                
                 paiement_existant.save()
+                messages.success(request, "Paiement ajouté avec succès!")
                 return redirect('paiementParEvenement', pk=pk)
 
             else:
@@ -2497,18 +2584,27 @@ def ajoutPaiementEvenement(request, pk):
                     paiement.statut = "avance"
                 else:
                     paiement.statut = "non_payé"
+                
+                if reinscris_id:
+                    paiement.membre_Reinscris = reinscription 
+                paiement.evenement = evenement 
+                
+                paiement.ajout_par = request.user.username
 
                 paiement.save()
                 messages.success(request, 'Nouveau paiement enregistré avec succès !')
                 return redirect('paiementParEvenement', pk=pk)
         else:
-            messages.error(request, "Erreur : formulaire non valide")
+            print(form.errors)
+            messages.error(request, f"Formulaire non valide : {form.errors}")
+            
     else:
-        form = PaiementForm()
+        form = PaiementEvenementForm()
 
     return render(request, "gestionPaiement/ajoutPaiementEvenement.html", {
         'form': form,
-        'evenement': evenement
+        'evenement': evenement,
+        'membres_reinscris': Reinscription.objects.filter(annee=evenement.annee), 
     })
 
 
@@ -2711,6 +2807,8 @@ def modifierPaiement(request, pk):
             # Enregistrement du paiement
             paiement = form.save(commit=False)
             paiement.statut = statut
+            paiement.ajout_par = request.user.username
+            
             paiement.save()
             
             form.save()
@@ -2734,32 +2832,54 @@ def modifierPaiement(request, pk):
 @login_required
 @admin_required
 def paiementParEvenement(request, pk):
-    evenement = get_object_or_404(Evenement, id = pk)
-    
-    paiements = Paiement.objects.filter(evenement = evenement).order_by('-date_paiement')
-    
-    # 2. Récupérer les IDs des membres déjà réinscrits et ayant fait un paiement
-    membres_ayant_paye = paiements.values_list('membre_Reinscris_id', flat=True)
+    evenement = get_object_or_404(Evenement, id=pk)
 
+    paiements = Paiement.objects.filter(
+        evenement=evenement
+    ).order_by('-date_paiement')
+
+    # paiementNonPresent = 
+    membres_ayant_paye = paiements.values_list(
+        'membre_Reinscris_id', flat=True
+    )
     # 3. Trouver les réinscriptions de l'année en excluant ceux qui ont payé
-    reinscris = Reinscription.objects.filter(annee=evenement.annee).exclude(id__in=membres_ayant_paye)
+    reinscris = Reinscription.objects.filter(
+        annee=evenement.annee
+    ).exclude(id__in=membres_ayant_paye)
 
-    
-    membre_id = request.GET.get('membreReinscris_id')
-    if membre_id:
-        paiements = paiements.filter(membre_Reinscris__membre__id=membre_id)
-    
-    
+    reinscris_id = request.GET.get('membreReinscris_id')
+
+    budget_total = sum(p.montant for p in paiements)
+    if reinscris_id:
+        reinscris_id = int(reinscris_id)
+
+        paiements = paiements.filter(
+            membre_Reinscris_id=reinscris_id
+        )
+
+        #IMPORTANT : filtrer aussi les non-payés
+        reinscris = reinscris.filter(id=reinscris_id)
+
     contexte = {
-        "paiements": paiements, 
-        "evenement": evenement, 
-        'membres': Membre.objects.all(), 
+        "paiements": paiements,
+        "evenement": evenement,
+        "membres_reinscris": Reinscription.objects.filter(annee=evenement.annee),
+        "totalReinscris": Reinscription.objects.filter(annee=evenement.annee).count(),
+        "reinscrisPayee": paiements.count(),
+        "reinscrisToutPayee": paiements.filter(statut="payé").count(),
+        "reinscrisMoitiePayee": paiements.filter(statut="moitié_payé").count(),
+        "reinscrisNonPayee": reinscris.count(),
+        "reinscrisDonneAvance": paiements.filter(statut="avance").count(),
         "reinscris": reinscris,
-        'selected_membre': int(membre_id) if membre_id else None,
-        
-        }
-    return render(request, "gestionPaiement/paiementParEvenement.html", contexte)
+        "selected_membre": reinscris_id,
+        "budget_total": budget_total,
+    }
 
+    return render(
+        request,
+        "gestionPaiement/paiementParEvenement.html",
+        contexte
+    )
 
 
 @login_required
@@ -2792,6 +2912,25 @@ def supprimer_paiement(request, pk_membre, pk_evenement):
     except Exception as e:
         messages.error(request, f'Erreur lors de la suppression: {str(e)}')
         return redirect('paiementParEvenement', pk=pk_evenement)
+
+
+@login_required
+def supprimerPaiement(request, pk):
+    paiement = get_object_or_404(Paiement, pk=pk)
+    
+    try:        
+        membre_nom =""
+        if paiement.membre_Reinscris:
+            membre_nom = paiement.membre_Reinscris.membre.nom_complet
+        
+        paiement.delete()
+        messages.success(request, f'Paiement de {membre_nom} supprimé avec succès!')
+       
+        return redirect('liste_paiements')
+    except Exception as e:
+        messages.error(request, f'Erreur lors de la suppression: {str(e)}')
+        return redirect('liste_paiements')
+
 
 
 

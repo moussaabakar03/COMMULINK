@@ -434,10 +434,7 @@
 <header class="event-header">
     <div class="container text-center">
         <h1 class="event-title text-white">{{ evenement.typeEvenement.nom_type_evenement }}</h1>
-        <div class="d-flex justify-content-center">
-            <span class="me-3"><i class="far fa-calendar-alt me-2"></i>{{ evenement.dateHeure|date:"d M Y" }}</span>
-            <span><i class="fas fa-map-marker-alt me-2"></i>{{ evenement.lieu|default:"Hôtel 2 Fevrier" }}</span>
-        </div>
+        <span> {{ evenement.annee.debutAnnee|date:"Y" }}- {{ evenement.annee.finAnnee|date:"Y" }} </span>
     </div>
 </header>
 
