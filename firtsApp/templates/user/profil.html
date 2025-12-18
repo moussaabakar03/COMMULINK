@@ -335,7 +335,7 @@
                                 {% for paiement in paiements %}
                                 <tr>
                                     <td>{{ paiement.evenement.annee.debutAnnee|date:"Y" }}- {{ paiement.evenement.annee.finAnnee|date:"Y" }}</td>
-                                    <td>{{ paiement.evenement }}</td>
+                                    <td>{{ paiement.evenement|truncatechars:50 }}</td>
                                     <td>{{ paiement.montant }}</td>
                                     <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
                                 </tr>

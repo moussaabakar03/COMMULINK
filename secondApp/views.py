@@ -969,6 +969,8 @@ def liste_membres(request):
         membres = membres.filter(statut='valide')
     elif statut_filter == 'refuse':
         membres = membres.filter(statut='refuse')
+    elif statut_filter == 'bloquer':
+        membres = membres.filter(statut='bloquer')
     
     # Filtrer par recherche
     if search_query:
@@ -998,6 +1000,7 @@ def liste_membres(request):
     nombre_en_attente = base_qs.filter(statut='en_attente').count()
     nombre_valide = base_qs.filter(statut='valide').count()
     nombre_refuse = base_qs.filter(statut='refuse').count()
+    nombre_bloque = base_qs.filter(statut='bloquer').count()
     
     # Pagination
     paginator = Paginator(membres, 7)
@@ -1023,6 +1026,7 @@ def liste_membres(request):
         'nombre_en_attente': nombre_en_attente,
         'nombre_valide': nombre_valide,
         'nombre_refuse': nombre_refuse,
+        'nombre_bloque': nombre_bloque,
         'pdf_enabled': PDF_ENABLED,
     }
     
@@ -1104,8 +1108,7 @@ def get_filtered_membres(request):
 @login_required
 @admin_required
 def exporter_membres_pdf(request):
-    """Exporte UNIQUEMENT les membres au statut 'Validé'"""
-    
+    """Exporte UNIQUEMENT les membres au statut 'Validé' avec leurs réinscriptions filtrées par année"""
     if not PDF_ENABLED:
         messages.error(
             request,
@@ -1113,36 +1116,63 @@ def exporter_membres_pdf(request):
         )
         return redirect('liste_membres')
     
-    # Récupérer les membres (peu importe les filtres envoyés)
+    # Récupérer les membres et les filtres
     membres, filters = get_filtered_membres(request)
-
-    #  FORCER le statut Validé
+    
+    # FORCER le statut Validé
     membres = membres.filter(statut="valide")
-
+    
+    # Récupérer l'année filtrée
+    annee_selectionnee = filters.get('annee_selectionnee')
+    
+    # Préparer les réinscriptions filtrées par année
+    if annee_selectionnee:
+        # Filtrer les réinscriptions pour l'année sélectionnée
+        reinscriptions = Reinscription.objects.filter(
+            membre__in=membres,
+            annee_id=annee_selectionnee
+        ).select_related('membre', 'annee')
+    else:
+        # Si pas d'année sélectionnée, prendre la dernière réinscription de chaque membre
+        from django.db.models import Max
+        
+        # Sous-requête pour obtenir la date de réinscription la plus récente par membre
+        derniere_reinscription_ids = Reinscription.objects.filter(
+            membre__in=membres
+        ).values('membre').annotate(
+            derniere_date=Max('date_reinscription')
+        )
+        
+        # Récupérer les réinscriptions correspondantes
+        reinscriptions = Reinscription.objects.filter(
+            membre__in=membres,
+            date_reinscription__in=[r['derniere_date'] for r in derniere_reinscription_ids]
+        ).select_related('membre', 'annee')
+    
     # Contexte pour le template
     context = {
-        'membres': membres,
-        'total': membres.count(),
+        'reinscriptions': reinscriptions,  # Changé de 'membres' à 'reinscriptions'
+        'total': reinscriptions.count(),
         'statut_filter': 'Validé',
-        'annee_selectionnee': filters.get('annee_selectionnee'),
+        'annee_selectionnee': annee_selectionnee,
         'search_query': filters.get('search_query'),
         'date_export': timezone.now(),
         'exporteur': request.user,
     }
-
+    
     template = get_template('gestionMembre/export_pdf.html')
     html = template.render(context)
-
+    
     response = HttpResponse(content_type='application/pdf')
     filename = f"liste_membres_valides_{timezone.now().strftime('%Y%m%d_%H%M%S')}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
-
+    
     pisa_status = pisa.CreatePDF(html, dest=response, encoding='utf-8')
-
+    
     if pisa_status.err:
         messages.error(request, "Erreur lors de la génération du PDF.")
         return redirect('liste_membres')
-
+    
     return response
 
 
@@ -1361,7 +1391,7 @@ def creer_membre(request):
                     telephone = form.cleaned_data.get('telephone') or "defaultpass123"
                     
                     # Vérification supplémentaire
-                    if Utilisateur.objects.filter(email=email).exists():
+                    if Utilisateur.objects.filter(email=email, password=make_password(telephone)).exists():
                         messages.error(request, 'Un utilisateur avec cet email existe déjà.')
                         return render(request, 'gestionMembre/creer.html', {'form': form})
                     

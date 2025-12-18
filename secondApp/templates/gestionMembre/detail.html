@@ -237,10 +237,10 @@
                             </thead>
                             <tbody>
                                 {% for reinscriptionMembre in reinscriptionMembres %}
-                                <tr>
+                                <tr> 
                                     <td>{{ reinscriptionMembre.annee.debutAnnee|date:"Y" }}- {{ reinscriptionMembre.annee.finAnnee|date:"Y" }}</td>
                                     <td>{{reinscriptionMembre.ecole|default:"Non renseigné"}}</td>
-                                    <td>{{reinscriptionMembre.niveau|default:"Non renseigné"}}</td>
+                                    <td>{{reinscriptionMembre.niveauEtude|default:"Non renseigné"}}</td>
                                     <td>{{reinscriptionMembre.adresse|default:"Non renseigné"}}</td>
 
                                     <td>

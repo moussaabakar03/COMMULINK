@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -314,8 +315,11 @@
 </head>
 <body>
     <!-- Watermark -->
+    <div>
+        <img src="{% static 'assets/img/kaiadmin/logo.jpg' %}" alt="logo" style="width: 85px; height: 85px; object-fit: cover;">
+    </div>
     <div class="text-center" style="font-size: 20px; text-align: center;">LISTE DES MEMBRES </div>
-    
+    {% comment %}     
     <!-- En-tête -->
     <div class="header">
         <div class="header-content">
@@ -333,7 +337,7 @@
             </div>
         </div>
     </div>
-    
+     {% endcomment %}
     <!-- Informations de filtre -->
     <div class="filter-info">
         <span>📅 <strong>Date:</strong> {{ date_export|date:"d/m/Y" }}</span>
@@ -376,25 +380,30 @@
             </tr>
         </thead>
         <tbody>
-            {% for membre in membres %}
+            {% for reinscription in reinscriptions %}
             <tr>
                 <td class="numero">{{ forloop.counter }}</td>
-                <td class="nom-cell">{{ membre.nom|upper }}</td>
-                <td>{{ membre.prenom|title }}</td>
-                <td>{% if membre.ner %}{{ membre.ner }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td>{% if membre.keri %}{{ membre.keri }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td>{% if membre.keribour %}{{ membre.keribour }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td>{% if membre.telephone %}{{ membre.telephone }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td>{% if membre.ecole %}{{ membre.ecole }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td>{% if membre.niveauEtude %}{{ membre.niveauEtude }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td class="address-cell">{% if membre.adresse %}{{ membre.adresse }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td class="nom-cell">{{ reinscription.membre.nom|upper }}</td>
+                <td>{{ reinscription.membre.prenom|title }}</td>
+                <td>{% if reinscription.membre.ner %}{{ reinscription.membre.ner }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if reinscription.membre.keri %}{{ reinscription.membre.keri }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if reinscription.membre.keribour %}{{ reinscription.membre.keribour }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if reinscription.membre.telephone %}{{ reinscription.membre.telephone }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if reinscription.ecole %}{{ reinscription.ecole }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td>{% if reinscription.niveauEtude %}{{ reinscription.niveauEtude }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td class="address-cell">{% if reinscription.adresse %}{{ reinscription.adresse }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
                 <td>
-                    {% if membre.photo_annuelle %}
-                        <img src="{{ membre.photo_annuelle.url }}" style="width:40px;height:40px;border-radius:50%;margin-right:10px;object-fit:cover;border:2px solid black;">
-                    {% else %}
-                        <i class="fas fa-user-circle" style="font-size:2.2em;margin-right:10px;color:#ccc;"></i>
-                    {% endif %}
-                    ---
+                    <div class="member-avatar me-2">
+                        {% if reinscription.photo_annuelle %}
+                            <img src="{{ reinscription.photo_annuelle.path }}" 
+                                alt="{{ reinscription.membre.nom_complet }}" 
+                                style="width: 50px; height: 50px; border-radius: 20%; object-fit: cover;"/>
+                        {% else %}
+                            <div style="display: inline-block; width: 40px; height: 40px; border-radius: 50%; background-color: #e0e0e0; line-height: 40px; text-align: center; color: #666; font-size: 16px; font-weight: bold;">
+                                {{ reinscription.membre.prenom|first|upper }}{{ reinscription.membre.nom|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             {% empty %}
@@ -415,10 +424,7 @@
                 <div class="summary-number">{{ total }}</div>
                 <div class="summary-label">Total Membres</div>
             </div>
-            <div class="summary-item">
-                <div class="summary-number">{{ membres|length }}</div>
-                <div class="summary-label">Dans cette liste</div>
-            </div>
+           
         </div>
     </div>
     

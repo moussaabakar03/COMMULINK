@@ -743,7 +743,7 @@
                             <div class="section-number">5</div>
                             <div>
                                 <h2 class="section-title">Informations Complémentaires</h2>
-                                <p class="section-description">Photo et remarques supplémentaires</p>
+                                <p class="section-description">Photo, remarques et acceptation</p>
                             </div>
                         </div>
                         
@@ -751,7 +751,7 @@
                             <label for="photo" class="form-label">Photo de profil</label>
                             <div class="file-input-container">
                                 <input type="file" id="photo" name="photo" class="file-input" 
-                                       accept="image/*">
+                                    accept="image/*">
                             </div>
                             <small class="form-text" style="color: var(--gray-500); margin-top: 4px; display: block;">
                                 Formats acceptés: JPG, PNG, GIF. Taille maximale recommandée: 5MB
@@ -761,10 +761,28 @@
                         <div class="form-group">
                             <label for="notes" class="form-label">Remarques ou informations supplémentaires</label>
                             <textarea id="notes" name="notes" class="form-textarea" 
-                                      placeholder="Ajoutez ici toute information complémentaire que vous souhaitez partager..."></textarea>
+                                    placeholder="Ajoutez ici toute information complémentaire que vous souhaitez partager..."></textarea>
+                        </div>
+
+                        <!-- Cases à cocher déplacées ICI, dans la section 5 -->
+                        <div class="form-group">
+                            <div class="form-check" style="margin-bottom: 15px;">
+                                <input class="form-check-input" type="checkbox" name="accepte" id="accepteCheckbox" required>
+                                <label class="form-check-label" for="accepteCheckbox">
+                                    J'accepte les politiques de confidentialité de la Commulink
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" name="autorise" type="checkbox" id="autoriseCheckbox" required>
+                                <label class="form-check-label" for="autoriseCheckbox">
+                                    J'autorise la communauté UEBT à utiliser ces informations pour de la gestion de la communauté
+                                </label>
+                            </div>
                         </div>
                     </div>
+
                     
+
                     <!-- Actions du formulaire -->
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary btn-back" id="back-btn" style="display: none;">
@@ -1118,3 +1136,4 @@
     </script>
 </body>
 </html>
+

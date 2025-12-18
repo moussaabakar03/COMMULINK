@@ -410,12 +410,6 @@
             </div>
             {% endif %}
             
-            <!-- Affichage des erreurs de formulaire -->
-            {% if form.errors %}
-            <div class="alert alert-error">
-                ❌ Identifiant ou mot de passe incorrect.
-            </div>
-            {% endif %}
             
             <form id="login-form" method="POST" action="{% url 'connexion' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}">
                 {% csrf_token %}

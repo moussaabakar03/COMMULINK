@@ -46,7 +46,7 @@ def connexion(request):
             if next_url:
                 return redirect(next_url)
 
-            # 3️Sinon, ton comportement normal
+            # Sinon, ton comportement normal
             if utilisateur.is_superuser or utilisateur.role == "membreEquipe":
                 messages.success(request, f"Bienvenue 'Admin' ")
                 return redirect(reverse('admin_dashboard'))

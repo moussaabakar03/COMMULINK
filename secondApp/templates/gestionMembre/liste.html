@@ -285,8 +285,7 @@
                 {% endif %}
                 <a href="{% url 'exporter_membres_csv' %}?statut={{ statut_filter }}&annee={{ annee_filter }}&search={{ search_query }}" 
                    class="btn-export btn-export-csv"><i class="fas fa-file-excel"></i> <span>Excel</span></a>
-                <button onclick="window.print()" class="btn-export btn-export-print"><i class="fas fa-print"></i> <span>Imprimer</span></button>
-                {% if user.is_authenticated and user.est_membre_equipe %}
+                {% if user.is_authenticated %}
                 <a href="{% url 'creer_membre' %}" class="btn-export btn-add-membre"><i class="fas fa-user-plus"></i> <span>Ajouter</span></a>
                 {% endif %}
             </div>
@@ -295,7 +294,7 @@
         <!-- Filtres statut -->
         <div class="filter-tabs">
             <a href="?statut=tous&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab {% if statut_filter == 'tous' %}active{% endif %}">
-                <i class="fas fa-users"></i> Tous <span class="badge-count">{{ nombre_en_attente|add:nombre_valide|add:nombre_refuse }}</span>
+                <i class="fas fa-users"></i> Tous <span class="badge-count">{{ nombre_en_attente|add:nombre_valide|add:nombre_refuse|add:nombre_bloque }}</span>
             </a>
             <a href="?statut=en_attente&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab en-attente {% if statut_filter == 'en_attente' %}active{% endif %}">
                 <i class="fas fa-clock"></i> En attente <span class="badge-count">{{ nombre_en_attente }}</span>
@@ -305,6 +304,9 @@
             </a>
             <a href="?statut=refuse&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab refuse {% if statut_filter == 'refuse' %}active{% endif %}">
                 <i class="fas fa-times-circle"></i> Refusés <span class="badge-count">{{ nombre_refuse }}</span>
+            </a>
+            <a href="?statut=bloquer&search={{ search_query }}&annee={{ annee_filter }}" class="filter-tab bloquer {% if statut_filter == 'bloquer' %}active{% endif %}">
+                <i class="fas fa-times-circle"></i> Bloqués <span class="badge-count">{{ nombre_bloque }}</span>
             </a>
         </div>
 
@@ -377,6 +379,7 @@
                             <span class="status-badge {{ membre.statut }}">
                                 {% if membre.statut == 'en_attente' %}<i class="fas fa-clock"></i> En attente
                                 {% elif membre.statut == 'valide' %}<i class="fas fa-check"></i> Validé
+                                {% elif membre.statut == 'bloquer' %}<i class="fas fa-times"></i> Bloqué
                                 {% else %}<i class="fas fa-times"></i> Refusé{% endif %}
                             </span>
                         </td>
