@@ -331,13 +331,13 @@
             <form method="get" class="search-bar">
                 <input type="hidden" name="statut" value="{{ statut_filter }}">
                 <input type="hidden" name="annee" value="{{ annee_filter }}">
-                <input type="text" name="search" placeholder="Rechercher par nom, email, téléphone, ner, keri..." value="{{ search_query }}">
+                <input type="text" name="search" placeholder="Rechercher par nom, email, téléphone, ner, keri...">
                 <button type="submit" class="search-button"><i class="fas fa-search"></i> Rechercher</button>
-                {% if search_query %}
+                {% comment %} {% if search_query %}
                 <a href="?statut={{ statut_filter }}&annee={{ annee_filter }}" class="btn-export" style="background:#6c757d;color:white;margin-left:10px;">
                     <i class="fas fa-times"></i>
                 </a>
-                {% endif %}
+                {% endif %} {% endcomment %}
             </form>
         </div>
 

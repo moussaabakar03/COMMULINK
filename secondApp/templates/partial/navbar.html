@@ -17,25 +17,6 @@
 
     <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
 
-      <!-- ================= NOTIFICATIONS (EQUIPE SEULEMENT) ================= -->
-      {% if user.is_authenticated and user.est_membre_equipe %}
-      <li class="nav-item topbar-icon dropdown hidden-caret">
-        <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" data-bs-toggle="dropdown">
-          <i class="fa fa-bell"></i>
-          <span class="notification">4</span>
-        </a>
-        <ul class="dropdown-menu notif-box animated fadeIn">
-          <li>
-            <div class="dropdown-title">Notifications</div>
-          </li>
-          <li>
-            <a class="dropdown-item text-center" href="#">Aucune notification</a>
-          </li>
-        </ul>
-      </li>
-      {% endif %}
-
-      <!-- ================= QUICK ACTIONS (EQUIPE) ================= -->
       {% if user.is_authenticated and user.est_membre_equipe %}
       <li class="nav-item topbar-icon dropdown hidden-caret">
         <a class="nav-link" data-bs-toggle="dropdown" href="#">
@@ -74,18 +55,15 @@
       <li class="nav-item topbar-user dropdown hidden-caret">
         <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#">
           <div class="avatar-sm">
+           
             {% if membreEquipe.image %}
-              <img
-                src="{{ membreEquipe.image.url }}"
-                alt="avatar"
-                class="avatar-img rounded-circle"
-              />
+                <img src="{{membreEquipe.image.url }}" 
+                    alt="{{ membreEquipe.nom }}" 
+                    style="width: 40px; height: 40px; border-radius: 20%; object-fit: cover;"/>
             {% else %}
-              <img
-                src="{% static 'assets/img/profile.jpg' %}"
-                alt="avatar"
-                class="avatar-img rounded-circle"
-              />
+                <div style="display: inline-block; width: 40px; height: 40px; border-radius: 50%; background-color: #e0e0e0; line-height: 40px; text-align: center; color: #666; font-size: 16px; font-weight: bold;">
+                    {{ membreEquipe.nom|first|upper }}{{ membreEquipe.role|first|upper }}
+                </div>
             {% endif %}
           </div>
           <span class="profile-username">
@@ -99,19 +77,15 @@
             <li>
               <div class="user-box">
                 <div class="avatar-lg">
-                  {% if membreEquipe.image %}
-                    <img
-                      src="{{ membreEquipe.image.url}}"
-                      alt="avatar"
-                      class="avatar-img rounded-circle"
-                    />
-                  {% else %}
-                    <img
-                      src="{% static 'assets/img/profile.jpg' %}"
-                      alt="avatar"
-                      class="avatar-img rounded-circle"
-                    />
-                  {% endif %}
+                   {% if membreEquipe.image %}
+                        <img src="{{membreEquipe.image.url }}" 
+                            alt="{{ membreEquipe.nom }}" 
+                            style="width: 57px; height: 65px; border-radius: 20%; object-fit: cover;"/>
+                    {% else %}
+                        <div style="display: inline-block; width: 40px; height: 40px; border-radius: 50%; background-color: #e0e0e0; line-height: 40px; text-align: center; color: #666; font-size: 16px; font-weight: bold;">
+                            {{ membreEquipe.nom|first|upper }}{{ membreEquipe.role|first|upper }}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="u-text">
                   <h4>{{ user.get_full_name|default:user.username }}</h4>

@@ -268,7 +268,7 @@
                         <div> Ayant payé moitié: {{ reinscrisMoitiePayee }} </div>
                     </div>
                     <div>
-                        <div> Ayant rien payé: {{ reinscrisNonPayee }} </div>
+                        <div> Ayant rien payé: {{ reinscris_rien_payes }} </div>
                     </div>
                     <div>
                         <div> Ayant donnée avance: {{ reinscrisDonneAvance }} </div>
@@ -290,6 +290,20 @@
                                     {% for reinscris in membres_reinscris %}
                                         <option value="{{ reinscris.id }}">
                                             {{ reinscris.membre.nom_complet }}- {{ reinscris.membre.ner }}. {{ reinscris.membre.keri }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label for="membre" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Ajouter Par
+                                </label>
+                                <select name="administrateur" id="administrateur" class="form-select form-control w-100">
+                                    <option value="">Tous les membres</option>
+                                    {% for administrateur in administrateurs %}
+                                        <option value="{{ administrateur.username }}">
+                                            {{ administrateur.username }}
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -318,65 +332,77 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
-                                {% for paiement in paiements %}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="member-avatar me-2">
-                                                    <i class="fas fa-user-circle text-primary"></i>
-                                                </div>
-                                                <strong>{{ paiement.membre_Reinscris.membre.nom_complet }}</strong>
-                                            </div>
-                                        </td>
-                                        <td>{{ evenement.titre|truncatechars:15  }}</td>
-                                        <td>
-                                            <span class="fw-bold text-primary">{{ paiement.montant }} </span>
-                                        </td> 
-                                        <td>{{ paiement.reste_a_payer }}</td>
-                                        <td>
-                                            <span class="status-badge 
-                                                {% if paiement.statut == 'payé' %}status-paid
-                                                {% elif paiement.statut == 'non_payé' %}status-unpaid
-                                                {% else %}status-pending{% endif %}">
-                                                <i class="fas fa-{% if paiement.statut == 'payé' %}check-circle{% elif paiement.statut == 'non_payé' %}times-circle{% else %}clock{% endif %}"></i>
-                                                {{ paiement.get_statut_display }}
-                                            </span>
-                                        </td>
-                                        <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
-                                        <td>{{ paiement.ajout_par}}</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier">
-                                                    <i class="fas fa-sync-alt"></i>
-                                                </a>
-                                                <a href="{% url 'detailPaimentMembre' paiement.pk %}" class="btn-action btn-info" title="Voir preuve">
-                                                    <i class="fas fa-file-alt"></i>
-                                                </a>
-                                            </div>  
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                {% for reinscri in reinscris %}
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="member-avatar me-2">
-                                                    <i class="fas fa-user-circle text-primary"></i>
-                                                </div>
-                                                <strong>{{ reinscri.membre.nom_complet }}</strong>
-                                            </div>
-                                        </td>
-                                        <td>{{ evenement.titre|truncatechars:15 }}</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td><span class="fw-bold text-primary">Non payé</span></td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td></td>
-                                        
-                                    </tr>
-                                {% endfor %}
+                                {% if paiements_avec_membre or reinscris_non_payes or paiements_sans_membre%}
+                                    {% for paiement in paiements_avec_membre %}
+                                        <tr>
+                                            <td><strong>{{ paiement.membre_Reinscris.membre.nom_complet }}</strong></td>
+                                            <td>{{ evenement.titre|truncatechars:15 }}</td>
+                                            <td>{{ paiement.montant }}</td>
+                                            <td>{{ paiement.reste_a_payer }}</td>
+                                           
+                                            <td> 
+                                                {% if paiement.statut == "payé"%}
+                                                    <span class="badge bg-success">
+                                                        {{ paiement.get_statut_display }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">
+                                                        {{ paiement.get_statut_display }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ paiement.ajout_par }}</td>
+                                            <td> 
+                                                <div class="action-buttons"> 
+                                                    <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier"> 
+                                                        <i class="fas fa-sync-alt"></i> 
+                                                    </a> 
+                                                    <a href="{% url 'detailPaimentMembre' paiement.pk %}" class="btn-action btn-info" title="Voir preuve"> 
+                                                        <i class="fas fa-file-alt"></i> 
+                                                    </a> 
+                                                </div> 
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    {% for paiement in paiements_sans_membre %}
+                                        <tr class="table-secondary">
+                                            <td><strong>Paiement externe</strong></td>
+                                            <td>{{ evenement.titre|truncatechars:15 }}</td>
+                                            <td>{{ paiement.montant }}</td>
+                                            <td>-</td>
+                                            <td>
+                                                <span class="badge bg-info">Sans membre</span>
+                                            </td>
+                                            <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ paiement.ajout_par }}</td>
+                                            <td> 
+                                                <div class="action-buttons"> 
+                                                    <a href="{% url 'modifierPaiement' paiement.pk %}" class="btn-action btn-edit" title="Modifier"> 
+                                                        <i class="fas fa-sync-alt"></i> 
+                                                    </a> 
+                                                    <a href="{% url 'detailPaimentMembre' paiement.pk %}" class="btn-action btn-info" title="Voir preuve"> 
+                                                        <i class="fas fa-file-alt"></i> 
+                                                    </a> 
+                                                </div> 
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    {% for reinscri in reinscris_non_payes %}
+                                        <tr class="table-warning">
+                                            <td><strong>{{ reinscri.membre.nom_complet }}</strong></td>
+                                            <td>{{ evenement.titre|truncatechars:15 }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td><span class="badge bg-danger">Non payé</span></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td></td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <td colspan="8" style="text-align: center; color: red; font-weight: bold;">Aucun membre ajouté pour l'année ou cet evenement!</td>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>

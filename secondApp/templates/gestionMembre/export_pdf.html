@@ -346,18 +346,18 @@
         <span>📆 <strong>Année:</strong> {{ annee_selectionnee.debutAnnee|date:"Y" }} - {{ annee_selectionnee.finAnnee|date:"Y" }}</span>
         {% endif %}
         
-        {% if statut_filter and statut_filter != 'tous' %}
+        {% comment %} {% if statut_filter and statut_filter != 'tous' %}
         <span>🏷️ <strong>Statut:</strong> 
             {% if statut_filter == 'valide' %}Validés
             {% elif statut_filter == 'en_attente' %}En attente
             {% elif statut_filter == 'refuse' %}Refusés
             {% else %}{{ statut_filter }}{% endif %}
         </span>
-        {% endif %}
+        {% endif %} {% endcomment %}
         
-        {% if search_query %}
+        {% comment %} {% if search_query %}
         <span>🔍 <strong>Recherche:</strong> "{{ search_query }}"</span>
-        {% endif %}
+        {% endif %} {% endcomment %}
         
         <span>👤 <strong>Exporté par:</strong> {{ exporteur.get_full_name|default:exporteur.username }}</span>
     </div>
@@ -375,7 +375,7 @@
                 <th style="width: 90px;">Téléphone</th>
                 <th style="width: 100px;">École</th>
                 <th style="width: 80px;">Niveau</th>
-                <th>Adresse</th>
+                <th>Filière</th>
                 <th>Photo</th>
             </tr>
         </thead>
@@ -391,13 +391,17 @@
                 <td>{% if reinscription.membre.telephone %}{{ reinscription.membre.telephone }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
                 <td>{% if reinscription.ecole %}{{ reinscription.ecole }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
                 <td>{% if reinscription.niveauEtude %}{{ reinscription.niveauEtude }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td class="address-cell">{% if reinscription.adresse %}{{ reinscription.adresse }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
-                <td>
+                <td class="address-cell">{% if reinscription.filiere %}{{ reinscription.filiere }}{% else %}<span class="empty-cell">-</span>{% endif %}</td>
+                <td> 
                     <div class="member-avatar me-2">
                         {% if reinscription.photo_annuelle %}
                             <img src="{{ reinscription.photo_annuelle.path }}" 
                                 alt="{{ reinscription.membre.nom_complet }}" 
-                                style="width: 50px; height: 50px; border-radius: 20%; object-fit: cover;"/>
+                                style="width: 50px; height: 50px; border-radius: 20%; object-fit: cover!important;"/>
+                        {% elif reinscription.membre.photo %}
+                            <img src="{{ reinscription.membre.photo.path }}" 
+                                alt="{{ reinscription.membre.nom_complet }}" 
+                                style="width: 50px; height: 50px; border-radius: 20%; object-fit: cover!important;"/>
                         {% else %}
                             <div style="display: inline-block; width: 40px; height: 40px; border-radius: 50%; background-color: #e0e0e0; line-height: 40px; text-align: center; color: #666; font-size: 16px; font-weight: bold;">
                                 {{ reinscription.membre.prenom|first|upper }}{{ reinscription.membre.nom|first|upper }}

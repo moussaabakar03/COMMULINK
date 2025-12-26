@@ -105,10 +105,12 @@ def inscription_membre(request):
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
             
-            return render(request, 'user/formulaireInscription.html', {
-                'form': form,
-                'titre': "Demande d'inscription"
-            })
+            return redirect('index')
+            
+            # return render(request, 'user/formulaireInscription.html', {
+            #     'form': form,
+            #     'titre': "Demande d'inscription"
+            # })
         
         try:
             # Créer le membre avec statut "en_attente"
@@ -147,10 +149,11 @@ def inscription_membre(request):
                 request, 
                 "Cette adresse email est déjà utilisée. Veuillez en choisir une autre."
             )
-            return render(request, 'user/formulaireInscription.html', {
-                'form': form,
-                'titre': "Demande d'inscription"
-            })
+            return redirect("index")
+            # return render(request, 'user/formulaireInscription.html', {
+            #     'form': form,
+            #     'titre': "Demande d'inscription"
+            # })
             
         except Exception as e:
             print(f"ERREUR: {str(e)}")
@@ -176,41 +179,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import FormView
 from .forms import MembreForm
-
-# class InscriptionMembreView(FormView):
-#     template_name = 'user/formulaireInscription.html'
-#     form_class = MembreForm
-    
-#     def get(self, request, *args, **kwargs):
-#         form = self.form_class()
-#         return render(request, self.template_name, {'form': form})
-    
-#     def post(self, request, *args, **kwargs):
-#         form = self.form_class(request.POST, request.FILES)
-        
-#         if form.is_valid():
-#             try:
-#                 # Sauvegarder le membre
-#                 membre = form.save()
-                
-#                 messages.success(request, 
-#                     f"Le membre {membre.nom_complet} a été inscrit avec succès !")
-#                 return redirect('liste_membres')  # Ou une autre page
-                
-#             except Exception as e:
-#                 messages.error(request, 
-#                     f"Une erreur est survenue lors de l'inscription: {str(e)}")
-#                 return render(request, self.template_name, {'form': form})
-        
-#         messages.error(request, 
-#             "Veuillez corriger les erreurs dans le formulaire.")
-#         return render(request, self.template_name, {'form': form})
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['page_title'] = 'Inscription - COMMULINK'
-#         return context
-
 
 
 

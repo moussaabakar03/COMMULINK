@@ -339,7 +339,7 @@ def admin_dashboard(request):
 
     derniers_paiements = Paiement.objects.select_related(
         'membre_Reinscris__membre', 'evenement'
-    ).order_by('-date_paiement')[:10]
+    ).order_by('-date_paiement')[:3]
 
     prochains_evenements = Evenement.objects.filter(
         est_publie=True
@@ -473,9 +473,9 @@ def admin_dashboard(request):
 
     return render(request, 'index.html', context)
 
-def navBar(request):
-    membreEquipe = get_object_or_404(EquipeDirigeante, utilisateur = request.user)
-    return render(request, "partial/navbar.html", {"membreEquipe": membreEquipe})
+# def navBar(request):
+#     membreEquipe = get_object_or_404(EquipeDirigeante, utilisateur = request.user)
+#     return render(request, "partial/navbar.html", {"membreEquipe": membreEquipe})
 
 
 #----------------------------------GESTION DES EVENEMENTS--------------------------------------
@@ -744,9 +744,9 @@ def modifierEvenement(request, id):
 
         # ================= IMAGES SECONDAIRES =================
         if images:
-            for img in evenement.images.all():
-                img.image.delete(save=False)
-                img.delete()
+            # for img in evenement.images.all():
+            #     # img.image.delete(save=False)
+            #     img.delete()
 
             for image in images:
                 EvenementImage.objects.create(
@@ -2859,48 +2859,100 @@ def modifierPaiement(request, pk):
     return render(request, 'gestionPaiement/modifierPaiment.html', context)
 
 
+
 @login_required
 @admin_required
 def paiementParEvenement(request, pk):
     evenement = get_object_or_404(Evenement, id=pk)
-
-    paiements = Paiement.objects.filter(
-        evenement=evenement
+    paiements = Paiement.objects.filter(evenement = evenement)
+    # Paiements liés à un membre
+    paiements_avec_membre = Paiement.objects.filter(
+        evenement=evenement,
+        membre_Reinscris__isnull=False
     ).order_by('-date_paiement')
 
-    # paiementNonPresent = 
-    membres_ayant_paye = paiements.values_list(
+    # Paiements non liés à un membre
+    paiements_sans_membre = Paiement.objects.filter(
+        evenement=evenement,
+        membre_Reinscris__isnull=True
+    ).order_by('-date_paiement')
+
+    #  Membres réinscrits ayant payé (ids)
+    membres_ayant_paye = paiements_avec_membre.values_list(
         'membre_Reinscris_id', flat=True
     )
-    # 3. Trouver les réinscriptions de l'année en excluant ceux qui ont payé
-    reinscris = Reinscription.objects.filter(
-        annee=evenement.annee
+
+    #  Membres réinscrits qui n'ont pas payé
+    reinscris_non_payes = Reinscription.objects.filter(
+        annee=evenement.annee,
+        membre__statut="valide"
     ).exclude(id__in=membres_ayant_paye)
 
-    reinscris_id = request.GET.get('membreReinscris_id')
 
-    budget_total = sum(p.montant for p in paiements)
+    reinscris_id = request.GET.get('membreReinscris_id')
+    administrateur = request.GET.get('administrateur')
+
+   
     if reinscris_id:
         reinscris_id = int(reinscris_id)
 
-        paiements = paiements.filter(
+        paiements_avec_membre = paiements_avec_membre.filter(
             membre_Reinscris_id=reinscris_id
         )
 
-        #IMPORTANT : filtrer aussi les non-payés
-        reinscris = reinscris.filter(id=reinscris_id)
+        reinscris_non_payes = reinscris_non_payes.filter(
+            id=reinscris_id
+        )
+
+        paiements_sans_membre = paiements_sans_membre.none()
+
+
+    if administrateur:
+        paiements_avec_membre = paiements_avec_membre.filter(
+            ajout_par=administrateur
+        )
+
+        paiements_sans_membre = paiements_sans_membre.filter(
+            ajout_par=administrateur
+        )
+
+        reinscris_non_payes = reinscris_non_payes.none()
+
+
+        
+    # Budget total (uniquement paiements valides)
+    budget_total = paiements.aggregate(
+        total=Sum('montant')
+    )['total'] or 0
 
     contexte = {
-        "paiements": paiements,
         "evenement": evenement,
         "membres_reinscris": Reinscription.objects.filter(annee=evenement.annee),
-        "totalReinscris": Reinscription.objects.filter(annee=evenement.annee).count(),
-        "reinscrisPayee": paiements.count(),
-        "reinscrisToutPayee": paiements.filter(statut="payé").count(),
-        "reinscrisMoitiePayee": paiements.filter(statut="moitié_payé").count(),
-        "reinscrisNonPayee": reinscris.count(),
-        "reinscrisDonneAvance": paiements.filter(statut="avance").count(),
-        "reinscris": reinscris,
+        "administrateurs" : Utilisateur.objects.filter(is_staff=True),
+        
+        
+        # tableaux
+        "paiements_avec_membre": paiements_avec_membre,
+        "paiements_sans_membre": paiements_sans_membre,
+        "reinscris_non_payes": reinscris_non_payes,
+
+        # stats
+        "totalReinscris": Reinscription.objects.filter(
+            annee=evenement.annee,
+            membre__statut="valide"
+        ).count(),
+
+        "reinscrisPayee": paiements_avec_membre.count(),
+        "reinscrisToutPayee": paiements_avec_membre.filter(
+            statut="payé"
+        ).count(),
+        "reinscrisMoitiePayee": paiements_avec_membre.filter(
+            statut="moitié_payé"
+        ).count(),
+        "reinscrisDonneAvance": paiements_avec_membre.filter(
+            statut="avance"
+        ).count(),
+        "reinscris_rien_payes": reinscris_non_payes.count(),
         "selected_membre": reinscris_id,
         "budget_total": budget_total,
     }
@@ -2910,7 +2962,6 @@ def paiementParEvenement(request, pk):
         "gestionPaiement/paiementParEvenement.html",
         contexte
     )
-
 
 @login_required
 def detailPaimentMembre(request, pk):
