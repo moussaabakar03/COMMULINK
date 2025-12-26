@@ -58,15 +58,22 @@ class Annee(models.Model):
         # Format plus lisible pour l'affichage dans les filtres
         return f"{self.debutAnnee.year}-{self.finAnnee.year}"
     
-
 class Membre(models.Model):
     GENRE_CHOICES = [
         ('M', 'Masculin'),
         ('F', 'Féminin'),
         ('A', 'Autre')
     ]
+    
+    # Nouveau champ pour le statut de validation
+    STATUT_CHOICES = [
+        ('en_attente', 'En attente de validation'),
+        ('valide', 'Validé'),
+        ('refuse', 'Refusé'),
+        ('bloquer', 'Bloquer'),
+    ]
 
-    utilisateur = models.OneToOneField(Utilisateur, on_delete= models.CASCADE, null = True, blank= True, related_name= "membre")
+    utilisateur = models.OneToOneField(Utilisateur, on_delete=models.CASCADE, null=True, blank=True, related_name="membre")
 
     # Informations de base
     nom = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
@@ -87,8 +94,6 @@ class Membre(models.Model):
     ecole = models.CharField(max_length=20, blank=True, null=True)
     filiere = models.CharField(max_length=150, blank=True, null= True)
 
-
-    
     # Informations supplémentaires
     date_inscription = models.DateTimeField(auto_now_add=True)
     date_derniere_modification = models.DateTimeField(auto_now=True)
@@ -99,9 +104,27 @@ class Membre(models.Model):
         verbose_name="Photo de profil"
     )
     
+    # Nouveau champ statut
+    statut = models.CharField(
+        max_length=20,
+        choices=STATUT_CHOICES,
+        default='en_attente',
+        verbose_name="Statut de validation"
+    )
+    
+    # Date de validation
+    date_validation = models.DateTimeField(null=True, blank=True, verbose_name="Date de validation")
+    valide_par = models.ForeignKey(
+        Utilisateur, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="membres_valides",
+        verbose_name="Validé par"
+    )
+    
     # Métadonnées
     notes = models.TextField(blank=True, null=True, verbose_name="Remarques")
-
 
     # information sur l'identité
     ner = models.CharField(max_length=20, blank=True, null=True)
@@ -111,7 +134,7 @@ class Membre(models.Model):
     keribourBa = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.nom} {self.prenom}--- {self.ner}. {self.keri}"
+        return f"{self.nom} {self.prenom}- *{self.ner}. {self.keri}*"
 
     class Meta:
         verbose_name = "Membre"
@@ -120,11 +143,20 @@ class Membre(models.Model):
         indexes = [
             models.Index(fields=['nom', 'prenom']),
             models.Index(fields=['email']),
+            models.Index(fields=['statut']),
         ]
     
     @property
     def nom_complet(self):
         return f"{self.nom} {self.prenom}"
+    
+    @property
+    def est_valide(self):
+        return self.statut == 'valide'
+    
+    @property
+    def est_en_attente(self):
+        return self.statut == 'en_attente'
 
 
 #--------------------ANNONCES ET PAYEMENTS--------------------------------
@@ -139,7 +171,6 @@ class Annonce(models.Model):
 
     def __str__(self):
         return self.titre
-
 
 
 # Create your models here.
@@ -285,7 +316,7 @@ class Reinscription(models.Model):
     )
     
     def __str__(self):
-        return f"{self.membre.nom_complet}  *{self.membre.ner}- {self.membre.keri}* ({self.membre.ecole})"
+        return f"{self.membre.nom_complet}  *{self.membre.ner}- {self.membre.keri}* - {self.annee}"
 
 
 class Paiement(models.Model):
@@ -296,14 +327,16 @@ class Paiement(models.Model):
         ('avance', 'Avance'),
     ]
     
-    membre_Reinscris = models.ForeignKey(Reinscription, on_delete=models.CASCADE, null=True, blank=True)
-    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE)
+    membre_Reinscris = models.ForeignKey(Reinscription, on_delete=models.CASCADE, null=True, blank=True, related_name="paiement")
+    evenement = models.ForeignKey(Evenement, on_delete=models.CASCADE, null=True, blank=True, related_name="paiement")
     montant = models.IntegerField()
     date_paiement = models.DateTimeField(null=True, blank=True)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, null=True, blank=True)
     preuve_paiement = models.FileField(upload_to='paiements/', null=True, blank=True)
 
     reste_a_payer = models.IntegerField(null=True, blank=True) 
+    
+    ajout_par = models.CharField(max_length=350, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if self.evenement.prix > self.montant:

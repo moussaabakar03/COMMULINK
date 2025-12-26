@@ -211,7 +211,14 @@ class PaiementForm(forms.ModelForm):
         widgets = {
             'montant': forms.NumberInput(attrs={'min': '0', 'step': '25'}),
         }
-        # exclude = ['evenement', 'statut'] 
+
+class PaiementEvenementForm(forms.ModelForm):
+    class Meta:
+        model = Paiement
+        exclude = ['evenement']
+        widgets = {
+            'montant': forms.NumberInput(attrs={'min': '25', 'step': '25'}),
+        }
 
 
 class AnneeForm(forms.Form):

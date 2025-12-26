@@ -3,7 +3,7 @@
     {
         color: #FF6F0F;
     }
-    ..dropdown-item{
+    .dropdown-item{
         transition: all 1.5s ease-in-out;
         font-weight: bold;
     }
@@ -39,53 +39,83 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="{% url 'index' %}" class="nav-item nav-link active">Accueil</a>
-                {% if request.user.role == "membreEquipe" %}
+                {% if request.user.role == "membreEquipe" or request.user.is_superuser %}
                     <a href="{% url 'admin_dashboard' %}" class="nav-item nav-link">Dashbord</a>
                 {% endif %}
-                <a href="" class="nav-item nav-link">A propos</a>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav ms-auto p-4 p-lg-0">
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Explorer</a>
-                            <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
-                                <a href="{% url 'index' %}#evenements" class="dropdown-item">Nos évenements</a>
-                                <a href="{% url 'index' %}#dernierEvenement" class="dropdown-item">Nos Evenements recent</a>
-                                <a href="{% url 'index' %}#equipeDirigeante" class="dropdown-item">Notre Equipe</a>
-                                <a href="{% url 'index' %}#temoingnage" class="dropdown-item">Nos Temoingnages</a>
-                                <a href="{% url 'index' %}#faireDon" class="dropdown-item">Faire un don</a>
-                            </div>
-                        </div>
+                <a href="{% url 'about' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">A propos</a>
+                <a href="{% url 'liste_evenements' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'liste_evenements' %}active{% endif %}">Evenements</a>
+                
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Explorer</a>
+                    <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
+                        <a href="{% url 'index' %}#evenements" class="dropdown-item">Nos évenements</a>
+                        <a href="{% url 'index' %}#dernierEvenement" class="dropdown-item">Nos Evenements recent</a>
+                        <a href="{% url 'index' %}#equipeDirigeante" class="dropdown-item">Notre Equipe</a>
+                        <a href="{% url 'index' %}#temoingnage" class="dropdown-item">Nos Temoingnages</a>
+                        <a href="{% url 'index' %}#faireDon" class="dropdown-item">Faire un don</a>
                     </div>
                 </div>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav ms-auto p-4 p-lg-0">
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Contact</a>
-                            <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
-                                <a href="{% url 'contact' %}" class="dropdown-item">Contact</a>
-                                <a href="" class="dropdown-item">FAQ</a>
-                            </div>
-                        </div>
+
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Contact</a>
+                    <div class="dropdown-menu rounded-0 rounded-bottom m-0 explorer">
+                        <a href="{% url 'contact' %}" class="dropdown-item">Contact</a>
+                        <a href="{% url 'faq' %}" class="dropdown-item">FAQ</a>
                     </div>
+                </div>
+
+                <!-- Boutons d'authentification pour mobile (dans le menu collapsed) -->
+                <div class="d-lg-none mt-3">
+                    {% if user.is_authenticated %}
+
+                        {% if user.role == "membreLambda" %}
+                            <a href="{% url 'profil_membre' %}" class="nav-item nav-link">
+                                <i class="fas fa-user me-2"></i>{{ user.nom|default:user.username }}
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'deconnexion' %}" class="nav-item nav-link text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                        </a>
+
+                    {% else %}
+                        <a class="btn btn-outline-primary py-2 px-3 w-100" href="{% url 'connexion' %}">
+                            Connexion
+                            <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </div>
+                        </a>
+                    {% endif %}
+
                 </div>
             </div>
-            <div class="d-none d-lg-flex ms-2">
-                {% if user.is_authenticated %}
-                <a class="btn btn-outline-primary py-2 px-3" href="{% url 'deconnexion' %}">
-                    Déconnexion
-                    <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
-                        <i class="fa fa-arrow-right"></i>
-                    </div>
+
+            <!-- Boutons d'authentification pour desktop (hors du menu collapsed) -->
+            {% if user.is_authenticated %}
+            <div class="dropdown d-none d-lg-block">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                    <span class="d-none d-lg-inline me-2">{{ user.nom|default:user.username }}</span>
+                    <i class="fas fa-user-circle"></i>
                 </a>
-                {% else %}
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% if user.role == "membreLambda" %}
+                        <li><a class="dropdown-item" href="{% url 'profil_membre' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'deconnexion' %}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="d-none d-lg-flex ms-2">
                 <a class="btn btn-outline-primary py-2 px-3" href="{% url 'connexion' %}">
                     Connexion
                     <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
                         <i class="fa fa-arrow-right"></i>
                     </div>
                 </a>
-                {% endif %}
             </div>
+            {% endif %}
+
         </div>
     </nav>
 </div>

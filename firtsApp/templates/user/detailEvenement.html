@@ -3,106 +3,98 @@
 {% block body %}
 {% load static %}
 
+<!-- Font Awesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-  <style>
-    
-      .fadeIn{
-          background-color: rgba(128, 12, 12, 0.07);
-      }
-    
-      .headerNav nav{
-        background-color: #001D23;
-      }
+<style>
+   
+    .fadeIn{
+        background-color: rgba(128, 12, 12, 0.07);
+    }
+   
+    .headerNav nav{
+      background-color: #001D23;
+    }
 
-      .headerNav .header, .headerNav .header div small, .headerNav .header div a i {
-          background-color: white;
-          color: #FF6F0F;
-      }
-
-
-      .a-propos-section {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 60px 20px;
-        {% comment %} background-color: #1d1d3f; {% endcomment %}
-        color:rgb(32, 26, 26);
-        text-align: center;
-        font-family: 'Segoe UI', sans-serif;
-        margin-top: 120px;
-      }
-      
-      .a-propos-section h2 {
-        font-size: 3rem;
+    .headerNav .header, .headerNav .header div small, .headerNav .header div a i {
+        background-color: white;
         color: #FF6F0F;
-        margin-bottom: 20px;
-      }
-      
-      .a-propos-section p {
-        font-size: 1.1rem;
-        line-height: 1.6;
-        margin-bottom: 40px;
-      }
-      
-      .a-propos-section h3 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 10px;
-      }
-      
-      .a-propos-section ul {
-        list-style-type: disc;
-        text-align: left;
-        max-width: 400px;
-        margin: 0 auto 40px auto;
-        padding-left: 20px;
-      }
-      
-      .a-propos-section hr {
-        border: 0.5px solid #b3aaff33;
-        margin-bottom: 40px;
-      }
-      
-      .cta-button a {
-        background: #FF6F0F;
-        color: #ffffff;
-        text-decoration: none;
-        padding: 12px 30px;
-        border-radius: 30px;
-        font-weight: bold;
-        transition: background 0.3s ease;
-      }
-      
-      .cta-button a:hover {
-        background: linear-gradient(to right, #8e7cc3, #e0a7d8);
-      }
-      
+    }
 
+    .a-propos-section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      color:rgb(32, 26, 26);
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      margin-top: 120px;
+    }
+    
+    .a-propos-section h2 {
+      font-size: 3rem;
+      color: #FF6F0F;
+      margin-bottom: 20px;
+    }
+    
+    .a-propos-section p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+    
+    .a-propos-section hr {
+      border: 0.5px solid #b3aaff33;
+      margin-bottom: 40px;
+    }
+    
+    .cta-button a {
+      background: #FF6F0F;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    
+    .cta-button a:hover {
+      background: linear-gradient(to right, #8e7cc3, #e0a7d8);
+    }
 
-
-      .gallery {
+    .gallery {
       display: flex;
       flex-wrap: wrap;
-      gap: 20px; /* espacement entre les images */
+      gap: 20px;
       justify-content: center;
       width: 100%;
-      }
+      padding: 40px 20px;
+    }
 
-      .gallery-item {
+    .gallery-item {
       position: relative;
-      width: 300px; /* largeur fixe */
-      height: 200px; /* hauteur fixe */
+      width: 300px;
+      height: 200px;
       overflow: hidden;
       border-radius: 8px;
-      }
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
-      .gallery-item img {
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .gallery-item img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* remplissage sans déformation */
+      object-fit: cover;
       display: block;
-      }
+    }
 
-      .overlay {
+    .overlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -117,21 +109,290 @@
       transition: opacity 0.3s ease-in-out;
       font-size: 1.2rem;
       font-weight: bold;
-      }
+    }
 
-      .gallery-item:hover .overlay {
+    .gallery-item:hover .overlay {
       opacity: 1;
+    }
+
+    /* ============== MODAL LIGHTBOX ============== */
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      z-index: 99999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .image-modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+    }
+
+    /* Bouton fermer */
+    .modal-close {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 100002;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    /* ============== MENU 3 POINTS - CORRIGÉ ============== */
+    .modal-menu-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100003;
+    }
+
+    .modal-menu-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .modal-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Les trois points verticaux */
+    .three-dots {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .three-dots span {
+      display: block;
+      width: 6px;
+      height: 6px;
+      background-color: white;
+      border-radius: 50%;
+    }
+
+    /* Menu déroulant - CORRIGÉ */
+    .dropdown-menu {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      min-width: 220px;
+      overflow: hidden;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.95);
+      transition: all 0.2s ease;
+      z-index: 100004;
+    }
+
+    .dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 15px;
+      font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      text-align: left;
+    }
+
+    .dropdown-item:hover {
+      background: #f0f0f0;
+    }
+
+    .dropdown-item i {
+      font-size: 18px;
+      color: #FF6F0F;
+      width: 24px;
+      text-align: center;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 0;
+    }
+
+    /* Boutons navigation */
+    .modal-nav {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 100001;
+    }
+
+    .modal-nav:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-nav.prev {
+      left: 20px;
+    }
+
+    .modal-nav.next {
+      right: 20px;
+    }
+
+    /* Compteur d'images */
+    .image-counter {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 100001;
+    }
+
+    /* Toast notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 14px;
+      z-index: 100005;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast-notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-notification i {
+      color: #4CAF50;
+      font-size: 18px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .modal-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
       }
 
-      
-      .divider {
-          height: 3px;
-          background: linear-gradient(to right, transparent, var(--secondary-color), transparent);
-          margin: 3rem 0;
-          opacity: 0.3;
+      .modal-nav.prev {
+        left: 10px;
       }
 
-      
+      .modal-nav.next {
+        right: 10px;
+      }
+
+      .modal-close,
+      .modal-menu-btn {
+        width: 45px;
+        height: 45px;
+      }
+
+      .gallery-item {
+        width: calc(50% - 10px);
+        height: 150px;
+      }
+
+      .a-propos-section h2 {
+        font-size: 2rem;
+      }
+
+      .dropdown-menu {
+        min-width: 200px;
+        right: -10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .gallery-item {
+        width: 100%;
+        height: 200px;
+      }
+    }
+
+    {% comment %} style vidéo {% endcomment %}
+
      /* Section Vidéos - CORRECTIONS */
     .video-section {
         max-width: 1200px;
@@ -334,157 +595,533 @@
               font-size: 1.5rem;
           }
       }
-      
-  </style>
 
 
-  
-  <div class="a-propos-section">
-    <h2>{{ evenement.titre }}</h2>
+</style>
+
+<!-- Contenu principal -->
+<div class="a-propos-section">
+  <h2>{{ evenement.titre }}</h2>
+  {% if evenement.photo %}
     <img src="{{ evenement.photo.url }}" alt="Photo de couverture" style="width:300px; height:200px; object-fit:cover; border-radius:15px;">
-    <p>
-        {{evenement.description}}
-    </p>
+  {% endif %}
+  <p>{{ evenement.description }}</p>
 
-    <hr />
+  <hr />
 
-    <div class="cta-button">
-      <a href="{% url 'index' %}#evenements">Voir d'autres Evenements</a>
+  <div class="cta-button">
+    <a href="{% url 'index' %}#evenements">Voir d'autres Evenements</a>
+  </div>
+</div>
+
+<!-- Galerie d'images -->
+<div class="gallery">
+  {% if evenementImage %}
+    {% for image in evenementImage %}
+      <div class="gallery-item" data-index="{{ forloop.counter0 }}" data-src="{{ image.image.url }}">
+        {% if image.image %}
+          <img src="{{ image.image.url }}" alt="Image {{ forloop.counter }}">
+          <div class="overlay">
+            <i class="fas fa-search-plus" style="margin-right: 8px;"></i>
+            Voir la photo
+          </div>
+        {% else %}
+          <div class="no-image">
+            <i>📷</i>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="text-align: center; color: #666; padding: 40px;">Il n'y a pas d'image pour cet événement.</p>
+  {% endif %}
+</div>
+
+
+
+
+<!-- Modal Lightbox -->
+<div class="image-modal" id="imageModal">
+  
+  <!-- Bouton Fermer -->
+  <button class="modal-close" id="btnClose" title="Fermer">
+    <i class="fas fa-times"></i>
+  </button>
+
+  <!-- Menu 3 points -->
+  <div class="modal-menu-container">
+    <button class="modal-menu-btn" id="btnMenuToggle" title="Options">
+      <div class="three-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </button>
+    
+    <!-- Dropdown Menu -->
+    <div class="dropdown-menu" id="dropdownMenu">
+      <button class="dropdown-item" id="btnDownload">
+        <i class="fas fa-download"></i>
+        <span>Télécharger l'image</span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item" id="btnShare">
+        <i class="fas fa-share-alt"></i>
+        <span>Partager</span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-item" id="btnNewTab">
+        <i class="fas fa-external-link-alt"></i>
+        <span>Ouvrir dans un nouvel onglet</span>
+      </button>
     </div>
   </div>
-  <div class="gallery">
-    {% if evenementImage %}
-      {% for image in evenementImage %}
-        <div class="gallery-item">
-          {% if image.image %}
-            <a href="{{ image.image.url }}" target="_blank">
-              <img src="{{ image.image.url }}" alt="image">
-              <div class="overlay">Voir la photo</div>
-            </a>
-          {% else %}
-            <div class="no-image">
-              <i>📷</i>
-            </div>
-          {% endif %}
-        </div>
-      {% endfor %}
-    {% else %}
-      <p>Il n'y a pas d'image pour cet événement.</p>
-    {% endif %}
+
+  <!-- Navigation -->
+  <button class="modal-nav prev" id="btnPrev" title="Image précédente">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <button class="modal-nav next" id="btnNext" title="Image suivante">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+
+  <!-- Contenu de l'image -->
+  <div class="modal-content">
+    <img id="modalImage" src="" alt="Image agrandie">
   </div>
 
+  <!-- Compteur -->
+  <div class="image-counter">
+    <span id="currentIndex">1</span> / <span id="totalImages">1</span>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-notification" id="toastNotification">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMessage">Téléchargement en cours...</span>
+</div>
 
 
-  <div class="divider"></div>
+
+
+<div class="divider"></div>
 {% if evenementVideos %}
-<section class="video-section">
-    <h2 class="section-title">
-        <i class="fas fa-video" style="color: #FF6F0F; margin-right: 10px;"></i>
-        Vidéos des événements
-    </h2>
-    
-    <div class="video-grid">
-        {% for video in evenementVideos %}
-        <div class="video-card">
-            <!-- CONTAINER UNIQUE POUR THUMBNAIL ET VIDÉO -->
-            <div class="video-container">
-                {% if video.miniature %}
-                <!-- THUMBNAIL - visible par défaut -->
-                <div class="video-thumbnail" data-video-id="video-{{ video.id }}">
-                    <img src="{{ video.miniature.url }}" alt="{{ video.titre|default:'Vidéo' }}">
-                    <div class="play-btn">
-                        <i class="fas fa-play"></i>
+    <section class="video-section">
+        <h2 class="section-title">
+            <i class="fas fa-video" style="color: #FF6F0F; margin-right: 10px;"></i>
+            Vidéos des événements
+        </h2>
+        
+        <div class="video-grid">
+            {% for video in evenementVideos %}
+            <div class="video-card">
+                <!-- CONTAINER UNIQUE POUR THUMBNAIL ET VIDÉO -->
+                <div class="video-container">
+                    {% if video.miniature %}
+                    <!-- THUMBNAIL - visible par défaut -->
+                    <div class="video-thumbnail" data-video-id="video-{{ video.id }}">
+                        <img src="{{ video.miniature.url }}" alt="{{ video.titre|default:'Vidéo' }}">
+                        <div class="play-btn">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- VIDÉO - cachée par défaut si miniature existe -->
+                    <video id="video-{{ video.id }}" 
+                        class="video-player {% if video.miniature %}hidden{% endif %}" 
+                        controls 
+                        preload="metadata">
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la lecture de vidéos.
+                    </video>
+                </div>
+                
+                <div class="video-info">
+                    <h3 class="video-title">{{ video.titre|default:"Vidéo événement" }}</h3>
+                    {% if video.description %}
+                    <p class="video-description">{{ video.description|truncatechars:80 }}</p>
+                    {% endif %}
+                    <div class="video-meta">
+                        <span class="video-badge">
+                            <i class="fas fa-hdd"></i> {{ video.taille_fichier }}
+                        </span>
+                        <span class="video-badge">
+                            <i class="fas fa-calendar"></i> {{ video.evenement.titre|truncatechars:20 }}
+                        </span>
                     </div>
                 </div>
-                {% endif %}
-                
-                <!-- VIDÉO - cachée par défaut si miniature existe -->
-                <video id="video-{{ video.id }}" 
-                       class="video-player {% if video.miniature %}hidden{% endif %}" 
-                       controls 
-                       preload="metadata">
-                    <source src="{{ video.video.url }}" type="video/mp4">
-                    Votre navigateur ne supporte pas la lecture de vidéos.
-                </video>
             </div>
-            
-            <div class="video-info">
-                <h3 class="video-title">{{ video.titre|default:"Vidéo événement" }}</h3>
-                {% if video.description %}
-                <p class="video-description">{{ video.description|truncatechars:80 }}</p>
-                {% endif %}
-                <div class="video-meta">
-                    <span class="video-badge">
-                        <i class="fas fa-hdd"></i> {{ video.taille_fichier }}
-                    </span>
-                    <span class="video-badge">
-                        <i class="fas fa-calendar"></i> {{ video.evenement.titre|truncatechars:20 }}
-                    </span>
+            {% endfor %}
+        </div>
+    </section>
+    <div class="divider"></div>
+{% endif %}
+
+<hr/>
+
+
+<!-- Témoignages -->
+<div class="container py-5" id="temoingnages">
+    <h2 class="section-title text-center mb-5">Témoignages</h2>
+    <div class="row">
+        {% for temoingnage in temoingnages %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="row g-0">
+                    {% if temoingnage.image %}
+                    <div class="col-md-4 d-flex align-items-center">
+                        <img src="{{ temoingnage.image.url }}" 
+                            class="img-fluid rounded-start m-2" 
+                            alt="{{ temoingnage.nom }}"
+                            style="max-height: 150px; object-fit: cover;">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title">{{ temoingnage.nom }}</h5>
+                                    <p class="card-subtitle text-muted small">{{ temoingnage.role }}</p>
+                                </div>
+                                {% if temoingnage.evenement %}
+                                <span class="badge bg-primary">
+                                    {{ temoingnage.evenement.typeEvenement.nom_type_evenement|truncatechars:20 }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <p class="card-text mt-3">{{ temoingnage.message }}</p>
+                            
+                            {% if temoingnage.video %}
+                            <div class="mt-3 ratio ratio-16x9">
+                                <video controls class="rounded">
+                                    <source src="{{ temoingnage.video.url }}" type="video/mp4">
+                                    Votre navigateur ne supporte pas les vidéos.
+                                </video>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
-</section>
-<div class="divider"></div>
-{% endif %}
-
-
-  <hr/>
-
-  <!-- Témoignages -->
-  <div class="container py-5" id="temoingnages">
-      <h2 class="section-title text-center mb-5">Témoignages</h2>
-      <div class="row">
-          {% for temoingnage in temoingnages %}
-          <div class="col-md-6 mb-4">
-              <div class="card h-100 shadow">
-                  <div class="row g-0">
-                      {% if temoingnage.image %}
-                      <div class="col-md-4 d-flex align-items-center">
-                          <img src="{{ temoingnage.image.url }}" 
-                                class="img-fluid rounded-start m-2" 
-                                alt="{{ temoingnage.nom }}"
-                                style="max-height: 150px; object-fit: cover;">
-                      </div>
-                      {% endif %}
-                      
-                      <div class="col-md-8">
-                          <div class="card-body">
-                              <div class="d-flex justify-content-between align-items-start">
-                                  <div>
-                                      <h5 class="card-title">{{ temoingnage.nom }}</h5>
-                                      <p class="card-subtitle text-muted small">{{ temoingnage.role }}</p>
-                                  </div>
-                                  {% if temoingnage.evenement %}
-                                  <span class="badge bg-primary">
-                                      {{ temoingnage.evenement.typeEvenement.nom_type_evenement|truncatechars:20 }}
-                                  </span>
-                                  {% endif %}
-                              </div>
-                              
-                              <p class="card-text mt-3">{{ temoingnage.message }}</p>
-                              
-                              {% if temoingnage.video %}
-                              <div class="mt-3 ratio ratio-16x9">
-                                  <video controls class="rounded">
-                                      <source src="{{ temoingnage.video.url }}" type="video/mp4">
-                                      Votre navigateur ne supporte pas les vidéos.
-                                  </video>
-                              </div>
-                              {% endif %}
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          {% endfor %}
-      </div>
-  </div>
+</div>
 
 
 
-    
+
+<script>
+    (function() {
+    'use strict';
+
+    // ============== VARIABLES ==============
+    let currentImageIndex = 0;
+    let images = [];
+
+    // ============== ELEMENTS DOM ==============
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const btnClose = document.getElementById('btnClose');
+    const btnMenuToggle = document.getElementById('btnMenuToggle');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnShare = document.getElementById('btnShare');
+    const btnNewTab = document.getElementById('btnNewTab');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const currentIndexEl = document.getElementById('currentIndex');
+    const totalImagesEl = document.getElementById('totalImages');
+    const toast = document.getElementById('toastNotification');
+    const toastMessage = document.getElementById('toastMessage');
+
+    // ============== INITIALISATION ==============
+    function init() {
+        // Récupérer toutes les images
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        
+        galleryItems.forEach((item, index) => {
+        const src = item.getAttribute('data-src');
+        if (src) {
+            images.push({ src: src, index: index });
+            
+            // Ajouter l'événement click
+            item.addEventListener('click', function() {
+            openModal(index);
+            });
+        }
+        });
+
+        // Mettre à jour le total
+        totalImagesEl.textContent = images.length;
+
+        // Attacher les événements
+        attachEvents();
+        
+        console.log('Galerie initialisée avec', images.length, 'images');
+    }
+
+    // ============== ÉVÉNEMENTS ==============
+    function attachEvents() {
+        // Bouton fermer
+        btnClose.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeModal();
+        });
+
+        // Bouton menu toggle (3 points)
+        btnMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleDropdown();
+        });
+
+        // Bouton télécharger
+        btnDownload.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        downloadImage();
+        });
+
+        // Bouton partager
+        btnShare.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        shareImage();
+        });
+
+        // Bouton nouvel onglet
+        btnNewTab.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openInNewTab();
+        });
+
+        // Navigation précédent
+        btnPrev.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        changeImage(-1);
+        });
+
+        // Navigation suivant
+        btnNext.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        changeImage(1);
+        });
+
+        // Fermer modal en cliquant sur le fond
+        modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+        });
+
+        // Fermer dropdown en cliquant ailleurs
+        document.addEventListener('click', function(e) {
+        if (!btnMenuToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            closeDropdown();
+        }
+        });
+
+        // Navigation clavier
+        document.addEventListener('keydown', function(e) {
+        if (!modal.classList.contains('active')) return;
+        
+        switch(e.key) {
+            case 'Escape':
+            closeModal();
+            break;
+            case 'ArrowLeft':
+            changeImage(-1);
+            break;
+            case 'ArrowRight':
+            changeImage(1);
+            break;
+        }
+        });
+
+        // Swipe sur mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        modal.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        modal.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+            changeImage(1);
+            } else {
+            changeImage(-1);
+            }
+        }
+        }, { passive: true });
+    }
+
+    // ============== FONCTIONS MODAL ==============
+    function openModal(index) {
+        currentImageIndex = index;
+        
+        if (images[index]) {
+        modalImage.src = images[index].src;
+        currentIndexEl.textContent = index + 1;
+        }
+        
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        closeDropdown();
+        
+        console.log('Modal ouvert, image:', index + 1);
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        closeDropdown();
+        console.log('Modal fermé');
+    }
+
+    function changeImage(direction) {
+        currentImageIndex += direction;
+        
+        if (currentImageIndex < 0) {
+        currentImageIndex = images.length - 1;
+        } else if (currentImageIndex >= images.length) {
+        currentImageIndex = 0;
+        }
+        
+        if (images[currentImageIndex]) {
+        modalImage.src = images[currentImageIndex].src;
+        currentIndexEl.textContent = currentImageIndex + 1;
+        }
+        
+        closeDropdown();
+    }
+
+    // ============== FONCTIONS DROPDOWN ==============
+    function toggleDropdown() {
+        const isOpen = dropdownMenu.classList.contains('show');
+        
+        if (isOpen) {
+        closeDropdown();
+        } else {
+        openDropdown();
+        }
+    }
+
+    function openDropdown() {
+        dropdownMenu.classList.add('show');
+        console.log('Dropdown ouvert');
+    }
+
+    function closeDropdown() {
+        dropdownMenu.classList.remove('show');
+    }
+
+    // ============== FONCTIONS ACTIONS ==============
+    function downloadImage() {
+        if (!images[currentImageIndex]) return;
+        
+        const imageUrl = images[currentImageIndex].src;
+        const imageName = 'image_' + (currentImageIndex + 1) + '.jpg';
+        
+        showToast('Téléchargement en cours...');
+        closeDropdown();
+
+        // Méthode avec fetch
+        fetch(imageUrl)
+        .then(response => {
+            if (!response.ok) throw new Error('Erreur réseau');
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = imageName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showToast('Image téléchargée !');
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            // Fallback
+            const a = document.createElement('a');
+            a.href = imageUrl;
+            a.download = imageName;
+            a.target = '_blank';
+            a.click();
+            showToast('Téléchargement lancé !');
+        });
+    }
+
+    function shareImage() {
+        if (!images[currentImageIndex]) return;
+        
+        const imageUrl = window.location.origin + images[currentImageIndex].src;
+        closeDropdown();
+
+        if (navigator.share) {
+        navigator.share({
+            title: 'Image',
+            url: imageUrl
+        })
+        .then(() => showToast('Partagé !'))
+        .catch(err => console.log('Erreur partage:', err));
+        } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(imageUrl)
+            .then(() => showToast('Lien copié !'))
+            .catch(() => showToast('Erreur de copie'));
+        } else {
+        // Fallback
+        prompt('Copiez ce lien:', imageUrl);
+        }
+    }
+
+    function openInNewTab() {
+        if (!images[currentImageIndex]) return;
+        
+        const imageUrl = images[currentImageIndex].src;
+        window.open(imageUrl, '_blank');
+        closeDropdown();
+    }
+
+    // ============== TOAST ==============
+    function showToast(message) {
+        toastMessage.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(function() {
+        toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // ============== DÉMARRAGE ==============
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+    })();
+</script>
+
+
+
+
 <script>
     // Script pour gérer la lecture des vidéos avec miniatures
     document.addEventListener('DOMContentLoaded', function() {
@@ -539,85 +1176,84 @@
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initialisation du lecteur vidéo...');
+        
+        // Gestion des clics sur les miniatures
+        document.querySelectorAll('.video-thumbnail').forEach(function(thumbnail) {
+            thumbnail.addEventListener('click', function() {
+                const videoId = this.getAttribute('data-video-id');
+                console.log('Miniature cliquée, vidéo ID:', videoId);
+                
+                const videoElement = document.getElementById(videoId);
+                
+                if (videoElement) {
+                    console.log('Élément vidéo trouvé, démarrage...');
+                    
+                    // 1. Masquer la miniature
+                    this.classList.add('hidden');
+                    
+                    // 2. Afficher la vidéo
+                    videoElement.classList.remove('hidden');
+                    
+                    // 3. Lancer la lecture
+                    videoElement.play().then(() => {
+                        console.log('Vidéo en lecture');
+                    }).catch(error => {
+                        console.error('Erreur de lecture:', error);
+                        // Si autoplay échoue, afficher un message
+                        if (error.name === 'NotAllowedError') {
+                            alert('Cliquez sur le bouton play pour démarrer la vidéo');
+                        }
+                    });
+                } else {
+                    console.error('Vidéo non trouvée avec ID:', videoId);
+                }
+            });
+        });
+        
+        // Gestion de la fin de lecture
+        document.querySelectorAll('.video-player').forEach(function(video) {
+            video.addEventListener('ended', function() {
+                console.log('Vidéo terminée');
+                // Optionnel: Revenir à la miniature après la fin
+                // const thumbnail = document.querySelector('[data-video-id="' + this.id + '"]');
+                // if (thumbnail) {
+                //     this.classList.add('hidden');
+                //     thumbnail.classList.remove('hidden');
+                // }
+            });
+        });
+        
+        // Animation au scroll pour les cartes vidéo
+        const videoCards = document.querySelectorAll('.video-card');
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                    cardObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        videoCards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            cardObserver.observe(card);
+        });
+    });
+</script>
+
 
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initialisation du lecteur vidéo...');
-    
-    // Gestion des clics sur les miniatures
-    document.querySelectorAll('.video-thumbnail').forEach(function(thumbnail) {
-        thumbnail.addEventListener('click', function() {
-            const videoId = this.getAttribute('data-video-id');
-            console.log('Miniature cliquée, vidéo ID:', videoId);
-            
-            const videoElement = document.getElementById(videoId);
-            
-            if (videoElement) {
-                console.log('Élément vidéo trouvé, démarrage...');
-                
-                // 1. Masquer la miniature
-                this.classList.add('hidden');
-                
-                // 2. Afficher la vidéo
-                videoElement.classList.remove('hidden');
-                
-                // 3. Lancer la lecture
-                videoElement.play().then(() => {
-                    console.log('Vidéo en lecture');
-                }).catch(error => {
-                    console.error('Erreur de lecture:', error);
-                    // Si autoplay échoue, afficher un message
-                    if (error.name === 'NotAllowedError') {
-                        alert('Cliquez sur le bouton play pour démarrer la vidéo');
-                    }
-                });
-            } else {
-                console.error('Vidéo non trouvée avec ID:', videoId);
-            }
-        });
-    });
-    
-    // Gestion de la fin de lecture
-    document.querySelectorAll('.video-player').forEach(function(video) {
-        video.addEventListener('ended', function() {
-            console.log('Vidéo terminée');
-            // Optionnel: Revenir à la miniature après la fin
-            // const thumbnail = document.querySelector('[data-video-id="' + this.id + '"]');
-            // if (thumbnail) {
-            //     this.classList.add('hidden');
-            //     thumbnail.classList.remove('hidden');
-            // }
-        });
-    });
-    
-    // Animation au scroll pour les cartes vidéo
-    const videoCards = document.querySelectorAll('.video-card');
-    const cardObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                setTimeout(() => {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }, index * 100);
-                cardObserver.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
-    
-    videoCards.forEach(card => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        cardObserver.observe(card);
-    });
-});
-</script>
-
 
 {% endblock %}
-

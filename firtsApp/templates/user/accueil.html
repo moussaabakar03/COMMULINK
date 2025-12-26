@@ -481,7 +481,7 @@
                                 <div class="col-lg-7 pt-5">
                                     <h1 class="display-4 text-white mb-3 animated slideInDown">Connecter. Organiser. Valoriser.</h1>
                                     <p class="fs-5 text-white-50 mb-5 animated slideInDown">Une communauté unie et connectée, c’est maintenant possible avec CommuLink.</p>
-                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="">
+                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
                                         S'inscrire
                                         <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
                                             <i class="fa fa-arrow-right"></i>
@@ -606,7 +606,7 @@
     <div class="container-xxl bg-light my-5 py-5" id = "evenements">
         <div class="container py-5">
             <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                <h1 class="display-6 mb-5">Nos événements</h1>
+                <h1 class="display-6 mb-5">NOS CATÉGORIES D'ÉVÉNEMENTS</h1>
             </div>
             <div class="row g-4 justify-content-center">
                 {% for type_evenement in typeEvenement %}
@@ -658,7 +658,7 @@
                         <div class="swiper-slide">
                             <div class="team-item position-relative rounded overflow-hidden">
                                 <div class="overflow-hidden">
-                                    {% if equipe.image != None %}
+                                    {% if equipe.image %}
                                         <img class="img-fluid" style="width:100%; height: 345px; object-fit: cover;" src="{{ equipe.image.url }}" alt="image {{ equipe.role }}">
                                     {% else %}
                                         <div class="no-image">

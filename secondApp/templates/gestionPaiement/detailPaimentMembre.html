@@ -665,11 +665,12 @@
             
             <!-- Pied de page -->
             <div class="payment-footer">
-                <a href="{% url 'paiementParEvenement' paiement.evenement.id %}" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Retour à la liste
-                </a>
-
                 <div class="action-buttons">
+                    
+                    <a href="{% url 'paiementParEvenement' paiement.evenement.id %}" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+
                     <a href="{% url 'modifierPaiement' paiement.id %}" class="btn-action btn-edit">
                         <i class="fas fa-edit"></i> Modifier
                     </a>
@@ -679,6 +680,7 @@
                         onclick="return confirm('Voulez-vous vraiment supprimer ce paiement ? Cette action est irréversible.');">
                         <i class="fas fa-trash-alt"></i> Supprimer
                     </a>
+
                 </div>
             </div>
         </div>

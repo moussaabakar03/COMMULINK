@@ -410,9 +410,9 @@
         <div class="auth-card fade-in">
             <div class="auth-header">
                 {% if messages %}
-                {% for message in messages %}
-                    <span style="color: red!important;">{{message}}</span>
-                {% endfor %}
+                    {% for message in messages %}
+                        <span style="color: red!important;">{{message}}</span>
+                    {% endfor %}
                 {% endif %}
                 <h2>Réinscription</h2>
                 <p>Complétez vos informations pour vous réinscrire à COMMULINK</p>
@@ -498,7 +498,7 @@
 
                 <!-- Filière -->
                 <div class="form-group">
-                    <label for="{{ form.filiere.id_for_label }}">Filière</label>
+                    <label for="{{ form.filiere.id_for_label }}">Filière(Spécialité)</label>
                     <div class="form-control">
                         <span class="form-icon">📘</span>
                         {{ form.filiere }}

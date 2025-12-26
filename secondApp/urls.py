@@ -41,6 +41,17 @@ urlpatterns = [
     path('reinscriptions/ajouter/', views.ajouter_reinscription, name='ajouter_reinscription'),
     path('reinscriptions/<int:pk>/supprimer/', views.supprimer_reinscription, name='supprimer_reinscription'),
 
+    path('membres/export-pdf/', views.exporter_membres_pdf, name='exporter_membres_pdf'),
+    path('membres/export-csv/', views.exporter_membres_csv, name='exporter_membres_csv'),
+    
+    
+    path('membres/<int:pk>/valider/', views.valider_membre, name='valider_membre'),
+    path('membres/<int:pk>/refuser/', views.refuser_membre, name='refuser_membre'),
+    
+    path('bloquer-membre/<int:pk>/refuser/', views.bloquerMembre, name='bloquerMembre'),
+    path('debloquer-membre/<int:pk>/refuser/', views.debloquerMembre, name='debloquerMembre'),
+    
+    path('membres/valider-tous/', views.valider_tous_en_attente, name='valider_tous_en_attente'),
     
     
     path('ajoutMembreEquipe/', views.ajoutMembreEquipe, name='ajoutMembreEquipe'),
@@ -57,6 +68,7 @@ urlpatterns = [
     path('annonces/publier/<int:id>/', views.publier_annonce, name='publier_annonce'),
     path('annonces/supprimer/<int:id>/', views.supprimer_annonce, name='supprimer_annonce'),
 
+    path('annonces/depublier/<int:id>/', views.depublier_annonce, name='depublier_annonce'),
 
 
     #-----------------------------URLS Annees------------------------------------
@@ -74,6 +86,7 @@ urlpatterns = [
     path('<int:pk>/ajout-Paiement-Evenement/', views.ajoutPaiementEvenement, name='ajoutPaiementEvenement'),
     path('<int:pk>/detail-paiment-membre/', views.detailPaimentMembre, name='detailPaimentMembre'),
     path('<int:pk_membre>/<int:pk_evenement>/supprimer-paiement/', views.supprimer_paiement, name='supprimer_paiement'),
+    path('<int:pk>/supprimer-Paiement/', views.supprimerPaiement, name='supprimerPaiement'),
     
     
     
