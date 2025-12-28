@@ -26,4 +26,6 @@ urlpatterns = [
     path('profil/modifier/', views.modifier_profil, name='modifier_profil'),
     path('profil/modifier-photo/', views.modifier_photo_profil, name='modifier_photo_profil'),
     
+    path('equipes-dirigeantes/', views.liste_equipes_dirigeantes, name='liste_equipes_dirigeantes_public'),
+
 ]

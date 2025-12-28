@@ -46,6 +46,16 @@
         </div>
         
         <div class="form-group">
+            <label for="annee">Année</label>
+            <select id="annee" name="annee" required>
+                <option value="">Sélectionnez une année</option>
+                {% for annee in annees %}
+                    <option value="{{ annee.id }}">{{ annee }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
             <label for="facebook">Les réseaux sociaux</label>
             <input type="text" id="facebook" name="facebook" placeholder="Entrez le lien Facebook" required>
             <input type="text" id="instagram" name="instagram" placeholder="Entrez le lien Instagram" required>
@@ -63,7 +73,12 @@
             </div>
         </div>
         
-        <button type="submit">Envoyer</button>
+        <div class="alert alert-info">
+            <strong>Note :</strong> Le membre sera créé comme "Non publié" par défaut. 
+            Vous pourrez le publier depuis la liste des membres.
+        </div>
+        
+        <button type="submit">Enregistrer</button>
     </form>
 </div>
 

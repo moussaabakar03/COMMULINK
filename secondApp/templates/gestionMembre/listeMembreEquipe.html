@@ -5,8 +5,6 @@
 {% block title %}Liste membres{% endblock %}
 
 {% block style %}
-
-
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
-    <link href="{% static 'user/lib//animate/animate.min.css" rel="stylesheet'%}">
+    <link href="{% static 'user/lib//animate/animate.min.css' %}" rel="stylesheet">
     <link href="{% static 'user/lib//owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
@@ -29,10 +27,8 @@
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 
-
     {% comment %} css pour la page {% endcomment %}
     <link rel="stylesheet" href="{% static 'assets/css/membres/listeMembre.css' %}" />
-
 {% endblock %}
 
 {% block body %}
@@ -46,25 +42,80 @@
 
     <div class="page-inner">
         <div class="container-custom">
-            <!-- Barre de recherche -->
+            
+            <!-- Barre de recherche et filtres -->
             <div class="search-section">
-                <form method="get" class="search-bar">
-                    <input type="text" name="search" 
-                        placeholder="Rechercher un membre par nom, email ou téléphone..." 
-                        value="{{ search_query }}">
-                    <button type="submit" class="search-button">
-                        <i class="fas fa-search"></i> Rechercher
-                    </button>
+                 <form method="get" class="search-bar">
+                    <div style="display: block;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <!-- Filtre par année -->
+                            <select name="annee" class="filter-select">
+                                <option value="">Toutes les années</option>
+                                {% for annee in annees %}
+                                    <option value="{{ annee.id }}">
+                                        {{ annee }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            <!-- Filtre par statut -->
+                            <select name="statut" class="filter-select">
+                                <option value="">Tous les statuts</option>
+                                <option value="publie">✅ Publiés</option>
+                                <option value="non_publie">❌ Non publiés</option>
+                            </select>
+
+                            <!-- Recherche -->
+                            <input type="text" name="search" 
+                                placeholder="Rechercher un membre par nom, rôle..." 
+                                value="">
+                        </div>
+                    </div>
+
+                    <div class="d-flex" style="gap: 10px;">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                      
+                    </div>
                 </form>
             </div>
+
+            <!-- Actions groupées si année sélectionnée -->
+            {% if annee_selectionnee %}
+                <div style="margin: 20px 0; padding: 15px; background: #fff3cd; border-radius: 8px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <span style="font-weight: 600;">Actions pour {{ annee_selectionnee }} :</span>
+                    <a href="{% url 'publier_tous_membres_annee' annee_selectionnee.id %}" 
+                       class="btn-details" 
+                       style="background: #28a745; color: white; padding: 8px 16px;"
+                       onclick="return confirm('Voulez-vous publier tous les membres de {{ annee_selectionnee }} ?')">
+                        <i class="fas fa-check-circle"></i> Publier tous
+                    </a>
+                    <a href="{% url 'depublier_tous_membres_annee' annee_selectionnee.id %}" 
+                       class="btn-details"
+                       style="background: #ffc107; color: #000; padding: 8px 16px;"
+                       onclick="return confirm('Voulez-vous dépublier tous les membres de {{ annee_selectionnee }} ?')">
+                        <i class="fas fa-ban"></i> Dépublier tous
+                    </a>
+                </div>
+            {% endif %}
+
+            <!-- Bouton ajout -->
+            {% comment %} <div style="margin-bottom: 20px;">
+                <a href="{% url 'ajoutMembreEquipe' %}" class="btn-details" style="background: #e98513; color: white; padding: 10px 20px;">
+                    <i class="fas fa-plus-circle"></i> Ajouter un membre
+                </a>
+            </div> {% endcomment %}
 
             <!-- Tableau des membres -->
             <div class="table-responsive">
                 <table class="members-table">
                     <thead>
                         <tr>
-                            <th> Nom & Prenom</th>
+                            <th>Nom & Prenom</th>
                             <th>Rôle</th>
+                            <th>Année</th>
+                            <th>Statut(Publier/Non)</th>
                             <th>Réseaux sociaux</th>
                             <th>Photo</th>
                             <th>Actions</th>
@@ -72,7 +123,7 @@
                     </thead>
                     <tbody>
                         {% for membre in page_obj %}
-                        <tr>
+                        <tr {% if not membre.est_publie %}style="background-color: #fff3cd; opacity: 0.9;"{% endif %}>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="member-avatar me-2">
@@ -83,35 +134,69 @@
                             </td>
                             <td>{{ membre.role }}</td>
                             <td>
-                                <a href="{{  membre.lienFacebook }}" class="btn-details"><i class="fab fa-facebook"></i></a>
-                                <a href="{{  membre.lienInstagram }}" class="btn-details"><i class="fab fa-twitter"></i></a>
-                                <a href="{{  membre.lienTwitter }}" class="btn-details"><i class="fab fa-instagram"></i></a>
+                                <span style="background: #6c757d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px;">
+                                    {{ membre.annee }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if membre.est_publie %}
+                                    <span style="background: #28a745; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px;">
+                                        ✅
+                                    </span>
+                                {% else %}
+                                    <span style="background: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px;">
+                                        ❌ 
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ membre.lienFacebook }}" class="btn-details" target="_blank"><i class="fab fa-facebook"></i></a>
+                                <a href="{{ membre.lienInstagram }}" class="btn-details" target="_blank"><i class="fab fa-instagram"></i></a>
+                                <a href="{{ membre.lienTwitter }}" class="btn-details" target="_blank"><i class="fab fa-twitter"></i></a>
                             </td>
                             <td>
                                 {% if membre.image %}
-                                    <a href="{{ membre.image.url }}"> <img src="{{  membre.image.url }}" alt = "{{  membre.image.url }}" 
-                                    style = "width: 60px; height: 60px; border-radius: 35%; object-fit: cover; border: 2px solid #e98513ff);"/> </a>
+                                    <a href="{{ membre.image.url }}" target="_blank"> 
+                                        <img src="{{ membre.image.url }}" alt="{{ membre.nom }}" 
+                                        style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #e98513;"/> 
+                                    </a>
                                 {% else %}
-                                    <img src="" class = "fa fa-user"/>
+                                    <i class="fas fa-user fa-2x text-muted"></i>
                                 {% endif %}
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                   <a href="{% url 'supprimer_MembreEquipe' membre.pk %}"
+                                    <!-- Publier/Dépublier -->
+                                    <a href="{% url 'toggle_publication_membre' membre.pk %}"
+                                       class="btn-details"
+                                       title="{% if membre.est_publie %}Dépublier{% else %}Publier{% endif %}"
+                                       style="background: {% if membre.est_publie %}#ffc107{% else %}#28a745{% endif %}; color: {% if membre.est_publie %}#000{% else %}#fff{% endif %};"
+                                       onclick="return confirm('Voulez-vous {% if membre.est_publie %}dépublier{% else %}publier{% endif %} ce membre ?')">
+                                        {% if membre.est_publie %}
+                                            <i class="fas fa-eye-slash"></i>
+                                        {% else %}
+                                            <i class="fas fa-eye"></i>
+                                        {% endif %}
+                                    </a>
+                                    
+                                    <!-- Modifier -->
+                                    <a href="{% url 'modification_MembreEquipeDirigeante' membre.pk %}" class="btn-details" title="Modifier">
+                                        <i class="fas fa-edit"></i> 
+                                    </a>
+                                    
+                                    <!-- Supprimer -->
+                                    <a href="{% url 'supprimer_MembreEquipe' membre.pk %}"
                                         class="btn-details"
                                         title="Supprimer"
                                         onclick="return confirm('Voulez-vous vraiment supprimer ce membre de l\'équipe dirigeante ?')">
                                         <i class="fas fa-trash-alt"></i> 
-                                    </a>
-                                    <a href="{% url 'modification_MembreEquipeDirigeante' membre.pk %}" class="btn-details" title = "Modifier">
-                                        <i class="fas fa-edit"></i> 
                                     </a>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4">
+                            <td colspan="7">
                                 <div class="empty-state">
                                     <i class="fas fa-users"></i>
                                     <h3>Aucun membre de l'equipe trouvé</h3>
@@ -131,7 +216,7 @@
                     <ul class="pagination">
                         {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page=1&search={{ search_query }}">
+                            <a class="page-link" href="?page=1&search={{ search_query }}&annee={{ request.GET.annee }}&statut={{ statut }}">
                                 <i class="fas fa-angle-double-left"></i>
                             </a>
                         </li>
@@ -144,14 +229,14 @@
                             </li>
                             {% else %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}&search={{ search_query }}">{{ num }}</a>
+                                <a class="page-link" href="?page={{ num }}&search={{ search_query }}&annee={{ request.GET.annee }}&statut={{ statut }}">{{ num }}</a>
                             </li>
                             {% endif %}
                         {% endfor %}
                         
                         {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}&annee={{ request.GET.annee }}&statut={{ statut }}">
                                 <i class="fas fa-angle-double-right"></i>
                             </a>
                         </li>
@@ -163,8 +248,17 @@
         </div>
     </div>
 
+    <style>
+        /* Styles minimaux ajoutés */
+        .filter-select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+    </style>
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
 {% endblock %}

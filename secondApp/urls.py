@@ -59,7 +59,10 @@ urlpatterns = [
     path('<int:pk>/modification-MembreEquipeDirigeante/', views.modification_MembreEquipeDirigeante, name='modification_MembreEquipeDirigeante'),
     path('<int:pk>/supprimer-MembreEquipe/', views.supprimer_MembreEquipe, name='supprimer_MembreEquipe'),
     
-    
+      # Publication/Dépublication
+    path('equipe/toggle-publication/<int:pk>/', views.toggle_publication_membre, name='toggle_publication_membre'),
+    path('equipe/publier-annee/<int:annee_id>/', views.publier_tous_membres_annee, name='publier_tous_membres_annee'),
+    path('equipe/depublier-annee/<int:annee_id>/', views.depublier_tous_membres_annee, name='depublier_tous_membres_annee'),
 
     #------------------------URLS ANNONCES------------------------------------
     path('annonces/', views.liste_annonces, name='liste_annonces'),

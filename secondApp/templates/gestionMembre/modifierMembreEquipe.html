@@ -44,15 +44,6 @@
 
 <div class="form-container">
     <h1>Formulaire Modification membre Équipe</h1>
-    
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
     <form class="new-added-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
@@ -67,6 +58,18 @@
         </div>
         
         <div class="form-group">
+            <label for="annee">Année</label>
+            <select id="annee" name="annee" required>
+                <option value="">Sélectionnez une année</option>
+                {% for annee in annees %}
+                    <option value="{{ annee.id }}" {% if membre.annee.id == annee.id %}selected{% endif %}>
+                        {{ annee }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
             <label for="facebook">Les réseaux sociaux</label>
             <input type="text" id="facebook" name="facebook" value="{{ membre.lienFacebook }}" placeholder="Entrez le lien Facebook" required>
             <input type="text" id="instagram" name="instagram" value="{{ membre.lienInstagram }}" placeholder="Entrez le lien Instagram" required>
@@ -77,7 +80,7 @@
             <label>Photo actuelle</label>
             {% if membre.image %}
                 <div class="current-image">
-                    <img src="{{ membre.image.url }}" alt="{{ membre.nom }}">
+                    <img src="{{ membre.image.url }}" alt="{{ membre.nom }}" style="max-width: 200px;">
                     <p>Photo actuelle du membre</p>
                 </div>
             {% endif %}
@@ -94,7 +97,7 @@
         
         <div class="button-group">
             <button type="submit">Mettre à jour</button>
-            <a type="button"  href="{% url 'liste_EquipeDirigeante' %}" class="btn btn-danger w-100 mt-3">Annuler</a>
+            <a href="{% url 'liste_EquipeDirigeante' %}" class="btn btn-danger w-100 mt-3">Annuler</a>
         </div>
     </form>
 </div>

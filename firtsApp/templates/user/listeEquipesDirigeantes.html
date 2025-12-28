@@ -1,0 +1,375 @@
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block body %}
+    <style type="text/css">
+        .fadeIn{
+            background-color: rgba(128, 12, 12, 0.07);
+        }
+        .contacts{
+            margin-top: 55px;
+        }
+        .headerNav nav{
+            background-color: #001D23;
+        }
+
+        .headerNav .header, .headerNav .header div small, .headerNav .header div a i {
+            background-color: white;
+            color: #FF6F0F;
+        }
+        
+        .hero-header {
+            background: linear-gradient(135deg, #001D23 0%, #E55A00 100%);
+            padding: 100px 0;
+            color: white;
+            margin-top: 100px;
+        }
+
+        :root {
+            --primary-color: #E55A00;
+            --secondary-color: #001D23;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+            --accent-color: #f59e0b;
+        }
+
+        /* Section année */
+        .year-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+
+        .year-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-family: 'Saira', sans-serif;
+        }
+
+        .year-description {
+            text-align: center;
+            color: #64748b;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Team cards styling */
+        .team-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .team-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .team-item img {
+            transition: transform 1s ease;
+        }
+
+        .team-item:hover img {
+            transform: scale(1.05);
+        }
+
+        img{
+            transition: 1s;
+        }
+
+        img:hover{
+            transform: scale(1.05);
+        }
+
+        .no-image {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            height: 345px;
+        }
+
+        /* Swiper customization */
+        .myTeamSwiper {
+            padding: 20px 0 60px;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            background: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+            font-size: 20px;
+            font-weight: bold;
+        }
+       
+        /* Wave separator */
+        .wave-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+        .wave-container svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 120px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-header .display-4 {
+                font-size: 2.5rem;
+            }
+            
+            .year-title {
+                font-size: 2rem;
+            }
+
+            .team-item img {
+                height: 250px !important;
+            }
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 40px !important;
+                height: 40px !important;
+            }
+
+            .swiper-button-next::after,
+            .swiper-button-prev::after {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Badge animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .badge.bg-danger {
+            animation: pulse 2s infinite;
+        }
+    </style>
+
+    <!-- Hero Section Start -->
+    <div class="container-fluid hero-header bg-primary py-5 mb-5">
+        <div class="container py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 text-white mb-3 animated slideInDown">Notre Équipe Dirigeante</h1>
+                    <p class="fs-5 text-white mb-4 animated slideInDown">
+                        Découvrez les membres passionnés qui guident notre communauté. 
+                        Ensemble, nous construisons un avenir meilleur et créons des opportunités pour tous.
+                    </p>
+                    <div class="d-flex gap-3 animated slideInDown">
+                        <a href="#equipes" class="btn btn-light btn-lg rounded-pill py-3 px-5">
+                            <i class="fas fa-users me-2"></i>Découvrir
+                        </a>
+                    </div>
+                    
+                    {% comment %} <div class="row mt-5 pt-4">
+                        <div class="col-6 animated fadeIn" data-wow-delay="0.1s">
+                            <div class="text-center">
+                                <h2 class="display-6 mb-0" style="color: red!important;">{{ total_annees|default:"0" }}</h2>
+                                <p class="text-light mb-0">Années</p>
+                            </div>
+                        </div>
+                        <div class="col-6 animated fadeIn" data-wow-delay="0.3s">
+                            <div class="text-center">
+                                <h2 class="text-white display-6 mb-0">{{ total_membres|default:"0" }}</h2>
+                                <p class="text-light mb-0">Membres</p>
+                            </div>
+                        </div>
+                    </div> {% endcomment %}
+                </div>
+                <div class="col-lg-6 animated fadeIn">
+                    <div class="position-relative">
+                        {% comment %} <img class="img-fluid rounded-4 shadow-lg" 
+                             src="{% static 'user/img/about.jpg' %}" 
+                             alt="Équipe Dirigeante"
+                             style="height: 400px; width: 100%; object-fit: cover;"> {% endcomment %}
+
+                        <div class="row mt-5 pt-4">
+                            <div class="col-6 animated fadeIn" data-wow-delay="0.1s">
+                                <div class="text-center">
+                                    <h2 class="text-white display-6 mb-0">{{ total_annees|default:"0" }}</h2>
+                                    <p class="text-light mb-0">Années</p>
+                                </div>
+                            </div>
+                            <div class="col-6 animated fadeIn" data-wow-delay="0.3s">
+                                <div class="text-center">
+                                    <h2 class="text-white display-6 mb-0">{{ total_membres|default:"0" }}</h2>
+                                    <p class="text-light mb-0">Membres</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary rounded-4" 
+                             style="opacity: 0.1; z-index: -1;"></div>
+                        <!-- Floating elements -->
+                        <div class="position-absolute top-0 end-0 mt-4 me-4">
+                            <div class="bg-white rounded-circle p-3 shadow">
+                                <i class="fas fa-users text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 mb-4 ms-4">
+                            <div class="bg-light rounded-circle p-3 shadow">
+                                <i class="fas fa-award text-primary fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wave separator -->
+        <div class="wave-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120">
+                <path fill="#ffffff" fill-opacity="1" d="M0,64L80,58.7C160,53,320,43,480,48C640,53,800,75,960,74.7C1120,75,1280,53,1360,42.7L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
+            </svg>
+        </div>
+    </div>
+    <!-- Hero Section End -->
+
+    <!-- Teams by Year Start -->
+    <div id="equipes">
+        {% for annee, membres in equipes_par_annee.items %}
+            <!-- Year Section -->
+            <div class="year-section">
+                <div class="container">
+                    <h2 class="year-title wow fadeInUp" data-wow-delay="0.1s">
+                        <i class="fas fa-calendar-alt me-3"></i>{{ annee }}
+                    </h2>
+                    <p class="year-description wow fadeInUp" data-wow-delay="0.2s">
+                        Découvrez l'équipe dirigeante de l'année {{ annee }}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Team Carousel -->
+            <div class="container-xxl py-5">
+                <div class="container">
+                    <div class="swiper myTeamSwiper-{{ forloop.counter }}">
+                        <div class="swiper-wrapper">
+                            {% for membre in membres %}
+                                <div class="swiper-slide">
+                                    <div class="team-item position-relative rounded overflow-hidden shadow">
+                                        <div class="overflow-hidden">
+                                            {% if membre.image %}
+                                                <img class="img-fluid" 
+                                                     style="width:100%; height: 345px; object-fit: cover;" 
+                                                     src="{{ membre.image.url }}" 
+                                                     alt="{{ membre.nom }}">
+                                            {% else %}
+                                                <div class="no-image">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="team-text bg-light text-center p-4">
+                                            <h5>{{ membre.nom }}</h5>
+                                            <p class="text-primary mb-3">{{ membre.role }}</p>
+                                            <div class="team-social text-center">
+                                                <a class="btn btn-square" href="{{ membre.lienFacebook }}" target="_blank">
+                                                    <i class="fab fa-facebook-f"></i>
+                                                </a>
+                                                <a class="btn btn-square" href="{{ membre.lienInstagram }}" target="_blank">
+                                                    <i class="fab fa-instagram"></i>
+                                                </a>
+                                                <a class="btn btn-square" href="{{ membre.lienTwitter }}" target="_blank">
+                                                    <i class="fab fa-twitter"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Navigation buttons -->
+                        <div class="swiper-button-next" style="color: rgba(234, 95, 9, 0.8); font-weight: bold;"></div>
+                        <div class="swiper-button-prev" style="color: rgba(234, 95, 9, 0.8); font-weight: bold;"></div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="container py-5">
+                <div class="text-center">
+                    <div class="alert alert-info wow fadeInUp">
+                        <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                        <h4 class="alert-heading">Aucune équipe disponible</h4>
+                        <p class="mb-0">Il n'y a pas d'équipes dirigeantes à afficher pour le moment.</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Teams by Year End -->
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Swiper for each year
+            {% for annee, membres in equipes_par_annee.items %}
+                new Swiper('.myTeamSwiper-{{ forloop.counter }}', {
+                    slidesPerView: 1,
+                    spaceBetween: 30,
+                    loop: {{ membres|length|add:"0" }} > 3,
+                    navigation: {
+                        nextEl: '.myTeamSwiper-{{ forloop.counter }} .swiper-button-next',
+                        prevEl: '.myTeamSwiper-{{ forloop.counter }} .swiper-button-prev',
+                    },
+                    breakpoints: {
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 20,
+                        },
+                        992: {
+                            slidesPerView: 3,
+                            spaceBetween: 30,
+                        },
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                });
+            {% endfor %}
+
+            // Smooth scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href.startsWith('#') && href !== '#') {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

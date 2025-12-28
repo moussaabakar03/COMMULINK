@@ -2162,32 +2162,86 @@ def supprimer_reinscription(request, pk):
 
 
 
+# @login_required
+# @admin_required
+# def liste_EquipeDirigeante(request):
+#     # Récupérer la requête de recherche
+#     search_query = request.GET.get('search', '').strip()
+    
+#     # Filtrer les membres selon la recherche
+#     if search_query:
+#         membres = EquipeDirigeante.objects.filter(
+#             Q(nom__icontains=search_query) | 
+#             Q(role__icontains=search_query) |
+#             Q(lienFacebook__icontains=search_query) |
+#             Q(lienTwitter__icontains=search_query) |
+#             Q(lienInstagram__icontains=search_query)
+#         ).order_by('nom')
+#     else:
+#         membres = EquipeDirigeante.objects.all().order_by('nom')
+    
+#     # Pagination (10 membres par page)
+#     paginator = Paginator(membres, 5)
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+    
+#     return render(request, 'gestionMembre/listeMembreEquipe.html', {
+#         'page_obj': page_obj,
+#         'search_query': search_query,
+#     })
+
+
+
 @login_required
 @admin_required
 def liste_EquipeDirigeante(request):
-    # Récupérer la requête de recherche
+    # Récupérer les paramètres de recherche et filtre
     search_query = request.GET.get('search', '').strip()
+    annee_id = request.GET.get('annee', '').strip()
+    statut = request.GET.get('statut', '').strip()  # 'publie', 'non_publie', ou ''
     
-    # Filtrer les membres selon la recherche
+    # Commencer avec tous les membres
+    membres = EquipeDirigeante.objects.all()
+    
+    # Filtrer par année si sélectionnée
+    annee_selectionnee = None
+    if annee_id:
+        annee_selectionnee = get_object_or_404(Annee, id=annee_id)
+        membres = membres.filter(annee=annee_selectionnee)
+    
+    # Filtrer par statut de publication
+    if statut == 'publie':
+        membres = membres.filter(est_publie=True)
+    elif statut == 'non_publie':
+        membres = membres.filter(est_publie=False)
+    
+    # Filtrer selon la recherche
     if search_query:
-        membres = EquipeDirigeante.objects.filter(
+        membres = membres.filter(
             Q(nom__icontains=search_query) | 
             Q(role__icontains=search_query) |
             Q(lienFacebook__icontains=search_query) |
             Q(lienTwitter__icontains=search_query) |
             Q(lienInstagram__icontains=search_query)
-        ).order_by('nom')
-    else:
-        membres = EquipeDirigeante.objects.all().order_by('nom')
+        )
     
-    # Pagination (10 membres par page)
+    # Ordonner par année (plus récente d'abord) puis par nom
+    membres = membres.order_by('-annee__id', 'nom')
+    
+    # Pagination (5 membres par page)
     paginator = Paginator(membres, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Récupérer toutes les années pour le filtre
+    annees = Annee.objects.all().order_by('-id')
+    
     return render(request, 'gestionMembre/listeMembreEquipe.html', {
         'page_obj': page_obj,
         'search_query': search_query,
+        'annees': annees,
+        'annee_selectionnee': annee_selectionnee,
+        'statut': statut,
     })
 
 @login_required
@@ -2200,35 +2254,59 @@ def ajoutMembreEquipe(request):
         facebook = request.POST.get('facebook')
         instagram = request.POST.get('instagram')
         twitter = request.POST.get('twitter')
+        annee_id = request.POST.get('annee')
         
+        # Récupérer l'année sélectionnée
+        annee = None
+        if annee_id:
+            annee = get_object_or_404(Annee, id=annee_id)
+        
+        # Créer l'utilisateur (inactif par défaut)
         utilisateur = Utilisateur.objects.create(
-            username = role,
-            password = make_password(role),
+            username=role,
+            password=make_password(role),
             role="membreEquipe",
-            is_active=True,
-            is_staff = True
+            is_active=False,  # Inactif par défaut
+            is_staff=True
         )
         
+        # Créer le membre (non publié par défaut)
         EquipeDirigeante.objects.create(
-            utilisateur = utilisateur, nom = nom, image = photo, role = role, lienFacebook = facebook, lienInstagram = instagram , lienTwitter = twitter
+            utilisateur=utilisateur,
+            annee=annee,
+            nom=nom,
+            image=photo,
+            role=role,
+            lienFacebook=facebook,
+            lienInstagram=instagram,
+            lienTwitter=twitter,
+            est_publie=False  # Non publié par défaut
         )
+        
+        messages.success(request, f'Membre ajouté avec succès ! Vous pouvez le publier depuis la liste.')
         return redirect("liste_EquipeDirigeante")
-    return render(request, 'gestionMembre/ajoutMembreEquipe.html')
+    
+    # Passer toutes les années au template
+    annees = Annee.objects.all().order_by('-id')
+    context = {
+        'annees': annees
+    }
+    return render(request, 'gestionMembre/ajoutMembreEquipe.html', context)
+
 
 @login_required
 @admin_required
 def modification_MembreEquipeDirigeante(request, pk):
-    # Récupérer le membre à modifier ou retourner 404 si non trouvé
     membre = get_object_or_404(EquipeDirigeante, pk=pk)
     
     if request.method == 'POST':
-        # Récupérer les données du formulaire
         nom = request.POST.get('nom')
         role = request.POST.get('role')
         facebook = request.POST.get('facebook')
         instagram = request.POST.get('instagram')
         twitter = request.POST.get('twitter')
         photo = request.FILES.get('photo')
+        annee_id = request.POST.get('annee')
         
         # Mettre à jour les champs
         membre.nom = nom
@@ -2237,29 +2315,101 @@ def modification_MembreEquipeDirigeante(request, pk):
         membre.lienInstagram = instagram
         membre.lienTwitter = twitter
         
-        # Mettre à jour la photo seulement si une nouvelle est fournie
+        # Mettre à jour l'année si sélectionnée
+        if annee_id:
+            membre.annee = get_object_or_404(Annee, id=annee_id)
+        
         if photo:
             membre.image = photo
         
+        # Mettre à jour l'utilisateur
         membre.utilisateur.username = role
         membre.utilisateur.password = make_password(role)
         membre.utilisateur.save()
         
-        # Sauvegarder les modifications
         membre.save()
         
-        # Message de succès (optionnel)
         messages.success(request, 'Membre modifié avec succès!')
-        
-        # Rediriger vers la liste
         return redirect("liste_EquipeDirigeante")
     
-    # Passer le membre au template pour pré-remplir le formulaire
+    # Passer toutes les années au template
+    annees = Annee.objects.all().order_by('-id')
     context = {
-        'membre': membre
+        'membre': membre,
+        'annees': annees
     }
-    
     return render(request, 'gestionMembre/modifierMembreEquipe.html', context)
+
+
+
+@login_required
+@admin_required
+def toggle_publication_membre(request, pk):
+    """
+    Publier ou dépublier un membre (inverse le statut)
+    """
+    membre = get_object_or_404(EquipeDirigeante, pk=pk)
+    
+    # Inverser le statut de publication
+    membre.est_publie = not membre.est_publie
+    membre.save()
+    
+    # Synchroniser avec is_active de l'utilisateur
+    membre.utilisateur.is_active = membre.est_publie
+    membre.utilisateur.save()
+    
+    # Message de confirmation
+    if membre.est_publie:
+        messages.success(request, f'{membre.nom} a été publié avec succès!')
+    else:
+        messages.info(request, f'{membre.nom} a été dépublié.')
+    
+    return redirect("liste_EquipeDirigeante")
+
+
+@login_required
+@admin_required
+def publier_tous_membres_annee(request, annee_id):
+    """
+    Publier tous les membres d'une année spécifique
+    """
+    annee = get_object_or_404(Annee, id=annee_id)
+    membres = EquipeDirigeante.objects.filter(annee=annee)
+    
+    count = 0
+    for membre in membres:
+        if not membre.est_publie:
+            membre.est_publie = True
+            membre.save()
+            membre.utilisateur.is_active = True
+            membre.utilisateur.save()
+            count += 1
+    
+    messages.success(request, f'{count} membre(s) de l\'année {annee} ont été publiés!')
+    return redirect("liste_EquipeDirigeante")
+
+
+@login_required
+@admin_required
+def depublier_tous_membres_annee(request, annee_id):
+    """
+    Dépublier tous les membres d'une année spécifique
+    """
+    annee = get_object_or_404(Annee, id=annee_id)
+    membres = EquipeDirigeante.objects.filter(annee=annee)
+    
+    count = 0
+    for membre in membres:
+        if membre.est_publie:
+            membre.est_publie = False
+            membre.save()
+            membre.utilisateur.is_active = False
+            membre.utilisateur.save()
+            count += 1
+    
+    messages.info(request, f'{count} membre(s) de l\'année {annee} ont été dépubliés!')
+    return redirect("liste_EquipeDirigeante")
+
 
 
 @login_required

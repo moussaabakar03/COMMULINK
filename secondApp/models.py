@@ -253,8 +253,8 @@ class EvenementVideo(models.Model):
     
 
 class EquipeDirigeante(models.Model):
-    
-    utilisateur = models.OneToOneField(Utilisateur, on_delete= models.CASCADE, null = True, blank= True, related_name= "equipeDirigeante")
+    utilisateur = models.OneToOneField(Utilisateur, on_delete=models.CASCADE, null=True, blank=True, related_name="equipeDirigeante")
+    annee = models.ForeignKey(Annee, on_delete=models.CASCADE, null=True, blank=True, related_name="equipeDirigeante")
     
     nom = models.CharField(max_length=100)
     role = models.CharField(max_length=100)
@@ -262,6 +262,20 @@ class EquipeDirigeante(models.Model):
     lienInstagram = models.CharField(max_length=100)
     lienTwitter = models.CharField(max_length=100)
     image = models.ImageField(upload_to='equipe')
+    
+    # Nouveau champ pour la publication
+    est_publie = models.BooleanField(default=False, verbose_name="Publié")
+    
+    class Meta:
+        verbose_name = "Équipe Dirigeante"
+        verbose_name_plural = "Équipes Dirigeantes"
+    
+    def __str__(self):
+        return f"{self.nom} - {self.role} ({self.annee})"
+
+
+    
+    
 
 
 class Temoingnage(models.Model):

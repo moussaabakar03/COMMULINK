@@ -74,7 +74,7 @@ def deconnexion(request):
 def index(request):
     evenements = Evenement.objects.all().order_by('id')[:5]
     typeEvenement = TypeEvenement.objects.all()
-    equipes = EquipeDirigeante.objects.all()
+    equipes = EquipeDirigeante.objects.filter(est_publie=True)
     temoingnages = Temoingnage.objects.all()
     return render(request, 'user/accueil.html', {'evenements': evenements, 'typeEvenement': typeEvenement, 'equipes': equipes, 'temoingnages': temoingnages})
 
@@ -372,5 +372,42 @@ def modifier_photo_profil(request):
             messages.error(request, f'Erreur lors de la mise à jour de la photo: {str(e)}')
     
     return redirect('profil_membre')
+
+
+
+from collections import OrderedDict
+
+def liste_equipes_dirigeantes(request):
+    """
+    Vue pour afficher toutes les équipes dirigeantes groupées par année
+    Seuls les membres publiés sont affichés
+    """
+    # Récupérer toutes les équipes publiées avec leur année
+    equipes_publiees = EquipeDirigeante.objects.filter(
+        # est_publie=True,
+        annee__isnull=False
+    ).select_related('annee').order_by('-annee__id', 'nom')
+    
+    # Grouper les équipes par année
+    equipes_par_annee = OrderedDict()
+    for equipe in equipes_publiees:
+        annee_str = str(equipe.annee)
+        if annee_str not in equipes_par_annee:
+            equipes_par_annee[annee_str] = []
+        equipes_par_annee[annee_str].append(equipe)
+    
+    # Statistiques
+    total_annees = len(equipes_par_annee)
+    total_membres = equipes_publiees.count()
+    
+    context = {
+        'equipes_par_annee': equipes_par_annee,
+        'total_annees': total_annees,
+        'total_membres': total_membres,
+    }
+    
+    return render(request, 'user/listeEquipesDirigeantes.html', context)
+
+
 
 
