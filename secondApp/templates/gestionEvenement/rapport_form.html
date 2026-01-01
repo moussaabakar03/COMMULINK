@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rapport - {{ evenement.titre }}{% endblock %}
+
+{% block style %}
+<style>
+    :root {
+        --primary: #1a2035;
+        --accent: #FF6F0F;
+    }
+    .rapport-card {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .rapport-title {
+        color: var(--primary);
+        font-weight: 700;
+    }
+    .btn-accent {
+        background-color: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+    .btn-accent:hover {
+        background-color: #e25f05;
+        border-color: #e25f05;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-inner">
+    <div class="container mt-4 rapport-card">
+        <div class="card card-round">
+            <div class="card-header">
+                <h4 class="rapport-title mb-0">
+                    Rapport pour : {{ evenement.titre }}
+                </h4>
+                <small class="text-muted">
+                    {% if creation %}Créer{% else %}Modifier{% endif %} le rapport d'évènement
+                </small>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'detailEvenement' evenement.id %}" class="btn btn-outline-secondary">
+                            Retour à l'évènement
+                        </a>
+                        <button type="submit" class="btn btn-accent">
+                            <i class="fas fa-save me-1"></i> Enregistrer le rapport
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

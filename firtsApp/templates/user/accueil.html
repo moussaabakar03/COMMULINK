@@ -443,12 +443,32 @@
                                 <div class="col-lg-7 pt-5">
                                     <h1 class="display-4 text-white mb-3 animated slideInDown">Connecter. Organiser. Valoriser.</h1>
                                     <p class="fs-5 text-white-50 mb-5 animated slideInDown">Une communauté unie et connectée, c’est maintenant possible avec CommuLink.</p>
-                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
-                                        S'inscrire
-                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
-                                            <i class="fa fa-arrow-right"></i>
-                                        </div>
-                                    </a>
+                                    
+                                    {% if user.is_authenticated %}
+                                        {% if user.role == "membreLambda"  %}
+                                            <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'profil_membre' %}">
+                                                Profil
+                                                <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                </div>
+                                            </a>
+                                        {% elif user.role == "membreEquipe" %}
+                                            <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'admin_dashboard' %}">
+                                                Dashboard
+                                                <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                </div>
+                                            </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
+                                            S'inscrire
+                                            <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                <i class="fa fa-arrow-right"></i>
+                                            </div>
+                                        </a>
+                                    {% endif %}
+
                                 </div>
                             </div>
                         </div>
@@ -462,12 +482,31 @@
                                 <div class="col-lg-7 pt-5">
                                     <h1 class="display-4 text-white mb-3 animated slideInDown">Solidarité. Fraternité. Reussite.</h1>
                                     <p class="fs-5 text-white-50 mb-5 animated slideInDown">Apprentissage, Reussite sont nos priorités.</p>
-                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
-                                        S'inscrire
-                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
-                                            <i class="fa fa-arrow-right"></i>
-                                        </div>
-                                    </a>
+                                    
+                                    {% if user.is_authenticated %}
+                                        {% if user.role == "membreLambda"  %}
+                                            <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'profil_membre' %}">
+                                                Profil
+                                                <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                </div>
+                                            </a>
+                                        {% elif user.role == "membreEquipe" %}
+                                            <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'admin_dashboard' %}">
+                                                Dashboard
+                                                <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                </div>
+                                            </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
+                                            S'inscrire
+                                            <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                <i class="fa fa-arrow-right"></i>
+                                            </div>
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -481,12 +520,31 @@
                                 <div class="col-lg-7 pt-5">
                                     <h1 class="display-4 text-white mb-3 animated slideInDown">Connecter. Organiser. Valoriser.</h1>
                                     <p class="fs-5 text-white-50 mb-5 animated slideInDown">Une communauté unie et connectée, c’est maintenant possible avec CommuLink.</p>
-                                    <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
-                                        S'inscrire
-                                        <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
-                                            <i class="fa fa-arrow-right"></i>
-                                        </div>
-                                    </a>
+                                    
+                                    {% if user.is_authenticated %}
+                                        {% if user.role == "membreLambda"  %}
+                                            <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'profil_membre' %}">
+                                                Profil
+                                                <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                </div>
+                                            </a>
+                                        {% elif user.role == "membreEquipe" %}
+                                            <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'admin_dashboard' %}">
+                                                Dashboard
+                                                <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                    <i class="fa fa-arrow-right"></i>
+                                                </div>
+                                            </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a class="btn btn-primary py-2 px-3 animated slideInDown" href="{% url 'inscription' %}">
+                                            S'inscrire
+                                            <div class="d-inline-flex btn-sm-square bg-white text-primary rounded-circle ms-2">
+                                                <i class="fa fa-arrow-right"></i>
+                                            </div>
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

@@ -35,6 +35,9 @@ from django.contrib.auth import authenticate, login, logout
 def connexion(request):
     next_url = request.GET.get("next")  
 
+    if request.user.is_authenticated:
+        return redirect('index') 
+    
     if request.method == "POST":
         form = ConnexionForm(request.POST, request=request)
 
@@ -92,9 +95,7 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 def inscription_membre(request):
-    """
-    Inscription publique - Crée une demande en attente de validation
-    """
+    
     if request.method == 'POST':
         form = MembreInscriptionForm(request.POST, request.FILES)
         
@@ -107,11 +108,6 @@ def inscription_membre(request):
             
             return redirect('index')
             
-            # return render(request, 'user/formulaireInscription.html', {
-            #     'form': form,
-            #     'titre': "Demande d'inscription"
-            # })
-        
         try:
             # Créer le membre avec statut "en_attente"
             membre = form.save(commit=False)
@@ -150,10 +146,6 @@ def inscription_membre(request):
                 "Cette adresse email est déjà utilisée. Veuillez en choisir une autre."
             )
             return redirect("index")
-            # return render(request, 'user/formulaireInscription.html', {
-            #     'form': form,
-            #     'titre': "Demande d'inscription"
-            # })
             
         except Exception as e:
             print(f"ERREUR: {str(e)}")
@@ -274,8 +266,6 @@ def profil_membre(request):
     return render(request, 'user/profil.html', context)
 
 
-    
-  
 
 
 @login_required

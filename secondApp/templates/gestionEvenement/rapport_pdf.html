@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport - {{ evenement.titre }}</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 11pt; }
+        h1, h2, h3 { color: #1a2035; }
+        h1 { font-size: 20pt; margin-bottom: 0; }
+        h2 { font-size: 14pt; margin-top: 20px; }
+        p { line-height: 1.4; }
+        .small { font-size: 9pt; color: #555; }
+        .section { margin-bottom: 10px; }
+        .label { font-weight: bold; }
+        .meta-table td { padding: 2px 6px; }
+    </style>
+</head>
+<body>
+    <h1>Rapport d'évènement</h1>
+    <p class="small">
+        Évènement : <strong>{{ evenement.titre }}</strong><br>
+        Date du rapport : {{ rapport.date_rapport|date:"d/m/Y H:i" }}<br>
+        {% if rapport.auteur %}Rédigé par : {{ rapport.auteur.get_full_name|default:rapport.auteur.username }}{% endif %}
+    </p>
+    <hr>
+
+    <h2>{{ rapport.titre }}</h2>
+
+    <div class="section">
+        <p class="label">Résumé :</p>
+        <p>{{ rapport.resume|linebreaks }}</p>
+    </div>
+
+    {% if rapport.objectifs %}
+    <div class="section">
+        <p class="label">Objectifs :</p>
+        <p>{{ rapport.objectifs|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    {% if rapport.deroulement %}
+    <div class="section">
+        <p class="label">Déroulement :</p>
+        <p>{{ rapport.deroulement|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    {% if rapport.points_positifs %}
+    <div class="section">
+        <p class="label">Points positifs :</p>
+        <p>{{ rapport.points_positifs|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    {% if rapport.points_a_ameliorer %}
+    <div class="section">
+        <p class="label">Points à améliorer :</p>
+        <p>{{ rapport.points_a_ameliorer|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    {% if rapport.recommandations %}
+    <div class="section">
+        <p class="label">Recommandations pour les prochains bureaux :</p>
+        <p>{{ rapport.recommandations|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    <h2>Données chiffrées</h2>
+    <table class="meta-table">
+        {% if rapport.nb_participants %}
+        <tr>
+            <td class="label">Nombre de participants :</td>
+            <td>{{ rapport.nb_participants }}</td>
+        </tr>
+        {% endif %}
+        {% if rapport.budget_prevu %}
+        <tr>
+            <td class="label">Budget prévu :</td>
+            <td>{{ rapport.budget_prevu }} FCFA</td>
+        </tr>
+        {% endif %}
+        {% if rapport.budget_depense %}
+        <tr>
+            <td class="label">Budget dépensé :</td>
+            <td>{{ rapport.budget_depense }} FCFA</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <hr>
+    <p class="small">
+        Exporté le {{ date_export|date:"d/m/Y H:i" }}{% if exporteur %} par {{ exporteur.get_full_name|default:exporteur.username }}{% endif %}.
+    </p>
+</body>
+</html>

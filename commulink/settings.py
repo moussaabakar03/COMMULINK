@@ -144,15 +144,21 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'alimoussaabakar003@gmail.com'
+# EMAIL_HOST_PASSWORD = 'ctdq fvqk ixoz iqkc'
+# DEFAULT_FROM_EMAIL = 'alimoussaabakar003@gmail.com'
+
+#Configuration de mon mail.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_HOST = 'smtp.gmail.com'  # ou autre (ex: smtp.mail.yahoo.com)
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'shalomgbekou84@gmail.com'
-EMAIL_HOST_PASSWORD = 'ctdq fvqk ixoz iqkc'
-DEFAULT_FROM_EMAIL = 'shalomgbekou84@gmail.com'
-
-
+EMAIL_HOST_USER = 'alimoussaabakar003@gmail.com'
+EMAIL_HOST_PASSWORD = 'yrbm kkbi flri yrgx'
 
 AUTH_USER_MODEL = 'secondApp.Utilisateur'
 

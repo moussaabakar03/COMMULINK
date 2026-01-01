@@ -316,28 +316,88 @@
                                     {{ form.telephone }}
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Section Adresse et Profession -->
-                    <div class="form-section">
-                        <h4 class="section-title">
-                            <i class="bi bi-geo-alt"></i>
-                            Adresse & Profession
-                        </h4>
-                        
-                        <div class="row g-4">
-                            <div class="col-12">
+                            
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="{{ form.adresse.id_for_label }}" class="form-label">Adresse</label>
                                     {{ form.adresse }}
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Identifiants de Connexion -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="bi bi-key"></i>
+                            Identifiants de Connexion
+                        </h4>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.nom_utilisateur.id_for_label }}" class="form-label">Nom d'utilisateur <span class="text-danger">*</span></label>
+                                    {{ form.nom_utilisateur }}
+                                    <div class="invalid-feedback">
+                                        Veuillez choisir un nom d'utilisateur.
+                                    </div>
+                                </div>
+                            </div>
                             
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.profession.id_for_label }}" class="form-label">Profession</label>
-                                    {{ form.profession }}
+                                    <label for="{{ form.mot_de_passe.id_for_label }}" class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                                    {{ form.mot_de_passe }}
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer un mot de passe.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Informations Académiques -->
+                    <div class="form-section">
+                        <h4 class="section-title">
+                            <i class="bi bi-mortarboard"></i>
+                            Informations Académiques
+                        </h4>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.niveauEtude.id_for_label }}" class="form-label">Niveau d'étude <span class="text-danger">*</span></label>
+                                    {{ form.niveauEtude }}
+                                    <div class="invalid-feedback">
+                                        Veuillez sélectionner votre niveau d'étude.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.ecole.id_for_label }}" class="form-label">École/Université <span class="text-danger">*</span></label>
+                                    {{ form.ecole }}
+                                    <div class="invalid-feedback">
+                                        Veuillez sélectionner votre établissement.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6" id="ecole-autre-container" style="display: none;">
+                                <div class="form-group">
+                                    <label for="{{ form.ecole_autre.id_for_label }}" class="form-label">Nom de l'établissement <span class="text-danger">*</span></label>
+                                    {{ form.ecole_autre }}
+                                    <div class="invalid-feedback">
+                                        Veuillez préciser le nom de votre établissement.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.filiere.id_for_label }}" class="form-label">Filière (Spécialité)</label>
+                                    {{ form.filiere }}
                                 </div>
                             </div>
                             
@@ -345,27 +405,6 @@
                                 <div class="form-group">
                                     <label for="{{ form.numeroUrgence.id_for_label }}" class="form-label">Numéro d'urgence</label>
                                     {{ form.numeroUrgence }}
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="{{ form.niveauEtude.id_for_label }}" class="form-label">Niveau d'étude</label>
-                                    {{ form.niveauEtude }}
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="{{ form.filiere.id_for_label }}" class="form-label">Filière(Spécialité)</label>
-                                    {{ form.filiere }}
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="{{ form.ecole.id_for_label }}" class="form-label">École/Université</label>
-                                    {{ form.ecole }}
                                 </div>
                             </div>
                         </div>
@@ -413,6 +452,14 @@
                                     {{ form.keribourBa }}
                                 </div>
                             </div>
+                            
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.toute_info_sur_identite.id_for_label }}" class="form-label">Informations supplémentaires sur l'identité</label>
+                                    {{ form.toute_info_sur_identite }}
+                                    {% comment %} <small class="form-text text-muted">Ajoutez toute information complémentaire concernant votre identité</small> {% endcomment %}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -433,7 +480,7 @@
                             
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="{{ form.notes.id_for_label }}" class="form-label">Informations supplémentaires</label>
+                                    <label for="{{ form.notes.id_for_label }}" class="form-label">Remarques</label>
                                     {{ form.notes }}
                                 </div>
                             </div>
@@ -455,24 +502,57 @@
     </div>
 </div>
 
-<!-- Script pour la validation côté client -->
-<script>
-// Validation Bootstrap (client-side)
-(function () {
-    'use strict'
-    
-    const forms = document.querySelectorAll('.needs-validation')
-    
-    Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
-                event.preventDefault()
-                event.stopPropagation()
+    <!-- Script pour la validation côté client -->
+    <script>
+        // Validation Bootstrap (client-side)
+        (function () {
+            'use strict'
+            
+            const forms = document.querySelectorAll('.needs-validation')
+            
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Utiliser l'ID correct généré par Django
+            const ecoleSelect = document.getElementById('id_ecole');
+            const ecoleAutreContainer = document.getElementById('ecole-autre-container');
+            const ecoleAutreInput = document.getElementById('id_ecole_autre');
+            
+            function toggleEcoleAutre() {
+                if (ecoleSelect && ecoleSelect.value === 'Autre') {
+                    ecoleAutreContainer.style.display = 'block';
+                    if (ecoleAutreInput) {
+                        ecoleAutreInput.required = true;
+                    }
+                } else {
+                    ecoleAutreContainer.style.display = 'none';
+                    if (ecoleAutreInput) {
+                        ecoleAutreInput.required = false;
+                        ecoleAutreInput.value = '';
+                    }
+                }
             }
             
-            form.classList.add('was-validated')
-        }, false)
-    })
-})()
-</script>
+            // Vérifier au chargement de la page
+            if (ecoleSelect) {
+                toggleEcoleAutre();
+                
+                // Vérifier à chaque changement
+                ecoleSelect.addEventListener('change', toggleEcoleAutre);
+            }
+        });
+    </script>
+
 {% endblock %}

@@ -5,8 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 
 from commulink.utils.decorators import admin_required
-from .models import Annee, EvenementVideo, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, Reinscription, Temoingnage, TypeEvenement, Utilisateur
-from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementEvenementForm, PaiementForm, ReinscriptionForm
+from .models import Annee, EvenementVideo, Membre, Annonce, Paiement, EquipeDirigeante, Evenement, EvenementImage, RapportEvenement, Reinscription, Temoingnage, TypeEvenement, Utilisateur
+from .forms import AnneeForm, MembreForm, AnnonceForm, PaiementEvenementForm, PaiementForm, RapportEvenementForm, ReinscriptionForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
@@ -17,6 +17,15 @@ from django.core.mail import send_mass_mail
 from time import timezone
 import datetime
 from django.db.models import Count
+
+
+from django.http import Http404
+from django.template.loader import get_template
+from django.utils.text import slugify
+from io import BytesIO
+from xhtml2pdf import pisa  
+
+
 # from firtsApp.models import EquipeDirigeante, Evenement, EvenementImage, Temoingnage, TypeEvenement
 
 
@@ -473,9 +482,473 @@ def admin_dashboard(request):
 
     return render(request, 'index.html', context)
 
-# def navBar(request):
-#     membreEquipe = get_object_or_404(EquipeDirigeante, utilisateur = request.user)
-#     return render(request, "partial/navbar.html", {"membreEquipe": membreEquipe})
+
+
+@login_required
+@admin_required
+def admin_dashboard_ancien(request):
+    # Date actuelle et périodes utiles
+    aujourd_hui = timezone.now()
+    debut_mois = aujourd_hui.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    debut_annee_civile = aujourd_hui.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    il_y_a_30_jours = aujourd_hui - timedelta(days=30)
+    il_y_a_7_jours = aujourd_hui - timedelta(days=7)
+
+    # ========= SÉLECTION D'ANNÉE (FILTRE) =========
+    annee_id = request.GET.get('annee')
+    annees_disponibles = Annee.objects.all().order_by('-debutAnnee')
+    annee_selectionnee = None
+
+    if annee_id:
+        try:
+            annee_selectionnee = annees_disponibles.get(pk=annee_id)
+        except Annee.DoesNotExist:
+            annee_selectionnee = annees_disponibles.first() if annees_disponibles.exists() else None
+    else:
+        annee_selectionnee = annees_disponibles.first() if annees_disponibles.exists() else None
+
+    # Période académique sélectionnée (pour filtrer les dates)
+    if annee_selectionnee:
+        periode_debut = annee_selectionnee.debutAnnee
+        periode_fin = annee_selectionnee.finAnnee
+    else:
+        # fallback : année civile courante
+        periode_debut = debut_annee_civile.date()
+        periode_fin = aujourd_hui.date()
+
+    # ========= BASE QUERYSETS FILTRÉS PAR ANNÉE =========
+    membres_qs = Membre.objects.all()
+    reinscriptions_qs = Reinscription.objects.all()
+    evenements_qs = Evenement.objects.all()
+    paiements_qs = Paiement.objects.all()
+
+    if annee_selectionnee:
+        # Membres ayant une réinscription sur cette année académique
+        membres_qs = membres_qs.filter(reinscriptions__annee=annee_selectionnee).distinct()
+        reinscriptions_qs = reinscriptions_qs.filter(annee=annee_selectionnee)
+        evenements_qs = evenements_qs.filter(annee=annee_selectionnee)
+        paiements_qs = paiements_qs.filter(
+            Q(evenement__annee=annee_selectionnee) |
+            Q(membre_Reinscris__annee=annee_selectionnee)
+        ).distinct()
+
+    # ========= STATISTIQUES GLOBALES (FILTRÉES PAR ANNÉE) =========
+
+    # ➜ Ces lignes alimentent les 4 cartes de ton screenshot
+    total_membres = membres_qs.count()
+    membres_valides = membres_qs.filter(statut='valide').count()
+    membres_en_attente = membres_qs.filter(statut='en_attente').count()
+    membres_refuses = membres_qs.filter(statut='refuse').count()
+
+    # Nouveau membres sur le mois / semaine (toujours dans cette année filtrée)
+    nouveaux_membres_mois = membres_qs.filter(date_inscription__gte=debut_mois).count()
+    nouveaux_membres_semaine = membres_qs.filter(date_inscription__gte=il_y_a_7_jours).count()
+
+    # "Membres cette année" = membres de l'année académique filtrée
+    membres_cette_annee = total_membres
+
+    # Évolution du mois vs mois précédent (sur le même segment filtré)
+    membres_mois_precedent = membres_qs.filter(
+        date_inscription__gte=debut_mois - timedelta(days=30),
+        date_inscription__lt=debut_mois
+    ).count()
+    evolution_membres = ((nouveaux_membres_mois - membres_mois_precedent) / max(membres_mois_precedent, 1)) * 100
+
+    # Répartition par genre
+    membres_hommes = membres_qs.filter(sexe='M').count()
+    membres_femmes = membres_qs.filter(sexe='F').count()
+    membres_autres = membres_qs.filter(sexe='A').count()
+
+    # Événements (filtrés par année)
+    total_evenements = evenements_qs.count()
+    evenements_publies = evenements_qs.filter(est_publie=True).count()
+    evenements_non_publies = evenements_qs.filter(est_publie=False).count()
+
+    # Annonces (laissées globales)
+    total_annonces = Annonce.objects.count()
+    annonces_publiees = Annonce.objects.filter(est_publie=True).count()
+
+    # Paiements (filtrés par année) ➜ alimente "Total Recettes"
+    total_paiements = paiements_qs.aggregate(total=Sum('montant'))['total'] or 0
+    paiements_ce_mois = paiements_qs.filter(
+        date_paiement__gte=debut_mois
+    ).aggregate(total=Sum('montant'))['total'] or 0
+
+    paiements_payes = paiements_qs.filter(statut='payé').count()
+    paiements_non_payes = paiements_qs.filter(statut='non_payé').count()
+    paiements_moitie = paiements_qs.filter(statut='moitié_payé').count()
+    paiements_avance = paiements_qs.filter(statut='avance').count()
+
+    montant_paye = paiements_qs.filter(statut='payé').aggregate(total=Sum('montant'))['total'] or 0
+    montant_en_attente = paiements_qs.filter(
+        statut__in=['non_payé', 'moitié_payé', 'avance']
+    ).aggregate(total=Sum('montant'))['total'] or 0
+
+    # Réinscriptions (filtrées)
+    total_reinscriptions = reinscriptions_qs.count()
+    reinscriptions_annee_courante = total_reinscriptions
+
+    # Utilisateurs (globaux)
+    total_utilisateurs = Utilisateur.objects.count()
+    utilisateurs_equipe = Utilisateur.objects.filter(role='membreEquipe').count()
+    utilisateurs_lambda = Utilisateur.objects.filter(role='membreLambda').count()
+
+    total_equipe_dirigeante = EquipeDirigeante.objects.count()
+    total_temoignages = Temoingnage.objects.count()
+    total_types_evenements = TypeEvenement.objects.count()
+
+    # ========= DONNÉES POUR GRAPHIQUES (FILTRÉES PAR ANNÉE si possible) =========
+
+    # 1. Inscriptions par mois (année filtrée ou 12 derniers mois)
+    if annee_selectionnee:
+        membres_inscriptions_base = membres_qs.filter(
+            date_inscription__date__range=(periode_debut, periode_fin)
+        )
+    else:
+        membres_inscriptions_base = membres_qs.filter(
+            date_inscription__gte=aujourd_hui - timedelta(days=365)
+        )
+
+    inscriptions_par_mois = list(
+        membres_inscriptions_base.annotate(
+            mois=TruncMonth('date_inscription')
+        ).values('mois').annotate(
+            total=Count('id')
+        ).order_by('mois')
+    )
+    labels_mois = []
+    data_inscriptions = []
+    for item in inscriptions_par_mois:
+        if item['mois']:
+            labels_mois.append(item['mois'].strftime('%b %Y'))
+            data_inscriptions.append(item['total'])
+
+    # 2. Paiements par mois (filtrés)
+    if annee_selectionnee:
+        paiements_base = paiements_qs.filter(
+            date_paiement__date__range=(periode_debut, periode_fin),
+            date_paiement__isnull=False,
+        )
+    else:
+        paiements_base = paiements_qs.filter(
+            date_paiement__gte=aujourd_hui - timedelta(days=365),
+            date_paiement__isnull=False,
+        )
+
+    paiements_par_mois = list(
+        paiements_base.annotate(
+            mois=TruncMonth('date_paiement')
+        ).values('mois').annotate(
+            total=Sum('montant')
+        ).order_by('mois')
+    )
+    labels_paiements_mois = []
+    data_paiements_mois = []
+    for item in paiements_par_mois:
+        if item['mois']:
+            labels_paiements_mois.append(item['mois'].strftime('%b %Y'))
+            data_paiements_mois.append(float(item['total']) if item['total'] else 0)
+
+    # 3. Événements par type (filtrés)
+    evenements_par_type = list(
+        evenements_qs.values(
+            'typeEvenement__nom_type_evenement'
+        ).annotate(
+            total=Count('id')
+        ).order_by('-total')
+    )
+    labels_types_evt = [item['typeEvenement__nom_type_evenement'] or 'Non défini' for item in evenements_par_type]
+    data_types_evt = [item['total'] for item in evenements_par_type]
+
+    # 4. Inscriptions par jour (30 derniers jours, filtrées)
+    inscriptions_par_jour = list(
+        membres_qs.filter(
+            date_inscription__gte=il_y_a_30_jours
+        ).annotate(
+            jour=TruncDate('date_inscription')
+        ).values('jour').annotate(
+            total=Count('id')
+        ).order_by('jour')
+    )
+    labels_jours = []
+    data_inscriptions_jour = []
+    for item in inscriptions_par_jour:
+        if item['jour']:
+            labels_jours.append(item['jour'].strftime('%d/%m'))
+            data_inscriptions_jour.append(item['total'])
+
+    # 5. Réinscriptions par année académique (globales pour vision d’ensemble)
+    reinscriptions_par_annee = list(
+        Reinscription.objects.values(
+            'annee__debutAnnee', 'annee__finAnnee'
+        ).annotate(
+            total=Count('id')
+        ).order_by('annee__debutAnnee')
+    )
+    labels_annees_reinscription = []
+    data_reinscriptions = []
+    for item in reinscriptions_par_annee:
+        if item['annee__debutAnnee'] and item['annee__finAnnee']:
+            label = f"{item['annee__debutAnnee'].year}-{item['annee__finAnnee'].year}"
+            labels_annees_reinscription.append(label)
+            data_reinscriptions.append(item['total'])
+
+    # =============== STATISTIQUES PAR ANNÉE CIVILE (long terme) ===============
+
+    membres_par_annee = list(
+        Membre.objects.annotate(
+            annee=ExtractYear('date_inscription')
+        ).values('annee').annotate(
+            total=Count('id')
+        ).order_by('annee')
+    )
+    labels_annees_membres = []
+    data_membres_par_annee = []
+    for item in membres_par_annee:
+        if item['annee']:
+            labels_annees_membres.append(str(item['annee']))
+            data_membres_par_annee.append(item['total'])
+
+    inscriptions_cumulees_par_annee = []
+    cumul = 0
+    for item in membres_par_annee:
+        if item['annee']:
+            cumul += item['total']
+            inscriptions_cumulees_par_annee.append(cumul)
+
+    annees_stats = []
+    for item in membres_par_annee:
+        if item['annee']:
+            annee_val = item['annee']
+            membres_annee = Membre.objects.filter(date_inscription__year=annee_val)
+            hommes = membres_annee.filter(sexe='M').count()
+            femmes = membres_annee.filter(sexe='F').count()
+            valides = membres_annee.filter(statut='valide').count()
+            en_attente = membres_annee.filter(statut='en_attente').count()
+            refuses = membres_annee.filter(statut='refuse').count()
+
+            annees_stats.append({
+                'annee': annee_val,
+                'total': item['total'],
+                'hommes': hommes,
+                'femmes': femmes,
+                'valides': valides,
+                'en_attente': en_attente,
+                'refuses': refuses,
+                'taux_validation': round((valides / item['total'] * 100) if item['total'] > 0 else 0, 1)
+            })
+
+    # 9. COMPARAISON ANNUELLE PAR ANNÉE ACADÉMIQUE
+    annees_academiques = list(Annee.objects.order_by('debutAnnee'))
+    annee_academique_actuelle = annees_academiques[-1] if annees_academiques else None
+    annee_academique_precedente = annees_academiques[-2] if len(annees_academiques) >= 2 else None
+
+    membres_acad_actuelle = 0
+    membres_acad_precedente = 0
+    evolution_academique = 0
+
+    if annee_academique_actuelle:
+        membres_acad_actuelle = (
+            Reinscription.objects
+            .filter(annee=annee_academique_actuelle)
+            .values('membre')
+            .distinct()
+            .count()
+        )
+
+    if annee_academique_precedente:
+        membres_acad_precedente = (
+            Reinscription.objects
+            .filter(annee=annee_academique_precedente)
+            .values('membre')
+            .distinct()
+            .count()
+        )
+
+    if membres_acad_precedente > 0:
+        evolution_academique = round(
+            ((membres_acad_actuelle - membres_acad_precedente) / membres_acad_precedente) * 100,
+            1
+        )
+
+    # 10. Membres par année académique (graphique)
+    membres_par_annee_academique = list(
+        Reinscription.objects.values(
+            'annee__debutAnnee', 'annee__finAnnee'
+        ).annotate(
+            total_membres=Count('membre', distinct=True)
+        ).order_by('annee__debutAnnee')
+    )
+    labels_annees_academiques = []
+    data_membres_academiques = []
+    for item in membres_par_annee_academique:
+        if item['annee__debutAnnee'] and item['annee__finAnnee']:
+            label = f"{item['annee__debutAnnee'].year}/{item['annee__finAnnee'].year}"
+            labels_annees_academiques.append(label)
+            data_membres_academiques.append(item['total_membres'])
+
+    # 11. Paiements par année civile (long terme)
+    paiements_par_annee = list(
+        Paiement.objects.filter(
+            date_paiement__isnull=False
+        ).annotate(
+            annee=ExtractYear('date_paiement')
+        ).values('annee').annotate(
+            total=Sum('montant'),
+            nombre=Count('id')
+        ).order_by('annee')
+    )
+    labels_paiements_annee = []
+    data_paiements_annee = []
+    data_nombre_paiements_annee = []
+    for item in paiements_par_annee:
+        if item['annee']:
+            labels_paiements_annee.append(str(item['annee']))
+            data_paiements_annee.append(float(item['total']) if item['total'] else 0)
+            data_nombre_paiements_annee.append(item['nombre'])
+
+    # ============== LISTES / TABLEAUX (FILTRÉS PAR ANNÉE) ==============
+
+    derniers_membres = membres_qs.order_by('-date_inscription')[:10]
+    membres_attente_validation = membres_qs.filter(
+        statut='en_attente'
+    ).order_by('-date_inscription')[:10]
+
+    derniers_paiements = paiements_qs.select_related(
+        'membre_Reinscris__membre', 'evenement'
+    ).order_by('-date_paiement')[:10]
+
+    prochains_evenements = evenements_qs.filter(
+        est_publie=True
+    ).order_by('-dateHeure')[:5]
+
+    dernieres_annonces = Annonce.objects.filter(
+        est_publie=True
+    ).order_by('-date_publication')[:5]
+
+    top_payeurs = paiements_qs.filter(
+        statut='payé'
+    ).values(
+        'membre_Reinscris__membre__nom',
+        'membre_Reinscris__membre__prenom'
+    ).annotate(
+        total_paye=Sum('montant')
+    ).order_by('-total_paye')[:5]
+
+    activites_recentes = []
+    for membre in membres_qs.order_by('-date_inscription')[:5]:
+        activites_recentes.append({
+            'type': 'inscription',
+            'date': membre.date_inscription,
+            'description': f"Nouvelle inscription: {membre.nom_complet}",
+            'icon': 'fa-user-plus',
+            'color': 'success'
+        })
+    for paiement in paiements_qs.filter(date_paiement__isnull=False).order_by('-date_paiement')[:5]:
+        nom_membre = "Membre"
+        if paiement.membre_Reinscris and paiement.membre_Reinscris.membre:
+            nom_membre = paiement.membre_Reinscris.membre.nom_complet
+        activites_recentes.append({
+            'type': 'paiement',
+            'date': paiement.date_paiement,
+            'description': f"Paiement de {paiement.montant} FCFA par {nom_membre}",
+            'icon': 'fa-money-bill',
+            'color': 'primary'
+        })
+    activites_recentes.sort(key=lambda x: x['date'] if x['date'] else aujourd_hui, reverse=True)
+    activites_recentes = activites_recentes[:10]
+
+    equipe = EquipeDirigeante.objects.all()[:6]
+
+    context = {
+        # Statistiques globales (FILTRÉES PAR ANNÉE)
+        'total_membres': total_membres,
+        'membres_valides': membres_valides,
+        'membres_en_attente': membres_en_attente,
+        'membres_refuses': membres_refuses,
+        'nouveaux_membres_mois': nouveaux_membres_mois,
+        'nouveaux_membres_semaine': nouveaux_membres_semaine,
+        'membres_cette_annee': membres_cette_annee,
+        'evolution_membres': round(evolution_membres, 1),
+
+        'membres_hommes': membres_hommes,
+        'membres_femmes': membres_femmes,
+        'membres_autres': membres_autres,
+
+        'total_evenements': total_evenements,
+        'evenements_publies': evenements_publies,
+        'evenements_non_publies': evenements_non_publies,
+
+        'total_annonces': total_annonces,
+        'annonces_publiees': annonces_publiees,
+
+        'total_paiements': total_paiements,
+        'paiements_ce_mois': paiements_ce_mois,
+        'paiements_payes': paiements_payes,
+        'paiements_non_payes': paiements_non_payes,
+        'paiements_moitie': paiements_moitie,
+        'paiements_avance': paiements_avance,
+        'montant_paye': montant_paye,
+        'montant_en_attente': montant_en_attente,
+
+        'total_reinscriptions': total_reinscriptions,
+        'reinscriptions_annee_courante': reinscriptions_annee_courante,
+
+        'total_utilisateurs': total_utilisateurs,
+        'utilisateurs_equipe': utilisateurs_equipe,
+        'utilisateurs_lambda': utilisateurs_lambda,
+
+        'total_equipe_dirigeante': total_equipe_dirigeante,
+        'total_temoignages': total_temoignages,
+        'total_types_evenements': total_types_evenements,
+
+        # Graphiques (JSON)
+        'labels_mois': json.dumps(labels_mois),
+        'data_inscriptions': json.dumps(data_inscriptions),
+        'labels_paiements_mois': json.dumps(labels_paiements_mois),
+        'data_paiements_mois': json.dumps(data_paiements_mois),
+        'labels_types_evt': json.dumps(labels_types_evt),
+        'data_types_evt': json.dumps(data_types_evt),
+        'labels_jours': json.dumps(labels_jours),
+        'data_inscriptions_jour': json.dumps(data_inscriptions_jour),
+        'labels_annees_reinscription': json.dumps(labels_annees_reinscription),
+        'data_reinscriptions': json.dumps(data_reinscriptions),
+
+        'labels_annees_membres': json.dumps(labels_annees_membres),
+        'data_membres_par_annee': json.dumps(data_membres_par_annee),
+        'data_membres_cumules': json.dumps(inscriptions_cumulees_par_annee),
+        'annees_stats': annees_stats,
+
+        # Comparaison académique
+        'annee_academique_actuelle': annee_academique_actuelle,
+        'annee_academique_precedente': annee_academique_precedente,
+        'membres_acad_actuelle': membres_acad_actuelle,
+        'membres_acad_precedente': membres_acad_precedente,
+        'evolution_academique': evolution_academique,
+
+        'labels_annees_academiques': json.dumps(labels_annees_academiques),
+        'data_membres_academiques': json.dumps(data_membres_academiques),
+        'labels_paiements_annee': json.dumps(labels_paiements_annee),
+        'data_paiements_annee': json.dumps(data_paiements_annee),
+        'data_nombre_paiements_annee': json.dumps(data_nombre_paiements_annee),
+
+        # Listes
+        'derniers_membres': derniers_membres,
+        'membres_attente_validation': membres_attente_validation,
+        'derniers_paiements': derniers_paiements,
+        'prochains_evenements': prochains_evenements,
+        'dernieres_annonces': dernieres_annonces,
+        'top_payeurs': top_payeurs,
+        'activites_recentes': activites_recentes,
+        'equipe': equipe,
+        'annees_disponibles': annees_disponibles,
+        'annee_selectionnee': annee_selectionnee,
+
+        'date_actuelle': aujourd_hui,
+    }
+
+    return render(request, 'index_sh.html', context)
+
 
 
 #----------------------------------GESTION DES EVENEMENTS--------------------------------------
@@ -1371,6 +1844,102 @@ def detail_membre(request, pk):
     })
 
 
+# @login_required
+# @admin_required
+# def creer_membre(request):
+#     """
+#     Création directe par un admin - Crée membre + utilisateur + réinscription
+#     Le membre est directement validé
+#     """
+    
+#     if request.method == 'POST':
+#         form = MembreForm(request.POST, request.FILES)
+        
+#         if form.is_valid():
+#             try:
+#                 with transaction.atomic():
+#                     nom = form.cleaned_data['nom']
+#                     prenom = form.cleaned_data['prenom']
+#                     email = form.cleaned_data['email']
+#                     telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+                    
+#                     if Utilisateur.objects.filter(email=email, password=make_password(telephone)).exists():
+#                         messages.error(request, 'Un utilisateur avec cet email existe déjà.')
+#                         return render(request, 'gestionMembre/creer.html', {'form': form})
+                    
+#                     # 1. Créer l'utilisateur
+#                     utilisateur = Utilisateur.objects.create(
+#                         username=email,
+#                         email=email,
+#                         password=make_password(telephone),
+#                         first_name=prenom,
+#                         last_name=nom,
+#                         role="membreLambda",
+#                         is_active=True,
+#                     )
+                    
+#                     # 2. Créer le membre (validé directement)
+#                     membre = Membre(
+#                         utilisateur=utilisateur,
+#                         nom=nom,
+#                         prenom=prenom,
+#                         sexe=form.cleaned_data['sexe'],
+#                         email=email,
+#                         telephone=telephone,
+#                         adresse=form.cleaned_data.get('adresse', ''),
+#                         profession=form.cleaned_data['profession'],
+#                         numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
+#                         niveauEtude=form.cleaned_data.get('niveauEtude', ''),
+#                         ecole=form.cleaned_data.get('ecole', ''),
+#                         ner=form.cleaned_data.get('ner', ''),
+#                         keri=form.cleaned_data.get('keri', ''),
+#                         keribour=form.cleaned_data.get('keribour', ''),
+#                         keriBa=form.cleaned_data.get('keriBa', ''),
+#                         keribourBa=form.cleaned_data.get('keribourBa', ''),
+#                         notes=form.cleaned_data.get('notes', ''),
+#                         statut='valide',  
+#                         date_validation=timezone.now(),
+#                         valide_par=request.user,
+#                     )
+                    
+#                     if form.cleaned_data.get('photo'):
+#                         membre.photo = form.cleaned_data['photo']
+#                     photo = form.cleaned_data['photo']
+                    
+#                     membre.save()
+                    
+#                     # 3. Créer la réinscription pour l'année active
+#                     annee_active = Annee.objects.order_by('-debutAnnee').first()
+#                     if annee_active:
+#                         Reinscription.objects.create(
+#                             membre=membre,
+#                             annee=annee_active,
+#                             username=email,
+#                             password=telephone,
+#                             adresse=form.cleaned_data.get('adresse', ''),
+#                             numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
+#                             ecole=form.cleaned_data.get('ecole', ''),
+#                             niveauEtude=form.cleaned_data.get('niveauEtude', ''),
+#                             photo_annuelle=photo,
+#                             filiere=form.cleaned_data.get('filiere', '')
+#                         )
+                    
+#                     messages.success(request, f'Le membre {nom} {prenom} a été créé avec succès.')
+#                     return redirect('detail_membre', pk=membre.pk)
+                    
+#             except Exception as e:
+#                 messages.error(request, f"Une erreur est survenue: {str(e)}")
+#         else:
+#             messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+#     else:
+#         form = MembreForm()
+    
+#     return render(request, 'gestionMembre/creer.html', {
+#         'form': form,
+#         'titre': "Créer un nouveau membre"
+#     })
+
+
 @login_required
 @admin_required
 def creer_membre(request):
@@ -1388,18 +1957,28 @@ def creer_membre(request):
                     nom = form.cleaned_data['nom']
                     prenom = form.cleaned_data['prenom']
                     email = form.cleaned_data['email']
-                    telephone = form.cleaned_data.get('telephone') or "defaultpass123"
+                    nom_utilisateur = form.cleaned_data['nom_utilisateur']
+                    mot_de_passe = form.cleaned_data['mot_de_passe']
                     
-                    # Vérification supplémentaire
-                    if Utilisateur.objects.filter(email=email, password=make_password(telephone)).exists():
+                    # Vérifier si un utilisateur avec ce nom d'utilisateur ou email existe déjà
+                    if Utilisateur.objects.filter(username=nom_utilisateur).exists():
+                        messages.error(request, 'Un utilisateur avec ce nom d\'utilisateur existe déjà.')
+                        return render(request, 'gestionMembre/creer.html', {'form': form})
+                    
+                    if Utilisateur.objects.filter(email=email).exists():
                         messages.error(request, 'Un utilisateur avec cet email existe déjà.')
                         return render(request, 'gestionMembre/creer.html', {'form': form})
                     
+                    # Gérer le champ école "Autre"
+                    ecole_value = form.cleaned_data['ecole']
+                    if ecole_value == 'Autre':
+                        ecole_value = form.cleaned_data.get('ecole_autre', '')
+                    
                     # 1. Créer l'utilisateur
                     utilisateur = Utilisateur.objects.create(
-                        username=email,
+                        username=nom_utilisateur,
                         email=email,
-                        password=make_password(telephone),
+                        password=make_password(mot_de_passe),
                         first_name=prenom,
                         last_name=nom,
                         role="membreLambda",
@@ -1413,17 +1992,20 @@ def creer_membre(request):
                         prenom=prenom,
                         sexe=form.cleaned_data['sexe'],
                         email=email,
-                        telephone=telephone,
+                        telephone=form.cleaned_data.get('telephone', ''),
                         adresse=form.cleaned_data.get('adresse', ''),
-                        profession=form.cleaned_data['profession'],
+                        nom_utilisateur=nom_utilisateur,
+                        mot_de_passe=mot_de_passe,
                         numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
                         niveauEtude=form.cleaned_data.get('niveauEtude', ''),
-                        ecole=form.cleaned_data.get('ecole', ''),
+                        ecole=ecole_value,
+                        filiere=form.cleaned_data.get('filiere', ''),
                         ner=form.cleaned_data.get('ner', ''),
                         keri=form.cleaned_data.get('keri', ''),
                         keribour=form.cleaned_data.get('keribour', ''),
                         keriBa=form.cleaned_data.get('keriBa', ''),
                         keribourBa=form.cleaned_data.get('keribourBa', ''),
+                        toute_info_sur_identite=form.cleaned_data.get('toute_info_sur_identite', ''),
                         notes=form.cleaned_data.get('notes', ''),
                         statut='valide',  
                         date_validation=timezone.now(),
@@ -1432,7 +2014,8 @@ def creer_membre(request):
                     
                     if form.cleaned_data.get('photo'):
                         membre.photo = form.cleaned_data['photo']
-                    photo = form.cleaned_data['photo']
+                    
+                    photo = form.cleaned_data.get('photo')
                     
                     membre.save()
                     
@@ -1442,11 +2025,11 @@ def creer_membre(request):
                         Reinscription.objects.create(
                             membre=membre,
                             annee=annee_active,
-                            username=email,
-                            password=telephone,
+                            username=nom_utilisateur,
+                            password=mot_de_passe,
                             adresse=form.cleaned_data.get('adresse', ''),
                             numeroUrgence=form.cleaned_data.get('numeroUrgence', ''),
-                            ecole=form.cleaned_data.get('ecole', ''),
+                            ecole=ecole_value,
                             niveauEtude=form.cleaned_data.get('niveauEtude', ''),
                             photo_annuelle=photo,
                             filiere=form.cleaned_data.get('filiere', '')
@@ -1467,56 +2050,6 @@ def creer_membre(request):
         'titre': "Créer un nouveau membre"
     })
 
-
-# @login_required
-# @admin_required
-# def modidfier_membre(request, pk):
-#     membre = Membre.objects.get(pk=pk)
-    
-#     if request.method == 'POST':
-#         form = MembreForm(request.POST, request.FILES)
-#         if form.is_valid():
-            
-            
-#             email = form.cleaned_data['email']
-#             telephone = form.cleaned_data.get('telephone') or "defaultpass123"
-            
-#             if Utilisateur.objects.filter(email=email).exists():
-#                 messages.error(request, 'Un utilisateur avec cet email existe déjà.')
-#                 return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
-            
-            
-#             membre.utilisateur.username = email
-#             membre.utilisateur.password=make_password(telephone),
-
-#             form.update(membre)
-#             messages.success(request, "Membre modifié avec succès!")
-#             return redirect('liste_membres')
-#     else:
-#         # Initialiser le formulaire avec les données du membre
-#         initial_data = {
-#             'nom': membre.nom,
-#             'prenom': membre.prenom,
-#             'sexe': membre.sexe,
-#             'email': membre.email,
-#             'telephone': membre.telephone,
-#             'adresse': membre.adresse,
-#             'profession': membre.profession,
-#             'numeroUrgence': membre.numeroUrgence,
-#             'niveauEtude': membre.niveauEtude,
-#             'ecole': membre.ecole,
-#             'photo': membre.photo,
-#             'notes': membre.notes,
-#             'ner': membre.ner,
-#             'keri': membre.keri,
-#             'keribour': membre.keribour,
-#             'keriBa': membre.keriBa,
-#             'keribourBa': membre.keribourBa,
-#         }
-
-#         form = MembreForm(initial=initial_data)
-    
-#     return render(request, 'gestionMembre/modifierMembre.html', {'form': form, 'membre': membre})
 
 
 @login_required
@@ -1621,6 +2154,8 @@ def get_annee_active():
     return annee
     
 
+
+
 @login_required
 @admin_required
 def valider_membre(request, pk):
@@ -1633,50 +2168,54 @@ def valider_membre(request, pk):
     try:
         with transaction.atomic():
             email = membre.email
-            telephone = membre.telephone or "defaut12345678"
+            nom_utilisateur = membre.nom_utilisateur or email
+            mot_de_passe = membre.mot_de_passe or "defaut12345678"
             
-            # Vérifier si un utilisateur existe déjà avec cet email
-            if Utilisateur.objects.filter(email=email).exists():
-                messages.error(request, f"Un utilisateur avec l'email {email} existe déjà.")
+            # Vérifier si un utilisateur existe déjà
+            if Utilisateur.objects.filter(username=nom_utilisateur, password=make_password(mot_de_passe)).exists():
+                messages.error(request, f"Un utilisateur avec le nom d'utilisateur '{nom_utilisateur}' existe déjà.")
                 return redirect('liste_membres')
             
-            # 1. Créer l'utilisateur avec create_user pour hasher le mot de passe
+            if Utilisateur.objects.filter(email=email).exists():
+                messages.error(request, f"Un utilisateur avec l'email '{email}' existe déjà.")
+                return redirect('liste_membres')
+            
+            # 1. Créer l'utilisateur
             utilisateur = Utilisateur.objects.create_user(
-                username=email,
+                username=nom_utilisateur,
                 email=email,
-                password=telephone,
+                password=make_password(mot_de_passe),
                 first_name=membre.prenom,
                 last_name=membre.nom,
             )
+            
             utilisateur.role = "membreLambda"
             utilisateur.is_active = True
             utilisateur.save()
             
-            # 2. Mettre à jour le membre
             membre.utilisateur = utilisateur
+            membre.notes = mot_de_passe
             membre.statut = 'valide'
             membre.date_validation = timezone.now()
             membre.valide_par = request.user
             membre.save()
             
-            # 3. Créer la réinscription pour l'année active
             annee_active = get_annee_active()
             if annee_active:
-                
                 Reinscription.objects.create(
                     membre=membre,
                     annee=annee_active,
-                    username=email,
-                    password=telephone,
+                    username=nom_utilisateur,
+                    password=mot_de_passe,
                     adresse=membre.adresse or '',
                     numeroUrgence=membre.numeroUrgence or '',
                     ecole=membre.ecole or '',
                     niveauEtude=membre.niveauEtude or '',
                     photo_annuelle=membre.photo if membre.photo else None,
-                    filiere=membre.filiere
+                    filiere=membre.filiere or ''
                 )
             
-            messages.success(request, f"L'inscription de {membre.nom_complet} a été validée avec succès. Mot de passe: {telephone}")
+            messages.success(request, f"L'inscription de {membre.nom_complet} a été validée. Identifiant: {nom_utilisateur}")
             
     except Exception as e:
         import traceback
@@ -1685,7 +2224,6 @@ def valider_membre(request, pk):
         messages.error(request, f"Erreur lors de la validation: {str(e)}")
     
     return redirect('liste_membres')
-
 
 @login_required
 @admin_required
@@ -2261,16 +2799,14 @@ def ajoutMembreEquipe(request):
         if annee_id:
             annee = get_object_or_404(Annee, id=annee_id)
         
-        # Créer l'utilisateur (inactif par défaut)
         utilisateur = Utilisateur.objects.create(
             username=role,
             password=make_password(role),
             role="membreEquipe",
-            is_active=False,  # Inactif par défaut
+            is_active=False,  
             is_staff=True
         )
         
-        # Créer le membre (non publié par défaut)
         EquipeDirigeante.objects.create(
             utilisateur=utilisateur,
             annee=annee,
@@ -2802,6 +3338,8 @@ def rappeler_paiements(request):
         # Récupérer tous les cas
         paiements_existants = Paiement.objects.filter(
             evenement_id=event_id,
+            membre_Reinscris__isnull=False,
+            # membre_Reinscris__isnull=False,
             statut__in=['non_payé', 'moitié_payé', 'avance']
         )
         
@@ -3113,6 +3651,7 @@ def paiementParEvenement(request, pk):
         contexte
     )
 
+
 @login_required
 def detailPaimentMembre(request, pk):
     """
@@ -3213,4 +3752,100 @@ def reinscriptionUser(request):
 
 
 
+#========================RAPPORTS===================================================
+@login_required
+@admin_required
+def rapport_evenement_form(request, pk):
+    """
+    Création / édition du rapport d'un évènement.
+    """
+    evenement = get_object_or_404(Evenement, pk=pk)
+
+    try:
+        rapport = evenement.rapport  
+        creation = False
+    except RapportEvenement.DoesNotExist:
+        rapport = None
+        creation = True
+
+    if request.method == 'POST':
+        form = RapportEvenementForm(request.POST, instance=rapport)
+        if form.is_valid():
+            rapport = form.save(commit=False)
+            rapport.evenement = evenement
+            if not rapport.auteur:
+                rapport.auteur = request.user
+            rapport.save()
+            messages.success(request, "Le rapport d'évènement a été enregistré.")
+            # IMPORTANT : utiliser id= pour correspondre à ton urls.py
+            return redirect('detailEvenement', id=evenement.id)
+    else:
+        form = RapportEvenementForm(instance=rapport)
+
+    return render(request, 'gestionEvenement/rapport_form.html', {
+        'form': form,
+        'evenement': evenement,
+        'creation': creation,
+    })
+
+
+@login_required
+def rapport_evenement_pdf(request, pk):
+    """
+    Export PDF du rapport d'un évènement.
+    """
+    evenement = get_object_or_404(Evenement, pk=pk)
+    try:
+        rapport = evenement.rapport
+    except RapportEvenement.DoesNotExist:
+        raise Http404("Aucun rapport n'est disponible pour cet évènement.")
+
+    template = get_template('gestionEvenement/rapport_pdf.html')
+    html = template.render({
+        'evenement': evenement,
+        'rapport': rapport,
+        'date_export': timezone.now(),
+        'exporteur': request.user,
+    })
+
+    response = HttpResponse(content_type='application/pdf')
+    filename = f"rapport_evenement_{slugify(evenement.titre)}.pdf"
+    response['Content-Disposition'] = f"attachment; filename='{filename}'"
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse("Erreur lors de la génération du PDF", status=500)
+
+    return response
+
+
+@login_required
+@admin_required
+def liste_rapports_evenement(request):
+    """
+    Liste des rapports d'évènements, filtrables par année académique.
+    """
+    annee_id = request.GET.get('annee')
+    annees = Annee.objects.all().order_by('-debutAnnee')
+
+    rapports = RapportEvenement.objects.select_related('evenement', 'evenement__annee', 'auteur')
+    annee_selectionnee = None
+
+    if annee_id:
+        try:
+            annee_selectionnee = annees.get(pk=annee_id)
+            rapports = rapports.filter(evenement__annee=annee_selectionnee)
+        except Annee.DoesNotExist:
+            annee_selectionnee = None
+
+    context = {
+        'rapports': rapports,
+        'annees': annees,
+        'annee_selectionnee': annee_selectionnee,
+    }
+    return render(request, 'gestionEvenement/liste_rapports.html', context)
+    
+    
+    
+    
 

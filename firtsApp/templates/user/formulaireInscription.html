@@ -553,6 +553,8 @@
                         <div class="progress-step" data-step="4">4</div>
                         <div class="progress-line"></div>
                         <div class="progress-step" data-step="5">5</div>
+                        <div class="progress-line"></div>
+                        <div class="progress-step" data-step="6">6</div>
                     </div>
                 </div>
             </div>
@@ -625,7 +627,7 @@
                             <div class="form-feedback" id="sexe-feedback"></div>
                         </div>
                     </div>
-                    
+
                     <!-- Étape 2: Informations professionnelles -->
                     <div class="form-section" id="section-2" data-step="2">
                         <div class="section-header">
@@ -636,24 +638,43 @@
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="profession" class="form-label">Profession <span class="required">*</span></label>
-                            <input type="text" id="profession" name="profession" class="form-input" 
-                                   placeholder="Votre profession actuelle" required maxlength="50">
-                            <div class="form-feedback" id="profession-feedback"></div>
-                        </div>
-                        
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="niveauEtude" class="form-label">Niveau d'étude</label>
-                                <input type="text" id="niveauEtude" name="niveauEtude" class="form-input" 
-                                       placeholder="Votre niveau d'étude" maxlength="20">
+                                <label for="niveauEtude" class="form-label">Niveau d'étude <span class="required">*</span></label>
+                                <select id="niveauEtude" name="niveauEtude" class="form-input" required>
+                                    <option value="">Sélectionnez votre niveau</option>
+                                    <option value="L1">L1 (Licence 1)</option>
+                                    <option value="L2">L2 (Licence 2)</option>
+                                    <option value="L3">L3 (Licence 3)</option>
+                                    <option value="M1">M1 (Master 1)</option>
+                                    <option value="M2">M2 (Master 2)</option>
+                                    <option value="Doctorat">Doctorat</option>
+                                </select>
+                                <div class="form-feedback" id="niveauEtude-feedback"></div>
                             </div>
                             
                             <div class="form-group">
-                                <label for="ecole" class="form-label">École/Université</label>
-                                <input type="text" id="ecole" name="ecole" class="form-input" 
-                                       placeholder="Nom de votre établissement" maxlength="20">
+                                <label for="ecole" class="form-label">École/Université <span class="required">*</span></label>
+                                <select id="ecole" name="ecole" class="form-input" required>
+                                    <option value="">Sélectionnez votre établissement</option>
+                                    <option value="IPNET">IPNET</option>
+                                    <option value="Formatec">Formatec</option>
+                                    <option value="Esgis">Esgis</option>
+                                    <option value="Esac Nd">Esac Nd</option>
+                                    <option value="ESA">ESA</option>
+                                    <option value="Université de Lomé">Université de Lomé</option>
+                                    <option value="Université de Kara">Université de Kara</option>
+                                    <option value="Autre">Autre (précisez)</option>
+                                </select>
+                                <div class="form-feedback" id="ecole-feedback"></div>
+                            </div>
+
+                            <!-- Champ pour l'école personnalisée (caché par défaut) -->
+                            <div class="form-group" id="ecole-autre-container" style="display: none;">
+                                <label for="ecole-autre" class="form-label">Nom de l'établissement <span class="required">*</span></label>
+                                <input type="text" id="ecole-autre" name="ecole_autre" class="form-input" 
+                                    placeholder="Précisez le nom de votre établissement" maxlength="100">
+                                <div class="form-feedback" id="ecole-autre-feedback"></div>
                             </div>
                         </div>
                         
@@ -661,18 +682,18 @@
                             <div class="form-group">
                                 <label for="filiere" class="form-label">Filière</label>
                                 <input type="text" id="filiere" name="filiere" class="form-input" 
-                                       placeholder="Votre filière d'étude" maxlength="20">
+                                    placeholder="Votre filière d'étude" maxlength="150">
                             </div>
                             
                             <div class="form-group">
                                 <label for="numeroUrgence" class="form-label">Numéro en cas d'urgence</label>
                                 <input type="tel" id="numeroUrgence" name="numeroUrgence" class="form-input" 
-                                       placeholder="Numéro d'une personne à contacter" maxlength="20">
+                                    placeholder="Numéro d'une personne à contacter" maxlength="20">
                                 <div class="form-feedback" id="urgence-feedback"></div>
                             </div>
                         </div>
                     </div>
-                    
+                  
                     <!-- Étape 3: Informations d'identité -->
                     <div class="form-section" id="section-3" data-step="3">
                         <div class="section-header">
@@ -687,13 +708,13 @@
                             <div class="form-group">
                                 <label for="ner" class="form-label">Ner</label>
                                 <input type="text" id="ner" name="ner" class="form-input" 
-                                       placeholder="Entrez la valeur pour Ner" maxlength="20">
+                                    placeholder="Entrez la valeur pour Ner" maxlength="20">
                             </div>
                             
                             <div class="form-group">
                                 <label for="keri" class="form-label">Keri</label>
                                 <input type="text" id="keri" name="keri" class="form-input" 
-                                       placeholder="Entrez la valeur pour Keri" maxlength="20">
+                                    placeholder="Entrez la valeur pour Keri" maxlength="20">
                             </div>
                         </div>
                         
@@ -701,20 +722,28 @@
                             <div class="form-group">
                                 <label for="keribour" class="form-label">Keribour</label>
                                 <input type="text" id="keribour" name="keribour" class="form-input" 
-                                       placeholder="Entrez la valeur pour Keribour" maxlength="20">
+                                    placeholder="Entrez la valeur pour Keribour" maxlength="20">
                             </div>
                             
                             <div class="form-group">
                                 <label for="keriBa" class="form-label">Keri Bâ</label>
                                 <input type="text" id="keriBa" name="keriBa" class="form-input" 
-                                       placeholder="Entrez la valeur pour Keri Bâ" maxlength="20">
+                                    placeholder="Entrez la valeur pour Keri Bâ" maxlength="20">
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="keribourBa" class="form-label">Keribour Bâ</label>
                             <input type="text" id="keribourBa" name="keribourBa" class="form-input" 
-                                   placeholder="Entrez la valeur pour Keribour Bâ" maxlength="20">
+                                placeholder="Entrez la valeur pour Keribour Bâ" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="toute_info_sur_identite" class="form-label">Informations supplémentaires sur l'identité</label>
+                            <textarea id="toute_info_sur_identite" name="toute_info_sur_identite" 
+                                    class="form-input" rows="4" 
+                                    placeholder="Ajoutez toute information complémentaire concernant votre identité"></textarea>
+                            <div class="form-feedback" id="toute_info_sur_identite-feedback"></div>
                         </div>
                         
                         <div class="form-feedback" id="identite-feedback"></div>
@@ -764,23 +793,58 @@
                                     placeholder="Ajoutez ici toute information complémentaire que vous souhaitez partager..."></textarea>
                         </div>
 
-                        <!-- Cases à cocher déplacées ICI, dans la section 5 -->
+                    </div>
+
+                    <!-- Étape 6: Identifiants de connexion -->
+                    <div class="form-section" id="section-6" data-step="6">
+                        <div class="section-header">
+                            <div class="section-number">6</div>
+                            <div>
+                                <h2 class="section-title">Identifiants de Connexion</h2>
+                                <p class="section-description">Créez vos identifiants pour accéder à votre compte</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nom_utilisateur" class="form-label">Nom d'utilisateur <span class="required">*</span></label>
+                                <input type="text" id="nom_utilisateur" name="nom_utilisateur" class="form-input" 
+                                    placeholder="Choisissez un nom d'utilisateur unique" required>
+                                <div class="form-feedback" id="nom_utilisateur-feedback"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="mot_de_passe" class="form-label">Mot de passe <span class="required">*</span></label>
+                                <input type="password" id="mot_de_passe" name="mot_de_passe" class="form-input" 
+                                    placeholder="Créez un mot de passe sécurisé" required minlength="8">
+                                <div class="form-feedback" id="mot_de_passe-feedback"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mot_de_passe_confirmation" class="form-label">Confirmer le mot de passe <span class="required">*</span></label>
+                            <input type="password" id="mot_de_passe_confirmation" name="mot_de_passe_confirmation" class="form-input" 
+                                placeholder="Retapez votre mot de passe" required minlength="8">
+                            <div class="form-feedback" id="mot_de_passe_confirmation-feedback"></div>
+                        </div>
+
+                        
+                        <!-- Cases à cocher déplacées ICI, dans la section 6 -->
                         <div class="form-group">
                             <div class="form-check" style="margin-bottom: 15px;">
                                 <input class="form-check-input" type="checkbox" name="accepte" id="accepteCheckbox" required>
                                 <label class="form-check-label" for="accepteCheckbox">
-                                    J'accepte les politiques de confidentialité de la Commulink
+                                    J'accepte les conditions d'utilisation et la politique de confidentialité *
                                 </label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" name="autorise" type="checkbox" id="autoriseCheckbox" required>
                                 <label class="form-check-label" for="autoriseCheckbox">
-                                    J'autorise la communauté UEBT à utiliser ces informations pour de la gestion de la communauté
+                                    J'autorise la communauté UBET à utiliser mes informations pour la bonne gestion de la communauté.
                                 </label>
                             </div>
                         </div>
                     </div>
-
                     
 
                     <!-- Actions du formulaire -->
@@ -803,6 +867,7 @@
         </div>
     </div>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('commulink-form');
@@ -817,11 +882,9 @@
             let currentStep = 1;
             const totalSteps = sections.length;
             
-            // Initialiser le formulaire
             updateProgress();
             updateButtons();
             
-            // Écouter le bouton Suivant
             nextBtn.addEventListener('click', function() {
                 if (validateCurrentSection()) {
                     if (currentStep < totalSteps) {
@@ -833,7 +896,6 @@
                 }
             });
             
-            // Écouter le bouton Retour
             backBtn.addEventListener('click', function() {
                 if (currentStep > 1) {
                     currentStep--;
@@ -843,61 +905,42 @@
                 }
             });
             
-            // Écouter le bouton Annuler
             cancelBtn.addEventListener('click', function(e) {
                 if (!confirm('Êtes-vous sûr de vouloir annuler ? Toutes les données saisies seront perdues.')) {
                     e.preventDefault();
                 }
             });
             
-            // Écouter la soumission du formulaire
+            // FIX PRINCIPAL : Soumission du formulaire
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                if (validateAllSections()) {
-                    // Vérification des champs d'identité (étape 3)
-                    if (!validateIdentiteSection()) {
-                        // Revenir à l'étape 3 si validation échoue
-                        currentStep = 3;
-                        updateProgress();
-                        updateButtons();
-                        showSection(currentStep);
-                        return;
-                    }
-                    
-                    // Désactiver le bouton pendant l'envoi
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<span>Envoi en cours...</span>';
-                    
-                    // Soumettre le formulaire
-                    form.submit();
+                if (!validateAllSections()) {
+                    alert('Veuillez corriger les erreurs dans le formulaire');
+                    return;
                 }
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Envoi en cours...</span>';
+                form.submit();
             });
             
-            // Fonction pour valider la section actuelle
             function validateCurrentSection() {
                 const currentSection = document.getElementById(`section-${currentStep}`);
                 const requiredFields = currentSection.querySelectorAll('[required]');
                 let isValid = true;
                 
-                // Validation spécifique pour l'étape 3 (champs d'identité)
-                if (currentStep === 3) {
-                    if (!validateIdentiteSection()) {
-                        isValid = false;
-                    }
-                }
+                if (currentStep === 2 && !validateEcoleAutre()) isValid = false;
+                if (currentStep === 3 && !validateIdentiteSection()) isValid = false;
+                if (currentStep === 6 && !validatePasswordConfirmation()) isValid = false;
                 
-                // Validation des champs obligatoires
                 requiredFields.forEach(field => {
-                    if (!validateField(field)) {
-                        isValid = false;
-                    }
+                    if (!validateField(field)) isValid = false;
                 });
                 
                 return isValid;
             }
             
-            // Fonction pour valider tous les champs obligatoires
             function validateAllSections() {
                 let allValid = true;
                 
@@ -905,235 +948,215 @@
                     const section = document.getElementById(`section-${i}`);
                     const requiredFields = section.querySelectorAll('[required]');
                     
-                    // Validation spécifique pour l'étape 3
-                    if (i === 3) {
-                        if (!validateIdentiteSection()) {
-                            allValid = false;
-                        }
-                    }
+                    if (i === 2 && !validateEcoleAutre()) allValid = false;
+                    if (i === 3 && !validateIdentiteSection()) allValid = false;
+                    if (i === 6 && !validatePasswordConfirmation()) allValid = false;
                     
-                    // Validation des champs obligatoires
                     requiredFields.forEach(field => {
-                        if (!validateField(field)) {
-                            allValid = false;
-                        }
+                        if (!validateField(field)) allValid = false;
                     });
                 }
                 
                 return allValid;
             }
-            
-            // Fonction pour valider les champs d'identité (étape 3)
-            function validateIdentiteSection() {
-                const identiteFields = [
-                    'ner', 'keri', 'keribour', 'keriBa', 'keribourBa'
-                ];
+
+            function validateEcoleAutre() {
+                const ecole = document.getElementById('ecole').value;
+                const ecoleAutre = document.getElementById('ecole-autre').value;
                 
-                let hasIdentiteValue = false;
-                identiteFields.forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field && field.value.trim()) {
-                        hasIdentiteValue = true;
-                    }
-                });
-                
-                const feedback = document.getElementById('identite-feedback');
-                if (!hasIdentiteValue) {
-                    showFeedback('identite-feedback', '⚠️ Veuillez remplir au moins un des champs d\'identité', 'error');
+                if (ecole === 'Autre' && !ecoleAutre.trim()) {
+                    showFeedback('ecole-autre-feedback', '⚠️ Précisez votre établissement', 'error');
+                    document.getElementById('ecole-autre').classList.add('error');
                     return false;
-                } else {
-                    showFeedback('identite-feedback', '✅ Informations d\'identité validées', 'success');
-                    return true;
                 }
+                if (ecole === 'Autre') {
+                    showFeedback('ecole-autre-feedback', '✅ Validé', 'success');
+                    document.getElementById('ecole-autre').classList.remove('error');
+                }
+                return true;
             }
-            
-            // Fonction pour valider un champ
-            function validateField(field) {
-                const value = field.value.trim();
-                const fieldId = field.id;
-                const feedbackId = fieldId + '-feedback';
-                const feedback = document.getElementById(feedbackId);
+
+            function validatePasswordConfirmation() {
+                const pass = document.getElementById('mot_de_passe').value;
+                const confirm = document.getElementById('mot_de_passe_confirmation').value;
                 
-                if (!field.hasAttribute('required')) {
-                    return true;
-                }
-                
-                if (!value) {
-                    showError(field, feedback, 'Ce champ est obligatoire');
+                if (pass !== confirm) {
+                    showFeedback('mot_de_passe_confirmation-feedback', '⚠️ Mots de passe différents', 'error');
+                    document.getElementById('mot_de_passe_confirmation').classList.add('error');
                     return false;
                 }
-                
-                // Validation spécifique par type de champ
-                switch(field.type) {
-                    case 'email':
-                        if (!isValidEmail(value)) {
-                            showError(field, feedback, 'Veuillez entrer une adresse email valide');
-                            return false;
-                        }
-                        break;
-                        
-                    case 'tel':
-                        if (!isValidPhone(value)) {
-                            showError(field, feedback, 'Veuillez entrer un numéro de téléphone valide');
-                            return false;
-                        }
-                        break;
+                if (confirm) {
+                    showFeedback('mot_de_passe_confirmation-feedback', '✅ Identiques', 'success');
+                    document.getElementById('mot_de_passe_confirmation').classList.remove('error');
                 }
-                
-                // Validation de la longueur minimale
-                if (field.hasAttribute('minlength')) {
-                    const minLength = parseInt(field.getAttribute('minlength'));
-                    if (value.length < minLength) {
-                        showError(field, feedback, `Minimum ${minLength} caractères requis`);
-                        return false;
-                    }
-                }
-                
-                showSuccess(field, feedback);
                 return true;
             }
             
-            // Fonction pour afficher une section
-            function showSection(step) {
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                });
+            function validateIdentiteSection() {
+                const fields = ['ner', 'keri', 'keribour', 'keriBa', 'keribourBa', 'toute_info_sur_identite'];
+                const hasValue = fields.some(id => document.getElementById(id)?.value.trim());
                 
-                const currentSection = document.getElementById(`section-${step}`);
-                if (currentSection) {
-                    currentSection.classList.add('active');
+                if (!hasValue) {
+                    showFeedback('identite-feedback', '⚠️ Remplissez au moins un champ', 'error');
+                    return false;
                 }
-                
-                // Faire défiler vers le haut
-                window.scrollTo({
-                    top: document.querySelector('.form-content').offsetTop - 20,
-                    behavior: 'smooth'
-                });
+                showFeedback('identite-feedback', '✅ Validé', 'success');
+                return true;
             }
             
-            // Fonction pour mettre à jour la progression
+            function validateField(field) {
+        const value = field.value.trim();
+        const feedbackId = field.id + '-feedback';
+        
+        if (!field.hasAttribute('required')) return true;
+        
+        // FIX: Validation pour les radio buttons
+        if (field.type === 'radio') {
+            const radioGroup = document.querySelectorAll(`input[name="${field.name}"]`);
+            const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+            if (!isChecked) {
+                showError(field, document.getElementById('sexe-feedback'), 'Veuillez sélectionner une option');
+                return false;
+            }
+            showSuccess(field, document.getElementById('sexe-feedback'));
+            return true;
+        }
+        
+        // FIX: Validation pour les checkboxes
+        if (field.type === 'checkbox') {
+            if (!field.checked) {
+                showError(field, document.getElementById(feedbackId), 'Cette case doit être cochée');
+                return false;
+            }
+            return true;
+        }
+        
+        if (!value) {
+            showError(field, document.getElementById(feedbackId), 'Champ obligatoire');
+            return false;
+        }
+        
+        if (field.type === 'email' && !isValidEmail(value)) {
+            showError(field, document.getElementById(feedbackId), 'Email invalide');
+            return false;
+        }
+        
+        if (field.hasAttribute('minlength')) {
+            const min = parseInt(field.getAttribute('minlength'));
+            if (value.length < min) {
+                showError(field, document.getElementById(feedbackId), `Min ${min} caractères`);
+                return false;
+            }
+        }
+        
+        showSuccess(field, document.getElementById(feedbackId));
+        return true;
+        }
+
+            function showSection(step) {
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(`section-${step}`)?.classList.add('active');
+                window.scrollTo({top: document.querySelector('.form-content').offsetTop - 20, behavior: 'smooth'});
+            }
+            
             function updateProgress() {
-                progressSteps.forEach((step, index) => {
-                    const stepNumber = parseInt(step.dataset.step);
-                    
+                progressSteps.forEach(step => {
+                    const num = parseInt(step.dataset.step);
                     step.classList.remove('active', 'completed');
-                    
-                    if (stepNumber < currentStep) {
-                        step.classList.add('completed');
-                    } else if (stepNumber === currentStep) {
-                        step.classList.add('active');
-                    }
+                    if (num < currentStep) step.classList.add('completed');
+                    else if (num === currentStep) step.classList.add('active');
                 });
                 
-                progressLines.forEach((line, index) => {
+                progressLines.forEach((line, i) => {
                     line.classList.remove('active', 'completed');
-                    
-                    if (index + 1 < currentStep) {
-                        line.classList.add('completed');
-                    } else if (index + 1 === currentStep) {
-                        line.classList.add('active');
-                    }
+                    if (i + 1 < currentStep) line.classList.add('completed');
+                    else if (i + 1 === currentStep) line.classList.add('active');
                 });
             }
             
-            // Fonction pour mettre à jour les boutons
             function updateButtons() {
                 backBtn.style.display = currentStep > 1 ? 'flex' : 'none';
-                
-                if (currentStep === totalSteps) {
-                    nextBtn.style.display = 'none';
-                    submitBtn.style.display = 'flex';
-                } else {
-                    nextBtn.style.display = 'flex';
-                    submitBtn.style.display = 'none';
-                }
+                nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
+                submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
             }
             
-            // Fonctions utilitaires
-            function showError(field, feedback, message) {
+            function showError(field, feedback, msg) {
                 if (feedback) {
-                    feedback.textContent = message;
+                    feedback.textContent = msg;
                     feedback.className = 'form-feedback show error';
                     field.classList.add('error');
-                    field.classList.remove('valid-pulse');
                 }
             }
             
             function showSuccess(field, feedback) {
                 if (feedback) {
-                    feedback.textContent = '✓ Champ valide';
+                    feedback.textContent = '✓ Valide';
                     feedback.className = 'form-feedback show success';
                     field.classList.remove('error');
-                    field.classList.add('valid-pulse');
-                    
-                    setTimeout(() => {
-                        field.classList.remove('valid-pulse');
-                    }, 300);
                 }
             }
             
-            function showFeedback(elementId, message, type) {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.textContent = message;
-                    element.className = 'form-feedback show ' + type;
+            function showFeedback(id, msg, type) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = msg;
+                    el.className = 'form-feedback show ' + type;
                 }
             }
             
             function isValidEmail(email) {
-                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return re.test(email);
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
             }
             
-            function isValidPhone(phone) {
-                // Accepte les numéros internationaux avec +, les espaces, tirets, parenthèses
-                const re = /^[\d\s\-\+\(\)]{8,}$/;
-                return re.test(phone);
+            // Toggle école "Autre"
+            const ecoleSelect = document.getElementById('ecole');
+            const ecoleAutreContainer = document.getElementById('ecole-autre-container');
+            const ecoleAutreInput = document.getElementById('ecole-autre');
+            
+            function toggleEcoleAutre() {
+                if (ecoleSelect.value === 'Autre') {
+                    ecoleAutreContainer.style.display = 'block';
+                    ecoleAutreInput.required = true;
+                } else {
+                    ecoleAutreContainer.style.display = 'none';
+                    ecoleAutreInput.required = false;
+                    ecoleAutreInput.value = '';
+                }
             }
             
-            // Écouter les changements sur les champs pour validation en temps réel
+            toggleEcoleAutre();
+            ecoleSelect.addEventListener('change', toggleEcoleAutre);
+            
+            // Validation en temps réel
             form.addEventListener('input', function(e) {
-                if (e.target.hasAttribute('required')) {
-                    validateField(e.target);
-                }
+                if (e.target.hasAttribute('required')) validateField(e.target);
             });
             
-            // Écouter les changements sur les champs d'identité
-            const identiteFields = ['ner', 'keri', 'keribour', 'keriBa', 'keribourBa'];
-            identiteFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener('input', function() {
-                        validateIdentiteSection();
-                    });
-                }
+            ['ner', 'keri', 'keribour', 'keriBa', 'keribourBa', 'toute_info_sur_identite'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', validateIdentiteSection);
             });
             
-            // Prévisualisation de la photo
-            const photoInput = document.getElementById('photo');
-            if (photoInput) {
-                photoInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        // Vérification de la taille (max 5MB)
-                        if (file.size > 5 * 1024 * 1024) {
-                            alert('La photo est trop volumineuse. Taille maximale: 5MB');
-                            photoInput.value = '';
-                            return;
-                        }
-                        
-                        // Vérification du type
-                        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                        if (!validTypes.includes(file.type)) {
-                            alert('Format de fichier non supporté. Utilisez JPG, PNG ou GIF.');
-                            photoInput.value = '';
-                            return;
-                        }
+            ecoleSelect?.addEventListener('change', validateEcoleAutre);
+            ecoleAutreInput?.addEventListener('input', validateEcoleAutre);
+            document.getElementById('mot_de_passe')?.addEventListener('input', validatePasswordConfirmation);
+            document.getElementById('mot_de_passe_confirmation')?.addEventListener('input', validatePasswordConfirmation);
+            
+            // Photo
+            document.getElementById('photo')?.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Photo trop volumineuse (max 5MB)');
+                        this.value = '';
+                    } else if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+                        alert('Format non supporté (JPG, PNG, GIF)');
+                        this.value = '';
                     }
-                });
-            }
+                }
+            });
         });
     </script>
+
 </body>
 </html>
 

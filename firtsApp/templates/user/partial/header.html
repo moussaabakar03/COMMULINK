@@ -12,7 +12,7 @@
         color: #FF6F0F;
     }
 </style>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <!-- Navbar Start -->
 <div class="container-fluid fixed-top px-0 wow fadeIn headerNav" data-wow-delay="0.1s">
     <div class="top-bar text-white-50 row gx-0 align-items-center d-none d-lg-flex header">
@@ -39,9 +39,9 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="{% url 'index' %}" class="nav-item nav-link active">Accueil</a>
-                {% if request.user.role == "membreEquipe" or request.user.is_superuser %}
+                {% comment %} {% if request.user.role == "membreEquipe" or request.user.is_superuser %}
                     <a href="{% url 'admin_dashboard' %}" class="nav-item nav-link">Dashbord</a>
-                {% endif %}
+                {% endif %} {% endcomment %}
                 <a href="{% url 'about' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">A propos</a>
                 <a href="{% url 'liste_evenements' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'liste_evenements' %}active{% endif %}">Evenements</a>
                 
@@ -67,11 +67,15 @@
                 <!-- Boutons d'authentification pour mobile (dans le menu collapsed) -->
                 <div class="d-lg-none mt-3">
                     {% if user.is_authenticated %}
-
                         {% if user.role == "membreLambda" %}
                             <a href="{% url 'profil_membre' %}" class="nav-item nav-link">
                                 <i class="fas fa-user me-2"></i>{{ user.nom|default:user.username }}
                             </a>
+                        {% endif %}
+
+                       
+                        {% if request.user.role == "membreEquipe" or request.user.is_superuser %}
+                            <a href="{% url 'admin_dashboard' %}" class="nav-item nav-link" style=" color:#001D23;"><i class="bi bi-speedometer2" style="font-size:18px;"></i>Dashbord</a>
                         {% endif %}
 
                         <a href="{% url 'deconnexion' %}" class="nav-item nav-link text-danger">
@@ -101,7 +105,12 @@
                     {% if user.role == "membreLambda" %}
                         <li><a class="dropdown-item" href="{% url 'profil_membre' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
                     {% endif %}
+                    {% if request.user.role == "membreEquipe" or request.user.is_superuser %}
+                        <a href="{% url 'admin_dashboard' %}" class="nav-item nav-link" style=" color:#001D23;"><i class="bi bi-speedometer2" style="font-size:18px;"></i>Dashbord</a>
+                    {% endif %}
+
                     <li><hr class="dropdown-divider"></li>
+
                     <li><a class="dropdown-item text-danger" href="{% url 'deconnexion' %}"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</a></li>
                 </ul>
             </div>

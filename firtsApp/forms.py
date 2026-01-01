@@ -52,21 +52,22 @@ class MembreInscriptionForm(forms.ModelForm):
         model = Membre
         fields = [
             'nom', 'prenom', 'sexe', 'email', 'telephone',
-            'profession', 'niveauEtude', 'ecole', 'filiere',
+            'niveauEtude', 'ecole', 'filiere',
             'numeroUrgence', 'ner', 'keri', 'keribour', 
-            'keriBa', 'keribourBa', 'adresse', 'photo', 'notes'
+            'keriBa', 'keribourBa', 'adresse', 'photo', 'notes',
+            'nom_utilisateur', 'mot_de_passe',
         ]
         
         widgets = {
             'nom': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'Votre nom de famille',
-                'maxlength': 50,
+                'maxlength': 150,
             }),
             'prenom': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'Votre prénom',
-                'maxlength': 50,
+                'maxlength': 150,
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-input',
@@ -79,11 +80,6 @@ class MembreInscriptionForm(forms.ModelForm):
             }),
             'sexe': forms.RadioSelect(attrs={
                 'class': 'radio-input'
-            }),
-            'profession': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'Votre profession actuelle',
-                'maxlength': 50,
             }),
             'niveauEtude': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -154,7 +150,8 @@ class MembreInscriptionForm(forms.ModelForm):
         self.fields['prenom'].required = True
         self.fields['email'].required = True
         self.fields['sexe'].required = True
-        self.fields['profession'].required = True
+        self.fields['nom_utilisateur'].required = True
+        self.fields['mot_de_passe'].required = True
         
         # Champs optionnels
         optional_fields = [
@@ -208,7 +205,6 @@ class MembreModificationForm(MembreForm):
                 'email': instance.email,
                 'telephone': instance.telephone or '',
                 'adresse': instance.adresse or '',
-                'profession': instance.profession,
                 'numeroUrgence': instance.numeroUrgence or '',
                 'niveauEtude': instance.niveauEtude or '',
                 'ecole': instance.ecole or '',
@@ -269,7 +265,7 @@ class MembreModificationForm(MembreForm):
 
     # Informations personnelles
     nom = forms.CharField(
-        max_length=50,
+        max_length=150,
         validators=[MinLengthValidator(2, "Le nom doit contenir au moins 2 caractères")],
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -280,7 +276,7 @@ class MembreModificationForm(MembreForm):
     )
     
     prenom = forms.CharField(
-        max_length=50,
+        max_length=150,
         validators=[MinLengthValidator(2, "Le prénom doit contenir au moins 2 caractères")],
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -339,15 +335,6 @@ class MembreModificationForm(MembreForm):
     )
     
     # Informations professionnelles/scolaires
-    profession = forms.CharField(
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Votre profession ou occupation',
-            'id': 'profession'
-        }),
-        label="Profession *"
-    )
     
     niveauEtude = forms.ChoiceField(
         choices=NIVEAU_ETUDE_CHOICES,
@@ -390,7 +377,7 @@ class MembreModificationForm(MembreForm):
     
     # Informations sur l'identité culturelle
     ner = forms.CharField(
-        max_length=50,
+        max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -401,7 +388,7 @@ class MembreModificationForm(MembreForm):
     )
     
     keri = forms.CharField(
-        max_length=50,
+        max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -412,7 +399,7 @@ class MembreModificationForm(MembreForm):
     )
     
     keribour = forms.CharField(
-        max_length=50,
+        max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -423,7 +410,7 @@ class MembreModificationForm(MembreForm):
     )
     
     keriBa = forms.CharField(
-        max_length=50,
+        max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -434,7 +421,7 @@ class MembreModificationForm(MembreForm):
     )
     
     keribourBa = forms.CharField(
-        max_length=50,
+        max_length=150,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
@@ -477,7 +464,6 @@ class MembreModificationForm(MembreForm):
     )
 
     def clean_email(self):
-        """Vérifie que l'email n'est pas déjà utilisé"""
         email = self.cleaned_data.get('email')
         if Membre.objects.filter(email=email).exists():
             raise forms.ValidationError("Cette adresse email est déjà utilisée par un autre membre.")
@@ -513,7 +499,6 @@ class MembreModificationForm(MembreForm):
             email=self.cleaned_data['email'],
             telephone=self.cleaned_data.get('telephone', ''),
             adresse=self.cleaned_data.get('adresse', ''),
-            profession=self.cleaned_data['profession'],
             numeroUrgence=self.cleaned_data.get('numeroUrgence', ''),
             niveauEtude=self.cleaned_data.get('niveauEtude', ''),
             ecole=self.cleaned_data.get('ecole', ''),
@@ -554,7 +539,6 @@ class MembreModificationForm(MembreInscriptionForm):
                 'email': instance.email,
                 'telephone': instance.telephone or '',
                 'adresse': instance.adresse or '',
-                'profession': instance.profession,
                 'numeroUrgence': instance.numeroUrgence or '',
                 'niveauEtude': instance.niveauEtude or '',
                 'ecole': instance.ecole or '',
@@ -592,7 +576,6 @@ class MembreModificationForm(MembreInscriptionForm):
         self.instance.email = self.cleaned_data['email']
         self.instance.telephone = self.cleaned_data.get('telephone', '')
         self.instance.adresse = self.cleaned_data.get('adresse', '')
-        self.instance.profession = self.cleaned_data['profession']
         self.instance.numeroUrgence = self.cleaned_data.get('numeroUrgence', '')
         self.instance.niveauEtude = self.cleaned_data.get('niveauEtude', '')
         self.instance.ecole = self.cleaned_data.get('ecole', '')

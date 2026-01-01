@@ -96,4 +96,11 @@ urlpatterns = [
     path('reinscriptionUser/', views.reinscriptionUser, name='reinscriptionUser'),
     
 
+
+    
+    #------------------------------URLS RAPPORT-------------------------------------
+    path('evenements/rapports/', views.liste_rapports_evenement, name='liste_rapports_evenement'),
+    path('evenements/<int:pk>/rapport/', views.rapport_evenement_form, name='rapport_evenement_form'),
+    path('evenements/<int:pk>/rapport/pdf/', views.rapport_evenement_pdf, name='rapport_evenement_pdf'),
+
 ]

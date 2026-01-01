@@ -169,7 +169,33 @@
                         </div>
                     </div>
                 </div>
-                
+
+                <div class="info-section">
+                    <h2 class="section-title">
+                        {% comment %} <i class="fas fa-briefcase"></i> {% endcomment %}
+                        Identifiants
+                    </h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                Nom utilisateur
+                            </div>
+                            <div class="info-value {% if not membre.nom_utilisateur %}empty{% endif %}">
+                                {{ membre.nom_utilisateur|default:"Non renseigné" }}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                Mot de passe
+                            </div>
+                            <div class="info-value {% if not membre.mot_de_passe %}empty{% endif %}">
+                                {{ membre.mot_de_passe|default:"Non renseigné" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Documents -->
                 <div class="info-section">
                     <h2 class="section-title">

@@ -7,12 +7,46 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 
 from django.core.validators import FileExtensionValidator
 
+from django.contrib.auth.models import BaseUserManager
+
+class UtilisateurManager(BaseUserManager):
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        if not username:
+            raise ValueError("Le nom d'utilisateur est obligatoire")
+
+        email = self.normalize_email(email)
+        user = self.model(
+            username=username,
+            email=email,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'membreEquipe')
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Le superuser doit avoir is_staff=True.')
+
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Le superuser doit avoir is_superuser=True.')
+
+        return self.create_user(username, email, password, **extra_fields)
+
 
 class Utilisateur(AbstractUser):
     ROLES = [  
         ("membreLambda", "Membre Lambda"),
         ("membreEquipe", "Membre de l'équipe")  
     ]
+    
+    objects = UtilisateurManager()
+
     
     groups = models.ManyToManyField( 
         Group, 
@@ -33,7 +67,7 @@ class Utilisateur(AbstractUser):
     role = models.CharField(
         max_length=20, 
         choices=ROLES,
-        default="membreLambda",  # Valeur par défaut
+        default="membreLambda",  
         verbose_name="Rôle"
     )
 
@@ -58,6 +92,8 @@ class Annee(models.Model):
         # Format plus lisible pour l'affichage dans les filtres
         return f"{self.debutAnnee.year}-{self.finAnnee.year}"
     
+    
+    
 class Membre(models.Model):
     GENRE_CHOICES = [
         ('M', 'Masculin'),
@@ -75,6 +111,8 @@ class Membre(models.Model):
 
     utilisateur = models.OneToOneField(Utilisateur, on_delete=models.CASCADE, null=True, blank=True, related_name="membre")
 
+    nom_utilisateur = models.CharField(blank=True, null=False)
+    mot_de_passe = models.CharField(blank=True, null=False)
     # Informations de base
     nom = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
     prenom = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
@@ -88,7 +126,6 @@ class Membre(models.Model):
     
     # Adresse
     adresse = models.TextField(blank=True, null=True, unique=False)
-    profession = models.CharField(max_length=50)
     numeroUrgence = models.CharField(max_length=20, blank=True, null=True)
     niveauEtude = models.CharField(max_length=20, blank=True, null=True)
     ecole = models.CharField(max_length=20, blank=True, null=True)
@@ -132,6 +169,8 @@ class Membre(models.Model):
     keribour = models.CharField(max_length=20, blank=True, null=True)
     keriBa = models.CharField(max_length=20, blank=True, null=True)
     keribourBa = models.CharField(max_length=20, blank=True, null=True)
+    
+    toute_info_sur_identite = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.nom} {self.prenom}- *{self.ner}. {self.keri}*"
@@ -159,6 +198,8 @@ class Membre(models.Model):
         return self.statut == 'en_attente'
 
 
+
+
 #--------------------ANNONCES ET PAYEMENTS--------------------------------
 class Annonce(models.Model):
     titre = models.CharField(max_length=200)
@@ -181,6 +222,8 @@ class TypeEvenement(models.Model):
     
     def __str__(self):
         return self.nom_type_evenement
+    
+    
     
 class Evenement(models.Model):
     
@@ -362,6 +405,89 @@ class Paiement(models.Model):
 
     def __str__(self):
         return f"{self.membre} - {self.evenement} - {self.statut}"
+    
+    
+    
+
+#=========================RAPPORT====================================
+class RapportEvenement(models.Model):
+    evenement = models.OneToOneField(
+        Evenement,
+        on_delete=models.CASCADE,
+        related_name='rapport',
+        verbose_name="Évènement"
+    )
+    auteur = models.ForeignKey(
+        Utilisateur,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='rapports_evenement',
+        verbose_name="Rédigé par"
+    )
+    titre = models.CharField(
+        max_length=200,
+        default="Rapport d'évènement",
+        verbose_name="Titre du rapport"
+    )
+    resume = models.TextField(
+        verbose_name="Résumé général",
+        help_text="Bref résumé de l'évènement et de ses objectifs."
+    )
+    objectifs = models.TextField(
+        blank=True, null=True,
+        verbose_name="Objectifs",
+        help_text="Objectifs principaux de l'évènement."
+    )
+    deroulement = models.TextField(
+        blank=True, null=True,
+        verbose_name="Déroulement",
+        help_text="Décrire les grandes étapes du déroulement."
+    )
+    points_positifs = models.TextField(
+        blank=True, null=True,
+        verbose_name="Points positifs",
+        help_text="Ce qui a bien fonctionné."
+    )
+    points_a_ameliorer = models.TextField(
+        blank=True, null=True,
+        verbose_name="Points à améliorer"
+    )
+    recommandations = models.TextField(
+        blank=True, null=True,
+        verbose_name="Recommandations pour les prochains bureaux",
+        help_text="Conseils, idées, bonnes pratiques à retenir."
+    )
+    nb_participants = models.PositiveIntegerField(
+        null=True, blank=True,
+        verbose_name="Nombre de participants"
+    )
+    budget_prevu = models.DecimalField(
+        max_digits=10, decimal_places=2,
+        null=True, blank=True,
+        verbose_name="Budget prévu"
+    )
+    budget_depense = models.DecimalField(
+        max_digits=10, decimal_places=2,
+        null=True, blank=True,
+        verbose_name="Budget dépensé"
+    )
+    date_rapport = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Date de création du rapport"
+    )
+    derniere_modif = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Dernière modification"
+    )
+
+    class Meta:
+        verbose_name = "Rapport d'évènement"
+        verbose_name_plural = "Rapports d'évènements"
+        ordering = ['-date_rapport']
+
+    def __str__(self):
+        return f"Rapport - {self.evenement.titre}"
     
     
     
